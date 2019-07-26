@@ -1,0 +1,27 @@
+{
+  "name": "aufagbe13_niers_stenkamp_jakuschona",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NJaku01/Aufgabe13_Niers_Stenkamp_Jakuschona.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NJaku01/Aufgabe13_Niers_Stenkamp_Jakuschona/issues"
+  },
+  "homepage": "https://github.com/NJaku01/Aufgabe13_Niers_Stenkamp_Jakuschona#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongodb": "^3.3.0-beta2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  }
+}
