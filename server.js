@@ -75,7 +75,7 @@ app.post("/item/create", (req, res) => {
         if (error) {
             console.dir(error);
         }
-        res.json(result);
+        res.redirect('/routes_editor.html');
     });
 });
 
@@ -89,7 +89,7 @@ app.post("/item/update", (req, res) => {
         if (error) {
             console.dir(error);
         }
-        res.json(result);
+        res.redirect('/routes_editor.html');
     });
 });
 
@@ -101,9 +101,9 @@ app.post("/item/delete", (req, res) => {
         if (error) {
             console.dir(error);
         }
-        res.json(result);
+        res.redirect('/routes_editor.html');
     });
-    res.redirect("/");
+
 });
 
 process.on("SIGTERM", () => {
