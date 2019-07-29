@@ -9,15 +9,18 @@ var json; // array with the result from the request to the openweathermap API
  * @param {array} coordinate Array which contains to numbers for the coordinates
  */
 function Request1() {
+
     $.ajax({
         url: 'https://www.movebank.org/movebank/service/public/json?&study_id=2911040&individual_local_identifiers[]=4262-84830876&max_events_per_individual=5&sensor_type=gps', // URL der Abfrage,
         //contentType: "application/json"
+        dataType: "jsonp"
     })
         .done(function (response) {
             console.log(json);
             json = response;
             //$("#content").text(JSON.stringify(response, null, 4));
             console.log("done");
+            console.log(json);
         })
 
         .fail(function (xhr, status, errorThrown) {
@@ -27,11 +30,7 @@ function Request1() {
 
 
 
-        /*
-         with always the next function which is called is startApplication(). The function startApplicationWithMongodb()
-         is an asynchronous function because its an ajax call. The functions which are named below always are only
-         (erst) called if the ajax request is done.
-         */
+
         .always(function (xhr, status) {
             show();
         });
