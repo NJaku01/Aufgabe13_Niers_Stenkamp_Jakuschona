@@ -1,7 +1,6 @@
 {
   "name": "aufagbe13_niers_stenkamp_jakuschona",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -18,13 +17,18 @@
   },
   "homepage": "https://github.com/NJaku01/Aufgabe13_Niers_Stenkamp_Jakuschona#readme",
   "dependencies": {
+    "bootstrap": "^4.3.1",
     "express": "^4.17.1",
+    "jquery": "^3.4.1",
     "leaflet": "^1.5.1",
     "leaflet-control-geocoder": "^1.8.3",
     "leaflet-routing-machine": "^3.2.12",
-    "mongodb": "^3.3.0-beta2"
+    "min-jquery": "^1.7.0",
+    "mongodb": "^3.3.0-beta2",
+    "pub-pkg-bootstrap-min": "^4.2.1"
   },
   "devDependencies": {
     "nodemon": "^1.19.1"
-  }
+  },
+  "description": ""
 }
