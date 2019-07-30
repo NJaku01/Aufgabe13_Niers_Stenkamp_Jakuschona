@@ -165,5 +165,5 @@ process.on("SIGINT", () => {
 });
 
 app.listen(3000, function () {
-    console.log('App listening on localhost!');
+    console.log('App listening on port 3000!');
 });
