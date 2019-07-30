@@ -58,7 +58,7 @@ app.use("/leaflet-routing-machine", express.static(__dirname + "/node_modules/le
 app.use("@turf/line-intersect", express.static(__dirname + "node_modules/@turf/line-intersect"));
 app.use("/pub-pkg-bootstrap-min", express.static(__dirname + "/node_modules/pub-pkg-bootstrap-min"));
 app.use("/jquery", express.static(__dirname + "/node_modules/jquery/dist"));
-
+app.use("/turf.js", express.static(__dirname + "/turf.js"))
 
 
 app.get("/item", (req, res) => {

@@ -16,6 +16,54 @@ var mongodbJSON;
 var routes = [];
 var routesFeature = L.featureGroup();
 
+var line1 = {
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        7.492675781249999,
+                        51.60437164681676
+                    ],
+                    [
+                        8.37158203125,
+                        51.05520733858494
+                    ]
+                ]
+            }
+        }
+    ]
+}
+var line2 ={
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        7.18505859375,
+                        51.45400691005982
+                    ],
+                    [
+                        8.50341796875,
+                        51.699799849741936
+                    ]
+                ]
+            }
+        }
+    ]
+}
+console.log(turf);
+var intersect = turf.lineIntersect(line1,line2);
+console.log(intersect);
+
 
 function getFiles() {
     $.ajax({
