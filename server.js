@@ -56,6 +56,10 @@ app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use("/leaflet-control-geocoder", express.static(__dirname + "/node_modules/leaflet-control-geocoder/dist"));
 app.use("/leaflet-routing-machine", express.static(__dirname + "/node_modules/leaflet-routing-machine/dist"));
 app.use("@turf/line-intersect", express.static(__dirname + "node_modules/@turf/line-intersect"));
+app.use("/pub-pkg-bootstrap-min", express.static(__dirname + "/node_modules/pub-pkg-bootstrap-min"));
+app.use("/jquery", express.static(__dirname + "/node_modules/jquery/dist"));
+
+
 
 app.get("/item", (req, res) => {
     // find all
