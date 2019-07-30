@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/NJaku01/Aufgabe13_Niers_Stenkamp_Jakuschona#readme",
   "dependencies": {
+    "@turf/line-intersect": "^6.0.2",
     "express": "^4.17.1",
     "leaflet": "^1.5.1",
     "leaflet-control-geocoder": "^1.8.3",

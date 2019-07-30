@@ -55,7 +55,7 @@ app.use(express.urlencoded({extended: false}));
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use("/leaflet-control-geocoder", express.static(__dirname + "/node_modules/leaflet-control-geocoder/dist"));
 app.use("/leaflet-routing-machine", express.static(__dirname + "/node_modules/leaflet-routing-machine/dist"));
-
+app.use("@turf/line-intersect", express.static(__dirname + "node_modules/@turf/line-intersect"));
 
 app.get("/item", (req, res) => {
     // find all
