@@ -2,8 +2,11 @@
 
 const express = require('express');
 const app = express();
-var server = require('http').createServer(app);
+
 var https = require("https");
+
+var server = require('http').createServer(app);
+
 
 const mongodb = require('mongodb');
 
@@ -108,7 +111,6 @@ app.post("/item/delete", (req, res) => {
         }
         res.redirect('/routes_editor.html');
     });
-
 });
 
 
@@ -150,6 +152,7 @@ app.get("/movebank", (req, res) => {
 });
 
 
+
 process.on("SIGTERM", () => {
     server.close();
     app.locals.dbConnection.close();
@@ -167,3 +170,4 @@ process.on("SIGINT", () => {
 app.listen(3000, function () {
     console.log('App listening on port 3000!');
 });
+
