@@ -3,6 +3,7 @@
 const express = require('express');
 const app = express();
 var server = require('http').createServer(app);
+var https = require("https");
 
 const mongodb = require('mongodb');
 
@@ -46,6 +47,7 @@ connectMongoDb();
 // const dirname="C:/Users/nick1/OneDrive - uni-muenster.de/UNI/Geosoftware/Aufgabe_07_Jakuschona";
 
 app.use(express.static(__dirname + '/Public'));
+app.use(express.static(__dirname + '/private'));
 app.use(express.json());
 
 // middleware for handling urlencoded request data
@@ -108,6 +110,45 @@ app.post("/item/delete", (req, res) => {
     });
 
 });
+
+
+var login = require(__dirname + "/private/token.js").token.MOVEBANK_login;
+var password = require(__dirname + "/private/token.js").token.MOVEBANK_password;
+
+var movebankEndpoint = "https://www.movebank.org/movebank/service/json-auth?study_id=16880941&individual_local_identifiers[]=Mary&individual_local_identifiers[]=Butterball&individual_local_identifiers[]=Schaumboch&&max_events_per_individual=2000&sensor_type=gps";
+
+const options = {
+    headers: {
+        'Authorization':'Basic ' + Buffer.from(login+':'+password).toString('base64')
+    }
+};
+
+app.get("/movebank", (req, res) => {
+
+    https.get(movebankEndpoint, options, (httpResponse) => {
+        // concatenate updates from datastream
+        console.log(movebankEndpoint);
+        var body = "";
+        httpResponse.on("data", (chunk) => {
+            body += chunk;
+        });
+
+        httpResponse.on("end", () => {
+            var weather = JSON.parse(body);
+            console.log(weather);
+
+            res.json(weather);
+
+        });
+
+        httpResponse.on("error", (error) => {
+            throw error;
+        });
+
+    });
+
+});
+
 
 process.on("SIGTERM", () => {
     server.close();

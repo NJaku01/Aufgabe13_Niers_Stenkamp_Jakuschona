@@ -26,6 +26,8 @@ function getFiles() {
         .done(function (response) {
             // parse + use data here
             mongodbJSON = response;
+            var routes = transformLinesIntoArray(mongodbJSON);
+            addMap(routes);
             console.log(mongodbJSON);
             console.log(JSON.stringify(response, null, 4));
         })
@@ -33,11 +35,11 @@ function getFiles() {
             // handle errors
         })
         .always(function (xhr, status) {
-            if (mongodbJSON.length == 0) {
+
+            if (response.length == 0) {
                 alert("no routes in database");
             }
-            var routes = transformLinesIntoArray(mongodbJSON);
-            addMap(routes);
+
         });
 
 }
@@ -130,7 +132,16 @@ function transformLinesIntoArray(text) {
 
     return linesArray;
 
-
 }
+
+
+var resource = "movebank";
+
+$.get(resource, function(response, status, x){
+    let formatted_response = JSON.stringify(response,null,4);
+    $("#movebankJson").text(formatted_response);
+    console.log(formatted_response);
+
+});
 
 
