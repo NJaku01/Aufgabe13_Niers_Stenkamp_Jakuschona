@@ -62,12 +62,14 @@ app.use("/leaflet-control-geocoder", express.static(__dirname + "/node_modules/l
 app.use("/leaflet-routing-machine", express.static(__dirname + "/node_modules/leaflet-routing-machine/dist"));
 app.use("/pub-pkg-bootstrap-min", express.static(__dirname + "/node_modules/pub-pkg-bootstrap-min"));
 app.use("/jquery", express.static(__dirname + "/node_modules/jquery/dist"));
-app.use("/turf.js", express.static(__dirname + "/turf.js"))
+app.use("/turf", express.static(__dirname + "/node_modules/@turf/turf"));
+app.use("/token.js", express.static(__dirname + "/private/token.js"))
 
 
-app.get("/item", (req, res) => {
+app.post("/item", (req, res) => {
     // find all
-    app.locals.db.collection('item').find({}).toArray((error, result) => {
+    console.log(req.body.collection);
+    app.locals.db.collection(req.body.collection).find({}).toArray((error, result) => {
         if (error) {
             console.dir(error);
         }
@@ -78,8 +80,7 @@ app.get("/item", (req, res) => {
 
 app.post("/item/create", (req, res) => {
     // insert item
-    console.log("insert item ");
-    app.locals.db.collection('item').insertOne(req.body, (error, result) => {
+    app.locals.db.collection(req.body.collection).insertOne(req.body, (error, result) => {
         if (error) {
             console.dir(error);
         }
@@ -92,7 +93,7 @@ app.post("/item/update", (req, res) => {
     console.log("update item " + req.body._id);
     let id = req.body._id;
     delete req.body._id;
-    console.log(req.body); // => { name:req.body.name, description:req.body.description }
+    console.log(req.body);// => { name:req.body.name, description:req.body.description }
     app.locals.db.collection('item').updateOne({_id: new mongodb.ObjectID(id)}, {$set: req.body}, (error, result) => {
         if (error) {
             console.dir(error);
