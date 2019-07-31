@@ -91,6 +91,28 @@ function showFiles() {
 
         });
 
+    //insertItem({foo: "bar"})
+}
+
+function insertItem(data){
+
+$.ajax({
+    url: "/item/create", // URL der Abfrage,
+    data: data,
+    type: "POST"
+})
+    .done(function (response) {
+        // parse + use data here
+        console.log("inerst data" +data);
+    })
+    .fail(function (xhr, status, errorThrown) {
+        // handle errors
+    })
+    .always(function (xhr, status) {
+
+
+    });
+
 }
 
 /**

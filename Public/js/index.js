@@ -61,7 +61,7 @@ var line2 ={
     ]
 }
 console.log(turf);
-var intersect = turf.lineIntersect(line1,line2);
+var intersect = turf.lineOverlap(line1,line2);
 console.log(intersect);
 
 
