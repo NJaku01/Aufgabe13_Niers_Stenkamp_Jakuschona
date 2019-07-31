@@ -133,8 +133,8 @@ console.log(calculateIntersect(line1test, lines));
 function getFiles() {
     $.ajax({
         url: "/item", // URL der Abfrage,
-        //data: {foo: "bar"},
-        type: "GET"
+        data: {collection: "userRoutes"},
+        type: "POST"
     })
         .done(function (response) {
             // parse + use data here
