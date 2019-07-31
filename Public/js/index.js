@@ -19,7 +19,10 @@ var mongodbJSON;
 var routes = [];
 var routesFeature = L.featureGroup();
 
-var line1 = {
+
+// Testroute
+var line1test = {
+    "_id":"5d41a216205cf30395e99b8221",
     "type": "FeatureCollection",
     "features": [
         {
@@ -41,7 +44,11 @@ var line1 = {
         }
     ]
 }
-var line2 ={
+// console.log(line1test.type);
+
+// Testroute
+var line2test = {
+    "_id":"5d41a216205cf30395e99b8a22",
     "type": "FeatureCollection",
     "features": [
         {
@@ -63,16 +70,74 @@ var line2 ={
         }
     ]
 }
-console.log(turf);
-var intersect = turf.lineIntersect(line1,line2);
-console.log(intersect);
+
+// Testroute
+var line3test = {
+    "_id":"5d41a216205cf30395e99b8123",
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        8.33587646484375,
+                        51.47796179607121
+                    ],
+                    [
+                        7.87994384765625,
+                        51.037939894299356
+                    ]
+                ]
+            }
+        }
+    ]
+}
+
+// Test AllRoutes
+var lines = [];
+lines.push(line2test, line3test);
+console.log(lines);
+console.log(line1test);
+console.log(line1test._id);
+console.log(turf.lineIntersect(line1test, line2test));
+
+// console.log(turf);
+//console.log(intersect);
+/**
+ * function which takes one new inputRoute and compares this one with all other routes in allRoutes if they intersect.
+ * function returns all given intersections.
+ * @param inputRoute
+ * @param allRoutes
+ * @returns {Array}
+ */
+function calculateIntersect(inputRoute, allRoutes) {
+    var intersectAll=[];
+
+    for (var j=0; j<allRoutes.length; j++) {
+                var intersect = turf.lineIntersect(inputRoute, allRoutes[j]);
+                intersectAll.push(intersect);
+        }
+
+    for (var i=0; i<intersectAll.length; i++) {
+        if (intersectAll[i].features.length == 0) {
+            intersectAll.splice(i, 1);
+        }
+    }
+    return intersectAll;
+}
+
+console.log(calculateIntersect(line1test, lines));
+
 
 
 function getFiles() {
     $.ajax({
         url: "/item", // URL der Abfrage,
-        //data: {foo: "bar"},
-        type: "GET"
+        data: {collection: "userRoutes"},
+        type: "POST"
     })
         .done(function (response) {
             // parse + use data here

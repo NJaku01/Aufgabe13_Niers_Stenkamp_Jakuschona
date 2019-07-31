@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/NJaku01/Aufgabe13_Niers_Stenkamp_Jakuschona#readme",
   "dependencies": {
+    "@turf/turf": "^5.1.6",
     "bootstrap": "^4.3.1",
     "express": "^4.17.1",
     "jquery": "^3.4.1",
