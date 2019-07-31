@@ -70,11 +70,11 @@ function events() {
  * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
  * @author Nick Jakuschona n_jaku01@wwu.de
  */
-function showFiles() {
+function showFiles(collection) {
     $.ajax({
         url: "/item", // URL der Abfrage,
-        //data: {foo: "bar"},
-        type: "GET"
+        data: {collection: collection},
+        type: "POST"
     })
         .done(function (response) {
             // parse + use data here
@@ -91,7 +91,6 @@ function showFiles() {
 
         });
 
-    //insertItem({foo: "bar"})
 }
 
 function insertItem(data){
