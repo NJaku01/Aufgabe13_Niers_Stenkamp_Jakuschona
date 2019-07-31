@@ -80,6 +80,8 @@ app.post("/item", (req, res) => {
 
 app.post("/item/create", (req, res) => {
     // insert item
+    console.log(req.body.collection);
+    console.log(req.body);
     app.locals.db.collection(req.body.collection).insertOne(req.body, (error, result) => {
         if (error) {
             console.dir(error);
