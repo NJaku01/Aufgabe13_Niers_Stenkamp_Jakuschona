@@ -299,5 +299,38 @@ function validateForm(form) {
             return false;
         }
     }
+}
 
+function transformMovebankJson(movebankResponse) {
+
+    var jsonArray = [];
+
+    var coordinates = [];
+    var latlon = [];
+
+    console.log(movebankResponse);
+
+    for (i = 0; i < movebankResponse.individuals.length; i++){
+
+        var json = {"User_ID":"","Name":"","Type":"","date":"","time":"",
+            "geojson":{"type":"FeatureCollection","features":{"type":"Feature","properties":{},"geometry":{"type":"LineString","coordinates":[]}}}};
+
+        json.User_ID = movebankResponse.individuals[i].individual_taxon_canonical_name;
+        json.Name = movebankResponse.individuals[i].individual_local_identifier;
+        json.Type = "animal";
+
+        coordinates = [];
+
+        for (j = 0; j < movebankResponse.individuals[i].locations.length; j++) {
+            latlon = [];
+            latlon[0] = movebankResponse.individuals[i].locations[j].location_lat;
+            latlon[1] = movebankResponse.individuals[i].locations[j].location_long;
+            coordinates.push(latlon);
+        }
+
+        json.geojson.features.geometry.coordinates = coordinates;
+
+        jsonArray.push(json);
+    }
+    return jsonArray;
 }

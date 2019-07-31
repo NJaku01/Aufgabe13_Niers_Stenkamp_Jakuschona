@@ -1,11 +1,14 @@
 "use strict";
 
+/**
+ * Schon in routes_editor definiert
 const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
 
-var map = L.map("mapdiv").setView(start_latlng, 13);
 
+var map = L.map("mapdiv").setView(start_latlng, 13);
+*/
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors",
@@ -82,7 +85,7 @@ function getFiles() {
         .fail(function (xhr, status, errorThrown) {
             // handle errors
         })
-        .always(function (xhr, status) {
+        .always(function (response, xhr, status) {
 
             if (response.length == 0) {
                 alert("no routes in database");
@@ -188,8 +191,20 @@ var resource = "movebank";
 $.get(resource, function(response, status, x){
     let formatted_response = JSON.stringify(response,null,4);
     $("#movebankJson").text(formatted_response);
-    console.log(formatted_response);
 
+    let transMovebankResponse = transformMovebankJson(response);
+    console.log(transMovebankResponse);
+    console.log(transMovebankResponse[0].geojson.features.geometry.coordinates);
+
+    var coordinates = [];
+
+    for (i = 0; i < transMovebankResponse.length; i++) {
+        coordinates.push(transMovebankResponse[i].geojson.features.geometry.coordinates)
+    }
+
+    console.log(coordinates);
+    var polyline = L.polyline(coordinates).addTo(map);
+    map.fitBounds(polyline.getBounds());
 });
 
 

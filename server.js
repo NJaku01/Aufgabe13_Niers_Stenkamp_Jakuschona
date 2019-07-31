@@ -117,7 +117,7 @@ app.post("/item/delete", (req, res) => {
 var login = require(__dirname + "/private/token.js").token.MOVEBANK_login;
 var password = require(__dirname + "/private/token.js").token.MOVEBANK_password;
 
-var movebankEndpoint = "https://www.movebank.org/movebank/service/json-auth?study_id=16880941&individual_local_identifiers[]=Mary&individual_local_identifiers[]=Butterball&individual_local_identifiers[]=Schaumboch&&max_events_per_individual=2000&sensor_type=gps";
+var movebankEndpoint = "https://www.movebank.org/movebank/service/public/json?study_id=2911040&sensor_type=gps";
 
 const options = {
     headers: {
