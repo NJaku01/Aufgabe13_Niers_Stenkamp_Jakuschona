@@ -71,8 +71,8 @@
         </div>
     </div>
     <div>
-        <button onclick="showFiles('item')">Show UserRoutes in Database</button>
-        <button onclick="showFiles('bar')">Show AnimalRoutes in Database</button>
+        <button onclick="showFiles('userRoutes')">Show UserRoutes in Database</button>
+        <button onclick="showFiles('animalRoutes')">Show AnimalRoutes in Database</button>
         <textarea readonly id="database" style="width: 100%; height: 400px;"> </textarea>
     </div>
     <div id="form">
@@ -91,6 +91,7 @@
             Time:<br/>
             <input type="time" name="time"/><br>
             <input type="hidden" id="geojson" name="geojson">
+            <input type="hidden" id="collection" value="userRoute">
             <input type="submit" value="Send"/>
         </form>
 
