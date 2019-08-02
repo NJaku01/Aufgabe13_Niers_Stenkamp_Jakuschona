@@ -250,6 +250,26 @@ function transformLinesIntoArray(text) {
 
 }
 
+function insertItem(data){
+
+    $.ajax({
+        url: "/item/create", // URL der Abfrage,
+        data: data,
+        type: "POST"
+    })
+        .done(function (response) {
+            // parse + use data here
+            console.log("inerst data" +data);
+        })
+        .fail(function (xhr, status, errorThrown) {
+            // handle errors
+        })
+        .always(function (xhr, status) {
+
+
+        });
+
+}
 
 var resource = "movebank";
 
@@ -264,6 +284,7 @@ $.get(resource, function(response, status, x){
     var coordinates = [];
 
     for (i = 0; i < transMovebankResponse.length; i++) {
+        insertItem({collection: "animalRoutes", geoJson: transMovebankResponse[i].geojson});
         coordinates.push(transMovebankResponse[i].geojson.features.geometry.coordinates)
     }
 

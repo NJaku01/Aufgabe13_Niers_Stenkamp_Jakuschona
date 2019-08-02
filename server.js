@@ -120,6 +120,17 @@ app.post("/item/delete", (req, res) => {
     });
 });
 
+app.post("/item/deleteAll", (req, res) =>{
+
+
+    app.locals.db.collection(req.body.collection).deleteMany({}, (error, result) => {
+        if (error) {
+            console.dir(error);
+        }
+        res.redirect('/routes_editor.html');
+    });
+});
+
 
 var login = require(__dirname + "/private/token.js").token.MOVEBANK_login;
 var password = require(__dirname + "/private/token.js").token.MOVEBANK_password;

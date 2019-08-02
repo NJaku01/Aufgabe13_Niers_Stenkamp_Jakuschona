@@ -323,6 +323,25 @@ function validateForm(form) {
     }
 }
 
+function deleteAll(collection){
+    $.ajax({
+        url: "/item/deleteAll", // URL der Abfrage,
+        data: {collection: collection},
+        type: "POST"
+    })
+        .done(function (response) {
+            // parse + use data here
+            console.log("inerst data" +data);
+        })
+        .fail(function (xhr, status, errorThrown) {
+            // handle errors
+        })
+        .always(function (xhr, status) {
+
+
+        });
+
+}
 function transformMovebankJson(movebankResponse) {
 
     var jsonArray = [];
