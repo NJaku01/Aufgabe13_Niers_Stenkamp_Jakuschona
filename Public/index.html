@@ -56,7 +56,19 @@
 
 
 <div id="mapdiv" style="width: device-width; height: 500px;"></div>
-
+<div id="filter">
+    <form name="filter" >
+        User_ID:
+        <input type="text" name="User_ID"/><br/>
+        Animal:
+        <input type="text" name="Animal"/><br/>
+        <input type="checkbox" name="userRoutes" value="true"/> Show User Routes<br/>
+        <input type="checkbox" name="animalRoutes" value="true"/> Show Animal Routes<br/>
+        <input type="checkbox" name="userIntersections" value="true"/> Show Intersections with user<br/>
+        <input type="checkbox" name="animalIntersections" value="true"/> Show Intersections with Animals<br/>
+    </form>
+    <button onclick="filter1()"> Submit </button>
+</div>
 <div id="movebankJson"></div>
 
 

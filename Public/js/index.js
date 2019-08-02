@@ -7,13 +7,7 @@ const lon = 7.59;
 const start_latlng = [lat, lon];
 
 
-var map = L.map("mapdiv").setView(start_latlng, 13);
 */
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 18,
-    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors",
-    id: "osm"
-}).addTo(map);
 
 var mongodbJSON;
 var routes = [];
@@ -144,8 +138,6 @@ function getFiles() {
             mongodbJSON = response;
             var routes = transformLinesIntoArray(mongodbJSON);
             addMap(routes);
-            console.log(mongodbJSON);
-            console.log(JSON.stringify(response, null, 4));
         })
         .fail(function (xhr, status, errorThrown) {
             // handle errors
@@ -271,8 +263,64 @@ function insertItem(data){
 
 }
 
+async function filter1(){
+
+    var userID = document.forms["filter"]["User_ID"].value;
+    var animal = document.forms["filter"]["Animal"].value;
+    var wantUserRoutes = document.forms["filter"]["userRoutes"].value;
+    var wantAnimalRoutes = document.forms["filter"]["animalRoutes"].value;
+    var wantUserIntersection = document.forms["filter"]["userIntersections"].value;
+    var wantAnimalIntersections = document.forms["filter"]["animalIntersections"].value;
+    var userRoutes;
+
+    map.eachLayer(function (layer) {
+        map.removeLayer(layer);
+    });
+
+    if(wantUserRoutes){
+        var query= {};
+        if(userID!="")
+        {
+            query="{\"User_ID\": \"" + userID +"\"}"
+        }
+        try {
+            userRoutes = await getDatabaseFiles("userRoutes", query);
+            console.log(userRoutes);
+            userRoutes = transformLinesIntoArray(userRoutes);
+            addMap(userRoutes);
+        }
+        catch{
+
+        }
+    }
+    if(wantAnimalRoutes){
+
+    }
+
+}
+
+
+/**
+ * Shows the Items from mongodb in a textarea
+ * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
+ * @author Nick Jakuschona n_jaku01@wwu.de
+ */
+async function getDatabaseFiles(collection, query) {
+
+        //Example query: "{\"User_ID\" : \"1234\"}"
+
+      return  $.ajax({
+            url: "/item", // URL der Abfrage,
+            data: {collection: collection, query: query},
+            type: "POST"
+        })
+
+
+};
+
 var resource = "movebank";
 
+/
 $.get(resource, function(response, status, x){
     let formatted_response = JSON.stringify(response,null,4);
     $("#movebankJson").text(formatted_response);
