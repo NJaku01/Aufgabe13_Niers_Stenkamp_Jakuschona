@@ -68,8 +68,12 @@ app.use("/token.js", express.static(__dirname + "/private/token.js"))
 
 app.post("/item", (req, res) => {
     // find all
-    console.log(req.body.collection);
-    app.locals.db.collection(req.body.collection).find({}).toArray((error, result) => {
+    console.log(req.body.query);
+    var queryJSON = req.body.query;
+    if(queryJSON!=null) {
+        queryJSON = JSON.parse(queryJSON);
+    }
+    app.locals.db.collection(req.body.collection).find(queryJSON).toArray((error, result) => {
         if (error) {
             console.dir(error);
         }

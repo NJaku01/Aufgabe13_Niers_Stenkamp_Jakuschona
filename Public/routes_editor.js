@@ -70,10 +70,11 @@ function events() {
  * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
  * @author Nick Jakuschona n_jaku01@wwu.de
  */
-function showFiles(collection) {
+function showFiles(collection, query) {
+    //Example query: "{\"User_ID\" : \"1234\"}"
     $.ajax({
         url: "/item", // URL der Abfrage,
-        data: {collection: collection},
+        data: {collection: collection, query: query},
         type: "POST"
     })
         .done(function (response) {
