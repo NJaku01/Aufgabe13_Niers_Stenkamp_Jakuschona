@@ -126,34 +126,6 @@ function calculateIntersect(inputRoute, allRoutes) {
 console.log(calculateIntersect(line1test, lines));
 
 
-
-function getFiles() {
-    $.ajax({
-        url: "/item", // URL der Abfrage,
-        data: {collection: "userRoutes"},
-        type: "POST"
-    })
-        .done(function (response) {
-            // parse + use data here
-            mongodbJSON = response;
-            var routes = transformLinesIntoArray(mongodbJSON);
-            addMap();
-            addUserRoutes(routes);
-        })
-        .fail(function (xhr, status, errorThrown) {
-            // handle errors
-        })
-        .always(function (response, xhr, status) {
-
-            if (response.length == 0) {
-                alert("no routes in database");
-            }
-
-        });
-
-}
-
-
 function addMap() {
 
 
