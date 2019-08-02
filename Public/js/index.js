@@ -137,7 +137,8 @@ function getFiles() {
             // parse + use data here
             mongodbJSON = response;
             var routes = transformLinesIntoArray(mongodbJSON);
-            addMap(routes);
+            addMap();
+            addUserRoutes(routes);
         })
         .fail(function (xhr, status, errorThrown) {
             // handle errors
@@ -153,7 +154,7 @@ function getFiles() {
 }
 
 
-function addMap(allRoutes) {
+function addMap() {
 
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -163,6 +164,22 @@ function addMap(allRoutes) {
     }).addTo(map); //ad a background Layer to the Map
 
 
+
+
+    //Show coordinates by Click of the Map
+    map.on('click', function (e) {
+        var popLocation = e.latlng;
+        var popup = L.popup()
+            .setLatLng(popLocation)
+            .setContent("You clicked at " + popLocation)
+            .openOn(map);
+    });
+
+    $("#mapdiv")[0].scrollIntoView();
+    $("#mapdiv")[0].style.visibility = "visible";
+}
+
+function addUserRoutes(allRoutes){
     for (var i = 0; i < allRoutes.length; i++) {
         for (var j = 0; j < allRoutes[i].length; j++) {
             var help = allRoutes[i][j][0];
@@ -198,27 +215,27 @@ function addMap(allRoutes) {
     }
 
     /**
-    for (i = 0; i < popUpInformation.length; i++) {
+     for (i = 0; i < popUpInformation.length; i++) {
         var marker = L.marker(popUpInformation[i][0]).addTo(map);
         marker.bindPopup("<img src=\"http://openweathermap.org/img/w/" + popUpInformation[i][3] + ".png\" /> <br/>" + popUpInformation[i][1] + "<br>" + popUpInformation[i][2] + "<br>" + popUpInformation[i][4] + "<br>" + popUpInformation[i][5] + "<br>");
         points.addLayer(marker);
     } //add all Markers to the Map with the weather Information
 
-    */
+     */
 
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
+}
 
-    //Show coordinates by Click of the Map
-    map.on('click', function (e) {
-        var popLocation = e.latlng;
-        var popup = L.popup()
-            .setLatLng(popLocation)
-            .setContent("You clicked at " + popLocation)
-            .openOn(map);
-    });
+function addAnimalroutes(transMovebankResponse)
+{
+    var coordinates = []
+    for (var i = 0; i < transMovebankResponse.length; i++) {
 
-    $("#mapdiv")[0].scrollIntoView();
-    $("#mapdiv")[0].style.visibility = "visible";
+        coordinates.push(transMovebankResponse[i].features.geometry.coordinates)
+    }
+    console.log(coordinates);
+    var polyline = L.polyline(coordinates).addTo(map);
+    map.fitBounds(polyline.getBounds());
 }
 
 function transformLinesIntoArray(text) {
@@ -267,15 +284,18 @@ async function filter1(){
 
     var userID = document.forms["filter"]["User_ID"].value;
     var animal = document.forms["filter"]["Animal"].value;
-    var wantUserRoutes = document.forms["filter"]["userRoutes"].value;
-    var wantAnimalRoutes = document.forms["filter"]["animalRoutes"].value;
-    var wantUserIntersection = document.forms["filter"]["userIntersections"].value;
-    var wantAnimalIntersections = document.forms["filter"]["animalIntersections"].value;
+    var wantUserRoutes = document.forms["filter"]["userRoutes"].checked;
+    var wantAnimalRoutes = document.forms["filter"]["animalRoutes"].checked;
+    var wantUserIntersection = document.forms["filter"]["userIntersections"].checked;
+    var wantAnimalIntersections = document.forms["filter"]["animalIntersections"].checked;
     var userRoutes;
+    var animalRoutes;
 
     map.eachLayer(function (layer) {
         map.removeLayer(layer);
     });
+
+    addMap();
 
     if(wantUserRoutes){
         var query= {};
@@ -285,15 +305,33 @@ async function filter1(){
         }
         try {
             userRoutes = await getDatabaseFiles("userRoutes", query);
-            console.log(userRoutes);
             userRoutes = transformLinesIntoArray(userRoutes);
-            addMap(userRoutes);
+            addUserRoutes(userRoutes);
         }
         catch{
 
         }
     }
+    console.log(wantAnimalRoutes);
     if(wantAnimalRoutes){
+        var routes = []
+        var query={};
+        if(animal!="")
+        {
+            query="{\"animal\": \"" + animal +"\"}"
+        }
+        try {
+            animalRoutes = await getDatabaseFiles("animalRoutes", query);
+        }
+        catch(e){
+            console.log(e);
+        }
+        for (var i =0; i<animalRoutes.length; i++){
+            routes.push(JSON.parse(animalRoutes[i].geoJson));
+        }
+        console.log(routes);
+        addAnimalroutes(routes);
+
 
     }
 
@@ -320,7 +358,7 @@ async function getDatabaseFiles(collection, query) {
 
 var resource = "movebank";
 
-/
+/**
 $.get(resource, function(response, status, x){
     let formatted_response = JSON.stringify(response,null,4);
     $("#movebankJson").text(formatted_response);
@@ -332,13 +370,13 @@ $.get(resource, function(response, status, x){
     var coordinates = [];
 
     for (i = 0; i < transMovebankResponse.length; i++) {
-        insertItem({collection: "animalRoutes", geoJson: transMovebankResponse[i].geojson});
+        var datastring = JSON.stringify(transMovebankResponse[i].geojson, '\\', 0);
+        insertItem({collection: "animalRoutes", geoJson: datastring} );
         coordinates.push(transMovebankResponse[i].geojson.features.geometry.coordinates)
     }
-
     console.log(coordinates);
     var polyline = L.polyline(coordinates).addTo(map);
     map.fitBounds(polyline.getBounds());
 });
-
+*/
 
