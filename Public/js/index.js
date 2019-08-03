@@ -9,8 +9,7 @@ const start_latlng = [lat, lon];
 
 */
 
-var mongodbJSON;
-var routes = [];
+
 var routesFeature = L.featureGroup();
 
 
@@ -101,7 +100,7 @@ lines.push(line2test, line3test);
 // console.log(turf);
 //console.log(intersect);
 /**
- * function which takes one new inputRoute and compares this one with all other routes in allRoutes if they intersect.
+ * function which takes one new inputRoute and compares this one with all other animalGeoJson in allRoutes if they intersect.
  * function returns all given intersections.
  * @param inputRoute
  * @param allRoutes
@@ -128,14 +127,14 @@ function calculateIntersect(inputRoute, allRoutes) {
 
 function addMap() {
 
+    routesFeature = L.featureGroup();
+
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 18,
         attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors",
         id: "osm"
     }).addTo(map); //ad a background Layer to the Map
-
-
 
 
     //Show coordinates by Click of the Map
@@ -153,15 +152,17 @@ function addMap() {
 
 function addUserRoutes(userRoutes){
 
-    console.log(userRoutes);
+
     var geojsons=[];
+    var linesArray=[];
+    var routes=[];
     for (var j in userRoutes) {
         var geojson = userRoutes[j].geojson;
         geojsons.push(JSON.parse(geojson));
 
     }
 
-    var linesArray=[];
+
     for (var i in geojsons) {
         linesArray.push(geojsons[i].features[0].geometry.coordinates);
     }
@@ -216,13 +217,35 @@ function addUserRoutes(userRoutes){
 
 function addAnimalroutes(animalRoutes)
 {
-    var coordinates = []
-    for (var i = 0; i < animalRoutes.length; i++) {
-
-        coordinates.push(animalRoutes[i].features.geometry.coordinates)
+    var animalGeoJson=[];
+    for (var i =0; i<animalRoutes.length; i++){
+        animalGeoJson.push(JSON.parse(animalRoutes[i].geoJson));
     }
-    var polyline = L.polyline(coordinates).addTo(map);
-    map.fitBounds(polyline.getBounds());
+    var collectionOfRoutes = [];
+    var coordinates = [];
+    for (var i = 0; i < animalGeoJson.length; i++) {
+
+        coordinates.push(animalGeoJson[i].features.geometry.coordinates)
+
+        var polyline = L.polyline(coordinates[i]).addTo(map);
+        collectionOfRoutes.push(polyline);
+        routesFeature.addLayer(polyline);
+
+        var popup = L.popup();
+        popup.setContent("Animal:" + animalRoutes[i].animal);
+        collectionOfRoutes[i].bindPopup(popup);
+
+        collectionOfRoutes[i].on('mouseover', function (e) {
+            var popup = e.target.getPopup();
+            popup.setLatLng(e.latlng).openOn(map);
+        });
+
+        collectionOfRoutes[i].on('mouseout', function (e) {
+            e.target.closePopup();
+        });
+    }
+
+    map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
 
@@ -287,7 +310,7 @@ async function filter1(){
         }
         try {
             userRoutes = await getDatabaseFiles("userRoutes", query);
-            addUserRoutes(userRoutes);
+
         }
         catch{
 
@@ -298,6 +321,9 @@ async function filter1(){
                 "To Show all routes just leave the field empty" +
                 "Tho Show routes of just on User enter only the UserID" +
                 "Tho Show routes of more Users seperate the UserIDs by \";\" eg. \"1; 2\" ")
+        }
+        else{
+            addUserRoutes(userRoutes);
         }
     }
     if(wantAnimalRoutes){
@@ -313,10 +339,14 @@ async function filter1(){
         catch(e){
             console.log(e);
         }
-        for (var i =0; i<animalRoutes.length; i++){
-            routes.push(JSON.parse(animalRoutes[i].geoJson));
+        if (animalRoutes.length === 0){
+            alert("No animal animalGeoJson found");
         }
-        addAnimalroutes(routes);
+        else{
+            addAnimalroutes(animalRoutes);
+        }
+
+
 
 
     }
@@ -356,13 +386,13 @@ $.get(resource, function(response, status, x){
     var coordinates = [];
 
     for (i = 0; i < transMovebankResponse.length; i++) {
-        var datastring = JSON.stringify(transMovebankResponse[i].geojson, '\\', 0);
-        insertItem({collection: "animalRoutes", geoJson: datastring} );
+        var datastring = JSON.stringify(transMovebankResponse[i].geojson);
+        insertItem({collection: "animalRoutes", animal: transMovebankResponse[i].User_ID, geoJson: datastring} );
         coordinates.push(transMovebankResponse[i].geojson.features.geometry.coordinates)
     }
     console.log(coordinates);
-    var polyline = L.polyline(coordinates).addTo(map);
-    map.fitBounds(polyline.getBounds());
+    //var polyline = L.polyline(coordinates).addTo(map);
+    //map.fitBounds(polyline.getBounds());
 });
 */
 

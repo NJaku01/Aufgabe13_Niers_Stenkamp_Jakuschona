@@ -86,7 +86,7 @@ function showFiles(collection, query) {
         })
         .always(function (xhr, status) {
             if (mongodbJSON.length == 0) {
-                alert("no routes in database");
+                alert("no animalGeoJson in database");
             }
             document.getElementById("database").value = JSON.stringify(mongodbJSON);
 
