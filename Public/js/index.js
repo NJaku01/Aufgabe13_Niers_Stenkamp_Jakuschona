@@ -93,10 +93,10 @@ var line3test = {
 // Test AllRoutes
 var lines = [];
 lines.push(line2test, line3test);
-console.log(lines);
-console.log(line1test);
-console.log(line1test._id);
-console.log(turf.lineIntersect(line1test, line2test));
+//console.log(lines);
+//console.log(line1test);
+//console.log(line1test._id);
+//console.log(turf.lineIntersect(line1test, line2test));
 
 // console.log(turf);
 //console.log(intersect);
@@ -123,7 +123,7 @@ function calculateIntersect(inputRoute, allRoutes) {
     return intersectAll;
 }
 
-console.log(calculateIntersect(line1test, lines));
+//console.log(calculateIntersect(line1test, lines));
 
 
 function addMap() {
@@ -151,21 +151,37 @@ function addMap() {
     $("#mapdiv")[0].style.visibility = "visible";
 }
 
-function addUserRoutes(allRoutes){
-    for (var i = 0; i < allRoutes.length; i++) {
-        for (var j = 0; j < allRoutes[i].length; j++) {
-            var help = allRoutes[i][j][0];
-            allRoutes[i][j][0] = allRoutes[i][j][1];
-            allRoutes[i][j][1] = help;
+function addUserRoutes(userRoutes){
+
+    console.log(userRoutes);
+    var geojsons=[];
+    for (var j in userRoutes) {
+        var geojson = userRoutes[j].geojson;
+        geojsons.push(JSON.parse(geojson));
+
+    }
+
+    var linesArray=[];
+    for (var i in geojsons) {
+        linesArray.push(geojsons[i].features[0].geometry.coordinates);
+    }
+
+
+    for (var i = 0; i < linesArray.length; i++) {
+        for (var j = 0; j < linesArray[i].length; j++) {
+            var help = linesArray[i][j][0];
+            linesArray[i][j][0] = linesArray[i][j][1];
+            linesArray[i][j][1] = help;
         }
 
-        var route = L.polyline(allRoutes[i], {color: 'red'}).addTo(map);
+
+        var route = L.polyline(linesArray[i], {color: 'red'}).addTo(map);
         routes.push(route);
         routesFeature.addLayer(route);
 
         //add all Routes to the Map
         var popup = L.popup();
-        popup.setContent('Route: ' + (i + 1));
+        popup.setContent('Route: ' + (i + 1) + "<br/>" +  "UserID:" + userRoutes[i].User_ID );
         routes[i].bindPopup(popup);
 
         routes[i].on('mouseover', function (e) {
@@ -179,10 +195,10 @@ function addUserRoutes(allRoutes){
         //add  the PopUps to the Map for the Routes
 
 
-        for (var j = 0; j < allRoutes[i].length; j++) {
-            var help = allRoutes[i][j][0];
-            allRoutes[i][j][0] = allRoutes[i][j][1];
-            allRoutes[i][j][1] = help;
+        for (var j = 0; j < linesArray[i].length; j++) {
+            var help = linesArray[i][j][0];
+            linesArray[i][j][0] = linesArray[i][j][1];
+            linesArray[i][j][1] = help;
         }
     }
 
@@ -198,38 +214,17 @@ function addUserRoutes(allRoutes){
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
-function addAnimalroutes(transMovebankResponse)
+function addAnimalroutes(animalRoutes)
 {
     var coordinates = []
-    for (var i = 0; i < transMovebankResponse.length; i++) {
+    for (var i = 0; i < animalRoutes.length; i++) {
 
-        coordinates.push(transMovebankResponse[i].features.geometry.coordinates)
+        coordinates.push(animalRoutes[i].features.geometry.coordinates)
     }
-    console.log(coordinates);
     var polyline = L.polyline(coordinates).addTo(map);
     map.fitBounds(polyline.getBounds());
 }
 
-function transformLinesIntoArray(text) {
-    "use strict";
-
-    var linesArray = [];
-    var geojsons = [];
-    console.log(text);
-    for (var j in text) {
-
-        var geojson = text[j].geojson;
-        geojsons.push(JSON.parse(geojson));
-    }
-
-    for (var i in geojsons) {
-        linesArray.push(geojsons[i].features[0].geometry.coordinates);
-    }
-
-
-    return linesArray;
-
-}
 
 function insertItem(data){
 
@@ -288,12 +283,10 @@ async function filter1(){
                 }
                 user= userID.substring(1,userID.length);
                 query += " {\"User_ID\": \"" + user + "\"}]}";
-                console.log(query);
             }
         }
         try {
             userRoutes = await getDatabaseFiles("userRoutes", query);
-            userRoutes = transformLinesIntoArray(userRoutes);
             addUserRoutes(userRoutes);
         }
         catch{
@@ -307,7 +300,6 @@ async function filter1(){
                 "Tho Show routes of more Users seperate the UserIDs by \";\" eg. \"1; 2\" ")
         }
     }
-    console.log(wantAnimalRoutes);
     if(wantAnimalRoutes){
         var routes = []
         var query={};
@@ -324,7 +316,6 @@ async function filter1(){
         for (var i =0; i<animalRoutes.length; i++){
             routes.push(JSON.parse(animalRoutes[i].geoJson));
         }
-        console.log(routes);
         addAnimalroutes(routes);
 
 
