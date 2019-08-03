@@ -271,9 +271,25 @@ async function filter1(){
 
     if(wantUserRoutes){
         var query= {};
+
         if(userID!="")
         {
-            query="{\"User_ID\": \"" + userID +"\"}"
+            if(userID.indexOf(";")=== -1) {
+                query = "{\"User_ID\": \"" + userID + "\"}"
+            }
+            else{
+                var user= userID.substring(0,userID.indexOf(";"));
+                userID = userID.substring(userID.indexOf(";")+1, userID.length);
+                query = "{ \"$or\" : [ {\"User_ID\": \"" + user + "\"} , ";
+                while(userID.indexOf(";")!= -1){
+                    user= userID.substring(1,userID.indexOf(";"));
+                    userID = userID.substring(userID.indexOf(";")+1, userID.length);
+                    query += " {\"User_ID\": \"" + user + "\"} , "
+                }
+                user= userID.substring(1,userID.length);
+                query += " {\"User_ID\": \"" + user + "\"}]}";
+                console.log(query);
+            }
         }
         try {
             userRoutes = await getDatabaseFiles("userRoutes", query);
@@ -282,6 +298,13 @@ async function filter1(){
         }
         catch{
 
+        }
+        if (userRoutes.length === 0){
+            alert("The API didn#t found User Routes to show. Please makes sure there are User Routes in the Database or the UserID really exists. " +
+                "Maybe you enteret the UserID the wrong way:" +
+                "To Show all routes just leave the field empty" +
+                "Tho Show routes of just on User enter only the UserID" +
+                "Tho Show routes of more Users seperate the UserIDs by \";\" eg. \"1; 2\" ")
         }
     }
     console.log(wantAnimalRoutes);
