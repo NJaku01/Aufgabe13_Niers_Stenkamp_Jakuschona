@@ -273,7 +273,7 @@ function insertItem(data){
 async function filter1(){
 
     var userID = document.forms["filter"]["User_ID"].value;
-    var animal = document.forms["filter"]["Animal"].value;
+    var animals = document.forms["filter"]["Animal"].value;
     var wantUserRoutes = document.forms["filter"]["userRoutes"].checked;
     var wantAnimalRoutes = document.forms["filter"]["animalRoutes"].checked;
     var wantUserIntersection = document.forms["filter"]["userIntersections"].checked;
@@ -327,11 +327,25 @@ async function filter1(){
         }
     }
     if(wantAnimalRoutes){
-        var routes = []
+
         var query={};
-        if(animal!="")
+        if(animals!="")
         {
-            query="{\"animal\": \"" + animal +"\"}"
+            if(animals.indexOf(";")=== -1) {
+                query = "{\"animal\": \"" + animals + "\"}"
+            }
+            else{
+                var animal = animals.substring(0,animals.indexOf(";"));
+                animals = animals.substring(animals.indexOf(";")+1, animals.length);
+                query = "{ \"$or\" : [ {\"animal\": \"" + animal  + "\"} , ";
+                while(animals.indexOf(";")!= -1){
+                    animal = animals.substring(1,animals.indexOf(";"));
+                    animals = animals.substring(animals.indexOf(";")+1, animals.length);
+                    query += " {\"User_ID\": \"" + animal  + "\"} , "
+                }
+                animal = animals.substring(1, animals.length);
+                query += " {\"animal\": \"" + animal  + "\"}]}";
+            }
         }
         try {
             animalRoutes = await getDatabaseFiles("animalRoutes", query);
@@ -340,7 +354,7 @@ async function filter1(){
             console.log(e);
         }
         if (animalRoutes.length === 0){
-            alert("No animal animalGeoJson found");
+            alert("No animal routes found");
         }
         else{
             addAnimalroutes(animalRoutes);
