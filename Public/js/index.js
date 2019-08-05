@@ -1,13 +1,14 @@
 "use strict";
 
-/**
- * Schon in routes_editor definiert
+
 const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
 
-
-*/
+var map = L.map("mapdiv", {
+    center: start_latlng,
+    zoom: 11
+});
 
 
 var routesFeature = L.featureGroup();
@@ -258,7 +259,7 @@ function insertItem(data){
     })
         .done(function (response) {
             // parse + use data here
-            console.log("inerst data" +data);
+            console.log("insert data" +data);
         })
         .fail(function (xhr, status, errorThrown) {
             // handle errors
