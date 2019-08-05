@@ -1,6 +1,5 @@
 "use strict";
 
-
 const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
