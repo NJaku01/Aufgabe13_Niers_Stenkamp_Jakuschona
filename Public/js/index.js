@@ -318,7 +318,16 @@ function weatherRequest(long, lat) {
     return response;
 }
 
-async function filter1(){
+function componentDidMount(){
+    var id= getParameterByName('id');
+    if(id !== null){
+        filter1(id)
+    }else{
+        filter1()
+    }
+}
+async function filter1(id){
+
 
     var userID = document.forms["filter"]["User_ID"].value;
     var animals = document.forms["filter"]["Animal"].value;
@@ -328,23 +337,21 @@ async function filter1(){
     var wantAnimalIntersections = document.forms["filter"]["animalIntersections"].checked;
     var userRoutes;
     var animalRoutes;
+    if(id !== null){
+        userID=id;
+        wantAnimalIntersections=false;
+        wantAnimalRoutes=false;
+
+    }
+
+    console.log(userID);
+
 
     map.eachLayer(function (layer) {
         map.removeLayer(layer);
     });
 
     addMap();
-
-    var id= getParameterByName('id');
-    console.log(id);
-
-    if(id !== null){
-        userID = id;
-        wantUserRoutes=true;
-        wantAnimalRoutes=false;
-        wantAnimalIntersections=false;
-        wantUserIntersection=false;
-    }
 
     if(wantUserRoutes){
         var query= {};
