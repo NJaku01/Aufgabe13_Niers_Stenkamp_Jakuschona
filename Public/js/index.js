@@ -14,6 +14,17 @@ var map = L.map("mapdiv", {
 var routesFeature = L.featureGroup();
 
 
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+
 // Testroute
 var line1test = {
     "_id":"5d41a216205cf30395e99b8221",
@@ -323,6 +334,17 @@ async function filter1(){
     });
 
     addMap();
+
+    var id= getParameterByName('id');
+    console.log(id);
+
+    if(id !== null){
+        userID = id;
+        wantUserRoutes=true;
+        wantAnimalRoutes=false;
+        wantAnimalIntersections=false;
+        wantUserIntersection=false;
+    }
 
     if(wantUserRoutes){
         var query= {};

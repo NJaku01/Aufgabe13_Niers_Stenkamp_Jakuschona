@@ -10,6 +10,7 @@ var server = require('http').createServer(app);
 
 const mongodb = require('mongodb');
 
+
 function connectMongoDb() {
     // finish this block before the server starts,
     // there are some async tasks inside we need to wait for => declare async so we can use await
@@ -64,6 +65,14 @@ app.use("/pub-pkg-bootstrap-min", express.static(__dirname + "/node_modules/pub-
 app.use("/jquery", express.static(__dirname + "/node_modules/jquery/dist"));
 app.use("/turf", express.static(__dirname + "/node_modules/@turf/turf"));
 app.use("/token.js", express.static(__dirname + "/private/token.js"));
+
+
+
+app.get('/:id', function (req, res) {
+     var id=   req.params.id
+
+    return res.redirect("/?id=" + id)
+});
 
 
 app.post("/item", (req, res) => {
