@@ -5,8 +5,7 @@ const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
 var drawnItems;
-var mongodbJSON;
-
+var mongodbJSON = [];
 
 var map = L.map("mapdiv", {
     center: start_latlng,
@@ -70,27 +69,32 @@ function events() {
  * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
  * @author Nick Jakuschona n_jaku01@wwu.de
  */
-function showFiles(collection, query) {
+async function showFiles(collection, query) {
+try {
+    mongodbJSON = await getFilesFromMongodb(collection, query);
+
+    if (mongodbJSON.length == 0) {
+        alert("no routes in database");
+    }
+    console.log(mongodbJSON);
+    document.getElementById("database").value = JSON.stringify(mongodbJSON);
+}
+catch {}
+}
+
+/**
+ * Gets the Items from mongodb.
+ * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
+ * @author Nick Jakuschona n_jaku01@wwu.de
+ */
+async function getFilesFromMongodb(collection, query) {
+
     //Example query: "{\"User_ID\" : \"1234\"}"
-    $.ajax({
+    return $.ajax({
         url: "/item", // URL der Abfrage,
         data: {collection: collection, query: query},
         type: "POST"
     })
-        .done(function (response) {
-            // parse + use data here
-            mongodbJSON = response;
-        })
-        .fail(function (xhr, status, errorThrown) {
-            // handle errors
-        })
-        .always(function (xhr, status) {
-            if (mongodbJSON.length == 0) {
-                alert("no routes in database");
-            }
-            document.getElementById("database").value = JSON.stringify(mongodbJSON);
-
-        });
 
 }
 
@@ -295,32 +299,47 @@ function setCookie(cname, cvalue, exdays) {
  * @param form to validate
  * @returns {boolean} if the form is correct
  */
-function validateForm(form) {
-    "use strict";
-    if (form == "create" || form == "update") {
-        var x = document.forms[form]["geojson"].value;
-        if (x == "") {
-            alert("A route must be selected");
-            return false;
+async function validateForm(form) {
+    try {
+        "use strict";
+        if (form == "create" || form == "update") {
+            var x = document.forms[form]["geojson"].value;
+            var userID = document.forms[form]["User_ID"].value;
+            if (x == "") {
+                alert("A route must be selected");
+                return false;
+            } else if (!checkIfGeoJsonLineString(x)) {
+                alert("No valid GeoJson inserted. Use the Routing Machine to create a valid GeoJson");
+                return false;
+            }
+            if (userID == "") {
+                alert("A userID must be selected");
+                return false;
+            }
+            console.log(x);
+            console.log(userID);
+
+            mongodbJSON = await getFilesFromMongodb("userRoutes");
+            console.log(mongodbJSON);
+
+            var intersections = calculateIntersect(userID, x, mongodbJSON);
+            console.log(intersections);
+
+
+
         }
-        else if(!checkIfGeoJsonLineString(x))
-        {
-            alert("No valid GeoJson inserted. Use the Routing Machine to create a valid GeoJson");
-            return false;
+        if (form == "update" || form == "delete") {
+            x = document.forms[form]["_id"].value;
+            if (x == "") {
+                alert("A id must be selected");
+                return false;
+            } else if (x.length < 12) {
+                alert("A id must be at least 12 characters long");
+                return false;
+            }
         }
     }
-    if (form == "update" || form == "delete") {
-        x = document.forms[form]["_id"].value;
-        if (x == "") {
-            alert("A id must be selected");
-            return false;
-        }
-        else if(x.length<12)
-        {
-            alert("A id must be at least 12 characters long");
-            return false;
-        }
-    }
+    catch {}
 }
 
 function deleteAll(collection){
@@ -342,6 +361,7 @@ function deleteAll(collection){
         });
 
 }
+
 function transformMovebankJson(movebankResponse) {
 
     var jsonArray = [];
@@ -398,3 +418,128 @@ $.get(resource, function(response, status, x){
     var polyline = L.polyline(coordinates).addTo(map);
     map.fitBounds(polyline.getBounds());
 });
+
+
+
+// Testroute
+var line1test = {
+    "_id":"5d41a216205cf30395e99b8221",
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        7.492675781249999,
+                        51.60437164681676
+                    ],
+                    [
+                        8.37158203125,
+                        51.05520733858494
+                    ]
+                ]
+            }
+        }
+    ]
+}
+// console.log(line1test.type);
+
+// Testroute
+var line2test = {
+    "_id":"5d41a216205cf30395e99b8a22",
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        7.18505859375,
+                        51.45400691005982
+                    ],
+                    [
+                        8.50341796875,
+                        51.699799849741936
+                    ]
+                ]
+            }
+        }
+    ]
+}
+
+// Testroute
+var line3test = {
+    "_id":"5d41a216205cf30395e99b8123",
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        8.33587646484375,
+                        51.47796179607121
+                    ],
+                    [
+                        7.87994384765625,
+                        51.037939894299356
+                    ]
+                ]
+            }
+        }
+    ]
+}
+
+// Test AllRoutes
+/*
+var lines = [];
+lines.push(line2test, line3test);
+console.log(lines);
+console.log(line1test);
+console.log(line1test._id);
+console.log(turf.lineIntersect(line1test, line2test));
+*/
+
+// console.log(turf);
+//console.log(intersect);
+/**
+ * function which takes one new inputRoute and compares this one with all other routes in allRoutes if they intersect.
+ * function returns all given intersections.
+ * @param inputRoute
+ * @param allRoutes
+ * @returns {Array}
+ */
+function calculateIntersect(userIDInput, inputRoute, allRoutes) {
+    var intersectAll=[];
+    var parseInputRoute = JSON.parse(inputRoute);
+    console.log(parseInputRoute);
+    console.log(allRoutes);
+    console.log(allRoutes[0]._id);
+    for (var j=0; j<allRoutes.length; j++) {
+        var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geojson));
+        console.log(intersect);
+        if (intersect.features.length =! 0) {
+            insertItem({collection: "userIntersections", geoJson: intersect, routeID: allRoutes[j]._id, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput});
+        }
+
+        intersectAll.push(intersect);
+        intersect = {};
+    }
+
+    for (var i=0; i<intersectAll.length; i++) {
+        if (intersectAll[i].features.length == 0) {
+            intersectAll.splice(i, 1);
+        }
+    }
+    console.log(intersectAll);
+    return intersectAll;
+}
+
+// console.log(calculateIntersect(line1test, lines));
