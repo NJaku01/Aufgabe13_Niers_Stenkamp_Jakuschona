@@ -157,6 +157,7 @@ function addUserRoutes(userRoutes){
     var geojsons=[];
     var linesArray=[];
     var routes=[];
+    var midpoints=[];
     for (var j in userRoutes) {
         var geojson = userRoutes[j].geojson;
         geojsons.push(JSON.parse(geojson));
@@ -166,6 +167,7 @@ function addUserRoutes(userRoutes){
 
     for (var i in geojsons) {
         linesArray.push(geojsons[i].features[0].geometry.coordinates);
+        midpoints.push(turf.centroid(geojsons[i]));
     }
 
 
@@ -176,6 +178,8 @@ function addUserRoutes(userRoutes){
             linesArray[i][j][1] = help;
         }
 
+        var weather = weatherRequest(midpoints[i].geometry.coordinates[0],midpoints[i].geometry.coordinates[1]);
+        weather= JSON.parse(weather);
 
         var route = L.polyline(linesArray[i], {color: 'red'}).addTo(map);
         routes.push(route);
@@ -183,7 +187,7 @@ function addUserRoutes(userRoutes){
 
         //add all Routes to the Map
         var popup = L.popup();
-        popup.setContent('Route: ' + (i + 1) + "<br/>" +  "UserID:" + userRoutes[i].User_ID );
+        popup.setContent('Route: ' + (i + 1) + "<br/>" +  "UserID:" + userRoutes[i].User_ID + "<br/> <img src=\"http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png\" /> <br/>" +"Weather: " + weather.weather[0].description);
         routes[i].bindPopup(popup);
 
         routes[i].on('mouseover', function (e) {
@@ -226,7 +230,7 @@ function addAnimalroutes(animalRoutes)
     var coordinates = [];
     for (var i = 0; i < animalGeoJson.length; i++) {
 
-        coordinates.push(animalGeoJson[i].features.geometry.coordinates)
+        coordinates.push(animalGeoJson[i].features.geometry.coordinates);
 
         var polyline = L.polyline(coordinates[i]).addTo(map);
         collectionOfRoutes.push(polyline);
@@ -269,6 +273,38 @@ function insertItem(data){
 
         });
 
+}
+
+/**
+ * Ask the openWeatherMap for the actual weather
+ * @desc Abgabe zu Aufgabe 4, Geosoft 1, SoSe 2019
+ * @author Nick Jakuschona n_jaku01@wwu.de
+ * @param lat
+ * @param long
+ * @returns {*}
+ */
+function weatherRequest(long, lat) {
+    "use strict";
+
+    var resource = "https://api.openweathermap.org/data/2.5/weather?units=metric&lat=" + lat + "&lon=" + long + "&appid=" + OPENWEATHERMAP_TOKEN;
+    var response = null;
+
+    var xhttp = new XMLHttpRequest();
+    try {
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                // Typical action to be performed when the document is ready:
+                response = xhttp.response;
+            }
+        };
+        xhttp.open("GET", resource, false);
+        xhttp.send();
+    } catch (err) {
+        alert("no connection to OpenWeatherMap. Please check your internet connection.");
+    }
+
+
+    return response;
 }
 
 async function filter1(){
@@ -317,7 +353,7 @@ async function filter1(){
 
         }
         if (userRoutes.length === 0){
-            alert("The API didn#t found User Routes to show. Please makes sure there are User Routes in the Database or the UserID really exists. " +
+            alert("The API didn't found User Routes to show. Please makes sure there are User Routes in the Database or the UserID really exists. " +
                 "Maybe you enteret the UserID the wrong way:" +
                 "To Show all routes just leave the field empty" +
                 "Tho Show routes of just on User enter only the UserID" +
