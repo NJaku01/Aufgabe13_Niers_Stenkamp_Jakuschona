@@ -69,7 +69,7 @@ app.use("/token.js", express.static(__dirname + "/private/token.js"));
 
 
 app.get('/:id', function (req, res) {
-     var id=   req.params.id
+     var id=   req.params.id;
 
     return res.redirect("/?id=" + id)
 });

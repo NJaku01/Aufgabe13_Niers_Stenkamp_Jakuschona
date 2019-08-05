@@ -323,7 +323,7 @@ function componentDidMount(){
     if(id !== null){
         filter1(id)
     }else{
-        filter1()
+        filter1(null)
     }
 }
 async function filter1(id){
