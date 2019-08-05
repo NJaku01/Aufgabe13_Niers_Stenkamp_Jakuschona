@@ -23,6 +23,8 @@
     <script src="leaflet-control-geocoder/Control.Geocoder.js"></script>
     <script src="leaflet-routing-machine/leaflet-routing-machine.js"></script>
     <script src="pub-pkg-bootstrap-min/js/bootstrap-v4.2.1.bundle.js"></script>
+    <script src="turf/turf.min.js"></script>
+
 
 
     <link href="routes_editor.css" rel="stylesheet">
@@ -79,7 +81,7 @@
         <h5>Add Item (POST Request)</h5>
 
 
-        <form name="create" action="item/create" onsubmit="return validateForm('create')"  method="POST">
+        <form name="create" action="item/create" onsubmit="return validateForm('create')"  method="POST" target="_blank">
             User_ID:<br/>
             <input type="text" name="User_ID"/><br>
             Name of the route:<br/>

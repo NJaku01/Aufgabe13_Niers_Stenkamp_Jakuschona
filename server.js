@@ -64,7 +64,6 @@ app.use("/pub-pkg-bootstrap-min", express.static(__dirname + "/node_modules/pub-
 app.use("/jquery", express.static(__dirname + "/node_modules/jquery/dist"));
 app.use("/turf", express.static(__dirname + "/node_modules/@turf/turf"));
 app.use("/token.js", express.static(__dirname + "/private/token.js"));
-app.use("/routes_editor.js", express.static(__dirname + "/Public/routes_editor.js"));
 
 
 app.post("/item", (req, res) => {
