@@ -63,7 +63,8 @@ app.use("/leaflet-routing-machine", express.static(__dirname + "/node_modules/le
 app.use("/pub-pkg-bootstrap-min", express.static(__dirname + "/node_modules/pub-pkg-bootstrap-min"));
 app.use("/jquery", express.static(__dirname + "/node_modules/jquery/dist"));
 app.use("/turf", express.static(__dirname + "/node_modules/@turf/turf"));
-app.use("/token.js", express.static(__dirname + "/private/token.js"))
+app.use("/token.js", express.static(__dirname + "/private/token.js"));
+app.use("/routes_editor.js", express.static(__dirname + "/Public/routes_editor.js"));
 
 
 app.post("/item", (req, res) => {
@@ -135,7 +136,9 @@ app.post("/item/deleteAll", (req, res) =>{
 var login = require(__dirname + "/private/token.js").token.MOVEBANK_login;
 var password = require(__dirname + "/private/token.js").token.MOVEBANK_password;
 
-var movebankEndpoint = "https://www.movebank.org/movebank/service/public/json?study_id=2911040&sensor_type=gps";
+var movebankEndpoint = "https://www.movebank.org/movebank/service/public/json?study_id=";
+
+var testEndpoint = "https://www.movebank.org/movebank/service/public/json?&study_id=2911040&max_events_per_individual=5&sensor_type=gps"
 
 const options = {
     headers: {
@@ -143,27 +146,82 @@ const options = {
     }
 };
 
+var transformMovebankJson = function(movebankResponse) {
+
+    var jsonArray = [];
+
+    var coordinates = [];
+    var latlon = [];
+
+    console.log(movebankResponse);
+
+    for (i = 0; i < movebankResponse.individuals.length; i++){
+
+        var json = {"User_ID":"","Name":"","Type":"","date":"","time":"",
+            "geojson":{"type":"FeatureCollection","features":{"type":"Feature","properties":{},"geometry":{"type":"LineString","coordinates":[]}}}};
+
+        json.User_ID = movebankResponse.individuals[i].individual_taxon_canonical_name;
+        json.Name = movebankResponse.individuals[i].individual_local_identifier;
+        json.Type = "animal";
+
+        coordinates = [];
+
+        for (j = 0; j < movebankResponse.individuals[i].locations.length; j++) {
+            latlon = [];
+            latlon[0] = movebankResponse.individuals[i].locations[j].location_lat;
+            latlon[1] = movebankResponse.individuals[i].locations[j].location_long;
+            coordinates.push(latlon);
+        }
+
+        json.geojson.features.geometry.coordinates = coordinates;
+
+        jsonArray.push(json);
+    }
+    return jsonArray;
+}
+
 app.get("/movebank", (req, res) => {
 
-    https.get(movebankEndpoint, options, (httpResponse) => {
+    console.log("Study_ID: " + req.query.Study_ID);
+    console.log(req.body);
+    console.log(req.params.id);
+
+    var study = req.query.Study_ID;
+    var endpoint = movebankEndpoint + study + "&individual_local_identifiers[]=1163-1163&individual_local_identifiers[]=2131-2131&max_events_per_individual=10&sensor_type=gps";
+
+    https.get(endpoint, options, (httpResponse) => {
         // concatenate updates from datastream
-        console.log(movebankEndpoint);
+
+        console.log(endpoint);
         var body = "";
         httpResponse.on("data", (chunk) => {
+            //console.log("chunk: " + chunk);
             body += chunk;
         });
 
         httpResponse.on("end", () => {
+            console.log("Body:" + body);
             var weather = JSON.parse(body);
-            console.log(weather);
 
-            res.json(weather);
+            var movebankJson = transformMovebankJson(weather);
+
+            console.log(movebankJson);
+
+            console.log("Req.query: " + req.query.collection);
+
+            app.locals.db.collection(req.query.collection).insertMany(movebankJson, (error, result) => {
+                if (error) {
+                    console.dir(error);
+                }
+                res.redirect('/routes_editor.html');
+            });
 
         });
 
         httpResponse.on("error", (error) => {
             throw error;
         });
+
 
     });
 

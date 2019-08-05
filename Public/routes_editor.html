@@ -128,6 +128,18 @@
             <br/>
             <input type="submit" value="Send"/>
         </form>
+
+        <h5>Add Animal Route</h5>
+
+        <form name="createAnimal" action="movebank"><!--onsubmit="getMovebankRoute()" method="GET"-->
+
+            Study ID:<br/>
+            <input type="number" name="Study_ID" id="study_id"/>
+            <br>
+            <input type="hidden" name="collection" value="animalRoutes"/>
+            <br/>
+            <input type="submit" value="Send"/>
+        </form>
     </div>
 
     <button onclick="deleteAll('userRoutes')">Delete all UserRoutes in Database</button>

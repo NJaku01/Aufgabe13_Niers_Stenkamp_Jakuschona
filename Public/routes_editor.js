@@ -376,25 +376,30 @@ function transformMovebankJson(movebankResponse) {
     return jsonArray;
 }
 
+var getMovebankRoute = function(response) {
 
-var resource = "movebank";
+    /**
+    var resource = "movebank";
 
-$.get(resource, function(response, status, x){
-    let formatted_response = JSON.stringify(response,null,4);
-    $("#movebankJson").text(formatted_response);
+    $.get(resource, function(response, status, x){
+    */
 
-    let transMovebankResponse = transformMovebankJson(response);
-    console.log(transMovebankResponse);
-    console.log(transMovebankResponse[0].geojson.features.geometry.coordinates);
+        let formatted_response = JSON.stringify(response, null, 4);
+        $("#movebankJson").text(formatted_response);
 
-    var coordinates = [];
+        let transMovebankResponse = transformMovebankJson(response);
+        console.log(transMovebankResponse);
+        console.log(transMovebankResponse[0].geojson.features.geometry.coordinates);
 
-    for (i = 0; i < transMovebankResponse.length; i++) {
-        insertItem({collection: "animalRoutes", geoJson: transMovebankResponse[i].geojson});
-        coordinates.push(transMovebankResponse[i].geojson.features.geometry.coordinates)
-    }
+        var coordinates = [];
 
-    console.log(coordinates);
-    var polyline = L.polyline(coordinates).addTo(map);
-    map.fitBounds(polyline.getBounds());
-});
+        for (i = 0; i < transMovebankResponse.length; i++) {
+            insertItem({collection: "animalRoutes", geoJson: transMovebankResponse[i].geojson});
+            coordinates.push(transMovebankResponse[i].geojson.features.geometry.coordinates)
+        }
+
+        console.log(coordinates);
+        var polyline = L.polyline(coordinates).addTo(map);
+        map.fitBounds(polyline.getBounds());
+
+}
