@@ -34,7 +34,7 @@
 
 </head>
 
-<body onload="getFiles()">
+<body onload="filter1()">
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <span class="navbar-brand">Geosoftware-Projekt</span>
@@ -56,6 +56,21 @@
 
 
 <div id="mapdiv" style="width: device-width; height: 500px;"></div>
+<div id="filter">
+    <form name="filter" >
+        User_ID:
+        <input type="text" name="User_ID"/> To show the routes off all User Routes, just leave this field Empty. To show more than routes from one other please enter the IDs like: "1; 2".<br/>
+        Animal:
+        <input type="text" name="Animal"/><br/>
+        <input type="checkbox" name="userRoutes" checked/> Show User Routes<br/>
+        <input type="checkbox" name="animalRoutes" checked/> Show Animal Routes<br/>
+        <input type="checkbox" name="userIntersections" checked/> Show Intersections with user<br/>
+        <input type="checkbox" name="animalIntersections" checked/> Show Intersections with Animals<br/>
+    </form>
+    <button onclick="filter1()"> Submit </button>
+</div>
+<div id="movebankJson"></div>
+
 
 <!--
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
@@ -78,6 +93,8 @@
 
 </body>
 
+
 <script src="js/index.js"></script>
+<script src="token.js"></script>
 
 </html>

@@ -107,7 +107,7 @@ $.ajax({
 })
     .done(function (response) {
         // parse + use data here
-        console.log("inerst data" +data);
+        console.log("insert data" +data);
     })
     .fail(function (xhr, status, errorThrown) {
         // handle errors
