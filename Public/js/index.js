@@ -231,10 +231,12 @@ function addUserRoutes(userRoutes){
 
 function addAnimalroutes(animalRoutes)
 {
+    console.log(animalRoutes);
     var animalGeoJson=[];
     for (var i =0; i<animalRoutes.length; i++){
-        animalGeoJson.push((animalRoutes[i].geoJson));
+        animalGeoJson.push((JSON.parse(animalRoutes[i].geoJson)));
     }
+    console.log(animalGeoJson);
     var collectionOfRoutes = [];
     var coordinates = [];
     for (var i = 0; i < animalGeoJson.length; i++) {
@@ -246,7 +248,7 @@ function addAnimalroutes(animalRoutes)
         routesFeature.addLayer(polyline);
 
         var popup = L.popup();
-        popup.setContent("Animal:" + animalRoutes[i].animal);
+        popup.setContent("Animal:" + animalRoutes[i].User_ID);
         collectionOfRoutes[i].bindPopup(popup);
 
         collectionOfRoutes[i].on('mouseover', function (e) {
@@ -484,19 +486,19 @@ async function filter1(id){
         if(animals!="")
         {
             if(animals.indexOf(";")=== -1) {
-                query = "{\"animal\": \"" + animals + "\"}"
+                query = "{\"USER_ID\": \"" + animals + "\"}"
             }
             else{
                 var animal = animals.substring(0,animals.indexOf(";"));
                 animals = animals.substring(animals.indexOf(";")+1, animals.length);
-                query = "{ \"$or\" : [ {\"animal\": \"" + animal  + "\"} , ";
+                query = "{ \"$or\" : [ {\"USER_ID\": \"" + animal  + "\"} , ";
                 while(animals.indexOf(";")!= -1){
                     animal = animals.substring(1,animals.indexOf(";"));
                     animals = animals.substring(animals.indexOf(";")+1, animals.length);
-                    query += " {\"User_ID\": \"" + animal  + "\"} , "
+                    query += " {\"USER_ID\": \"" + animal  + "\"} , "
                 }
                 animal = animals.substring(1, animals.length);
-                query += " {\"animal\": \"" + animal  + "\"}]}";
+                query += " {\"USER_ID\": \"" + animal  + "\"}]}";
             }
         }
         try {
