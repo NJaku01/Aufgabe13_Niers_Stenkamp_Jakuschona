@@ -39,6 +39,7 @@ var control = L.Routing.control({
 });
 control.addTo(map);
 
+
 /**
  * Some events that happen if the page is loaded, to reload the last result or set the navigation bar
  * @desc Abgabe zu Aufgabe 5, Geosoft 1, SoSe 2019
@@ -414,12 +415,15 @@ function getFilesFromMovebank() {
      * NIederland: 163020445
      * Nord- & Osteuropa: 467107447
      * Schweden bis Holland: 350174730
+     * Schweden bis Spanien: 10722328
      *
      */
 
     var study = document.forms["createAnimal"]["Study_ID"].value;;
 
     var resource = "movebank/" + study;
+
+    $('body').css('cursor','progress');
 
     $.get(resource, function(response, status, x) {
 
@@ -435,6 +439,10 @@ function getFilesFromMovebank() {
                 Type: transMovebankResponse[i].Type, date: transMovebankResponse[i].date, time: transMovebankResponse[i].time,
                 geoJson: JSON.stringify(transMovebankResponse[i].geoJson)});
         }
+
+        $('body').css('cursor','default');
+
+        alert("Routes of Study No. " + study + " have been added to the Database!");
 
     })
 }
