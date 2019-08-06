@@ -139,6 +139,8 @@ function showLine(route) {
         var length = line.features[0].geometry.coordinates.length;
         if (length > 30) {
             alert("You are only allowed to insert 30 Waypoints to calculate the route");
+            document.getElementById("geojsonUpdate").value = route;
+            document.getElementById("geojson").value = route;
         } else {
             control.spliceWaypoints(0, 10000000);
             for (var i = 0; i < length; i++) {
@@ -152,8 +154,6 @@ function showLine(route) {
 
     } else {
         alert("No valid Line string inserted");
-        document.getElementById("geojsonUpdate").value = route;
-        document.getElementById("geojson").value = route;
     }
 }
 
@@ -304,37 +304,39 @@ async function validateForm(form) {
     try {
         "use strict";
         if (form == "create" || form == "update") {
-            var x = document.forms[form]["geojson"].value;
-            var userID = document.forms[form]["User_ID"].value;
-            if (x == "") {
+            var inputJSON = document.forms[form]["geojson"].value;
+            var userIDInput = document.forms[form]["User_ID"].value;
+            if (inputJSON == "") {
                 alert("A route must be selected");
                 return false;
-            } else if (!checkIfGeoJsonLineString(x)) {
+            } else if (!checkIfGeoJsonLineString(inputJSON)) {
                 alert("No valid GeoJson inserted. Use the Routing Machine to create a valid GeoJson");
                 return false;
             }
-            if (userID == "") {
+            if (userIDInput == "") {
                 alert("A userID must be selected");
                 return false;
             }
-            console.log(x);
-            console.log(userID);
+            console.log(inputJSON);
+            console.log(userIDInput);
+
+            var routeIDInput = Math.random().toString(36).substring(2, 15);
+            document.getElementById("routeID").value = routeIDInput;
+            console.log(routeIDInput);
 
             mongodbJSON = await getFilesFromMongodb("userRoutes");
             console.log(mongodbJSON);
 
-            var intersections = calculateIntersect(userID, x, mongodbJSON);
+            var intersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSON);
             console.log(intersections);
-
-
 
         }
         if (form == "update" || form == "delete") {
-            x = document.forms[form]["_id"].value;
-            if (x == "") {
+            inputJSON = document.forms[form]["_id"].value;
+            if (inputJSON == "") {
                 alert("A id must be selected");
                 return false;
-            } else if (x.length < 12) {
+            } else if (inputJSON.length < 12) {
                 alert("A id must be at least 12 characters long");
                 return false;
             }
@@ -532,7 +534,7 @@ console.log(turf.lineIntersect(line1test, line2test));
  * @param allRoutes
  * @returns {Array}
  */
-function calculateIntersect(userIDInput, inputRoute, allRoutes) {
+function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes) {
     var intersectAll=[];
     var parseInputRoute = JSON.parse(inputRoute);
     console.log(parseInputRoute);
@@ -540,9 +542,10 @@ function calculateIntersect(userIDInput, inputRoute, allRoutes) {
     console.log(allRoutes[0]._id);
     for (var j=0; j<allRoutes.length; j++) {
         var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geojson));
-        console.log(intersect);
-        if (intersect.features.length =! 0) {
-            insertItem({collection: "userIntersections", geoJson: intersect, routeID: allRoutes[j]._id, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput});
+        if (intersect.features.length != 0) {
+            console.log(intersect);
+            intersect=JSON.stringify(intersect);
+            insertItem({collection: "userIntersections", geoJson: intersect, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
         }
 
         intersectAll.push(intersect);
