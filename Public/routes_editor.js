@@ -529,7 +529,7 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes) {
         if (intersect.features.length != 0) {
             console.log(intersect);
             intersect=JSON.stringify(intersect);
-            insertItem({collection: "userIntersections", geoJson: intersect, routeID: allRoutes[j]._id, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
+            insertItem({collection: "userIntersections", geoJson: intersect, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
         }
 
         intersectAll.push(intersect);

@@ -163,7 +163,6 @@ function addMap() {
 
 function addUserRoutes(userRoutes){
 
-
     var geojsons=[];
     var linesArray=[];
     var routes=[];
@@ -280,7 +279,7 @@ function addUserIntersections(userIntersections){
           var marker= L.marker([lat,lng]).addTo(map)
               .bindPopup("User Intersection between: <br/> User1:" + userIntersections[i].UserId +"<br/> User2: " + userIntersections[i].UserIDInput);
           routesFeature.addLayer(marker);
-          routesToShow.push(userIntersections[i]._id);
+          routesToShow.push(userIntersections[i].routeID);
           routesToShow.push(userIntersections[i].routeIDInput);
 
         }
@@ -380,7 +379,6 @@ async function filter1(id){
 
     }
 
-    console.log(userID);
 
 
     map.eachLayer(function (layer) {
@@ -418,22 +416,19 @@ async function filter1(id){
         var routesToShow = addUserIntersections(userIntersections);
 
         if (routesToShow.length != 0) {
-            if(routesToShow.length === 1) {
-                query = "{\"$or\" : [ {\"_id\" :  " + routesToShow[0] + "\"}, { \" routeID \" : " + routesToShow[0] + "\"}, ";
-            }
-            else{
-                query = "{\"$or\" : [ {\"_id\" :  " + routesToShow[0] + "\"}, { \" routeID \" : " + routesToShow[0] + "\"}, ";
+           query = "{\"$or\" : [ { \"routeID\" : \"" + routesToShow[0] + "\"}, ";
             for(var i=1;i < routesToShow.length-1; i++){
-                query+= "{\"_id\" :  " + routesToShow[i] + "\"}, { \" routeID \" : " + routesToShow[i] + "\"},"
+                query+= "{ \"routeID\" : \"" + routesToShow[i] + "\"},"
             }
-                query+= "{\"_id\" :  " + routesToShow[routesToShow.length-1] + "\"}, { \" routeID \" : " + routesToShow[routesToShow.length-1] + "\"}]}"
+            query+= "{ \"routeID\" : \"" + routesToShow[routesToShow.length-1] + "\"}]}"
 
-            }
+
 
             try {
                 routesToShow = await getDatabaseFiles("userRoutes", query);
 
-            } catch {
+            } catch(e) {
+                console.log(e)
 
             }
 
