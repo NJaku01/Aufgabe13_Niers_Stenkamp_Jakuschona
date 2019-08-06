@@ -265,15 +265,11 @@ function addAnimalroutes(animalRoutes)
 
 function addUserIntersections(userIntersections){
 
+    var userIntersectionsPoints= [];
     for( var i in userIntersections){
 
-        var lat;
-        var lng;
-
         try{
-            var test= "userIntersections[i].geoJson[features][0][geometry][coordinates][][0]"
-            console.log(userIntersections[i].geoJson);
-           lat= userIntersections[i].geoJson[features][0][geometry][coordinates][0];
+          userIntersections.push(JSON.parse(userIntersections[i].geoJson));
         }
         catch(e){
             console.log(e);
@@ -406,7 +402,6 @@ async function filter1(id){
 
         }
 
-        console.log(userIntersections);
         addUserIntersections(userIntersections);
 
         }
