@@ -444,7 +444,6 @@ async function filter1(id){
         if(filterUser || userID != "")
         try {
             var userIntersections2 = await getDatabaseFiles("userIntersections", query);
-            console.log(userIntersections2);
             userIntersections= userIntersections.concat(userIntersections2);
 
 
@@ -454,7 +453,6 @@ async function filter1(id){
 
 
             var routesToShow = [];
-            console.log(userIntersections);
 
         if(userIntersections.length !== 0) {
             routesToShow = addUserIntersections(userIntersections);
