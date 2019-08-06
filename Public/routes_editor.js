@@ -319,7 +319,7 @@ async function validateForm(form) {
             console.log(inputJSON);
             console.log(userIDInput);
 
-            var routeIDInput = Math.random().toString(36);
+            var routeIDInput = Math.random().toString(36).substring(2, 15);
             document.getElementById("routeID").value = routeIDInput;
             console.log(routeIDInput);
 
