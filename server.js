@@ -110,7 +110,7 @@ app.post("/item/update", (req, res) => {
     let id = req.body._id;
     delete req.body._id;
     console.log(req.body);// => { name:req.body.name, description:req.body.description }
-    app.locals.db.collection('userRoute').updateOne({_id: new mongodb.ObjectID(id)}, {$set: req.body}, (error, result) => {
+    app.locals.db.collection('userRoutes').updateOne({routeID: id}, {$set: req.body}, (error, result) => {
         if (error) {
             console.dir(error);
         }
@@ -121,8 +121,26 @@ app.post("/item/update", (req, res) => {
 app.post("/item/delete", (req, res) => {
     // delete item
     console.log("delete item " + JSON.stringify(req.body));
+    let objectId = "ObjectId(" + req.body.query + ")";
+    var queryJSON = req.body.query;
+    if(queryJSON!=null) {
+        queryJSON = JSON.parse(queryJSON);
+    }
+    app.locals.db.collection(req.body.collection).deleteOne(queryJSON, (error, result) => {
+        if (error) {
+            console.dir(error);
+        }
+        res.redirect('/routes_editor.html');
+    });
+});
+
+
+
+app.post("/item/deleteOne", (req, res) => {
+    // delete item
+    console.log("delete item " + JSON.stringify(req.body));
     let objectId = "ObjectId(" + req.body._id + ")";
-    app.locals.db.collection('userRoute').deleteOne({_id: new mongodb.ObjectID(req.body._id)}, (error, result) => {
+    app.locals.db.collection('userRoutes').deleteOne({routeID: req.body._id}, (error, result) => {
         if (error) {
             console.dir(error);
         }

@@ -196,7 +196,7 @@ function addUserRoutes(userRoutes){
 
         //add all Routes to the Map
         var popup = L.popup();
-        popup.setContent('Route: ' + (i + 1) + "<br/>" +  "UserID:" + userRoutes[i].User_ID + "<br/> <img src=\"http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png\" /> <br/>" +"Weather: " + weather.weather[0].description);
+        popup.setContent('Route: ' + userRoutes[i].routeID + "<br/>" +  "UserID:" + userRoutes[i].User_ID + "<br/> <img src=\"http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png\" /> <br/>" +"Weather: " + weather.weather[0].description);
         routes[i].bindPopup(popup);
 
         routes[i].on('mouseover', function (e) {
@@ -367,6 +367,7 @@ async function filter1(id){
 
     var userID = document.forms["filter"]["User_ID"].value;
     var animals = document.forms["filter"]["Animal"].value;
+    var interactions = document.forms["filter"]["InteractionIDs"].value;
     var wantUserRoutes = document.forms["filter"]["userRoutes"].checked;
     var wantAnimalRoutes = document.forms["filter"]["animalRoutes"].checked;
     var wantUserIntersection = document.forms["filter"]["userIntersections"].checked;
@@ -375,10 +376,11 @@ async function filter1(id){
     var animalRoutes;
     var userIntersections;
     if(id !== null){
-        userID=id;
-        wantAnimalIntersections=false;
+        interactions =id;
+        wantAnimalIntersections=true;
+        wantUserIntersection =true;
         wantAnimalRoutes=false;
-
+        wantUserRoutes=false;
     }
 
 
@@ -415,7 +417,12 @@ async function filter1(id){
 
         }
 
-        var routesToShow = addUserIntersections(userIntersections);
+        if(userIntersections.length !== 0) {
+            var routesToShow = addUserIntersections(userIntersections);
+        }
+        else{
+            alert("No User Intersections found")
+        }
 
         if (routesToShow.length != 0) {
            query = "{\"$or\" : [ { \"routeID\" : \"" + routesToShow[0] + "\"}, ";

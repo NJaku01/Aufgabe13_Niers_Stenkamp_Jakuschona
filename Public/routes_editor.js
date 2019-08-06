@@ -301,12 +301,20 @@ function setCookie(cname, cvalue, exdays) {
  * @returns {boolean} if the form is correct
  */
 async function validateForm(form) {
+
+    if(form === "update"){
+        var id = document.forms[form]["_id"].value;
+        console.log(id);
+        deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
+        deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
+    }
+
     try {
         "use strict";
         if (form == "create" || form == "update") {
             var inputJSON = document.forms[form]["geojson"].value;
             var userIDInput = document.forms[form]["User_ID"].value;
-            if (inputJSON == "") {
+           if (inputJSON == "") {
                 alert("A route must be selected");
                 return false;
             } else if (!checkIfGeoJsonLineString(inputJSON)) {
@@ -320,11 +328,22 @@ async function validateForm(form) {
             console.log(inputJSON);
             console.log(userIDInput);
 
-            var routeIDInput = Math.random().toString(36).substring(2, 15);
-            document.getElementById("routeID").value = routeIDInput;
-            console.log(routeIDInput);
+            var routeIDInput;
+            if(form=== "create") {
+                routeIDInput = Math.random().toString(36).substring(2, 15);
+                document.getElementById("routeID").value = routeIDInput;
+                console.log(routeIDInput);
+            }
+            else{
+                routeIDInput = id;
+            }
 
             mongodbJSON = await getFilesFromMongodb("userRoutes");
+            for (var i in mongodbJSON){
+                if(mongodbJSON[i].routeID == id){
+                    mongodbJSON.splice(i, 1);
+                }
+            }
             console.log(mongodbJSON);
 
             var intersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSON);
@@ -332,18 +351,41 @@ async function validateForm(form) {
 
         }
         if (form == "update" || form == "delete") {
-            inputJSON = document.forms[form]["_id"].value;
-            if (inputJSON == "") {
+            var id = document.forms[form]["_id"].value;
+            if (id == "") {
                 alert("A id must be selected");
                 return false;
-            } else if (inputJSON.length < 12) {
-                alert("A id must be at least 12 characters long");
-                return false;
             }
+            console.log(id);
+        }
+
+        if(form === "delete"){
+            var id = document.forms[form]["_id"].value;
+            console.log(id);
+            deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
+            deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
         }
     }
-    catch {}
+    catch(e){ console.log(e)}
 }
+
+/**
+ * Shows the Items from mongodb in a textarea
+ * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
+ * @author Nick Jakuschona n_jaku01@wwu.de
+ */
+async function deleteDatabaseFiles(collection, query) {
+
+    //Example query: "{\"User_ID\" : \"1234\"}"
+
+    $.ajax({
+        url: "/item/delete", // URL der Abfrage,
+        data: {collection: collection, query: query},
+        type: "POST"
+    })
+
+
+};
 
 function deleteAll(collection){
     $.ajax({
@@ -535,11 +577,8 @@ console.log(turf.lineIntersect(line1test, line2test));
  * @returns {Array}
  */
 function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes) {
-    var intersectAll=[];
     var parseInputRoute = JSON.parse(inputRoute);
     console.log(parseInputRoute);
-    console.log(allRoutes);
-    console.log(allRoutes[0]._id);
     for (var j=0; j<allRoutes.length; j++) {
         var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geojson));
         if (intersect.features.length != 0) {
@@ -549,17 +588,9 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes) {
             insertItem({collection: "userIntersections", geoJson: intersect, id: userInteractionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
         }
 
-        intersectAll.push(intersect);
-        intersect = {};
+      intersect = {};
     }
 
-    for (var i=0; i<intersectAll.length; i++) {
-        if (intersectAll[i].features.length == 0) {
-            intersectAll.splice(i, 1);
-        }
-    }
-    console.log(intersectAll);
-    return intersectAll;
 }
 
 // console.log(calculateIntersect(line1test, lines));
