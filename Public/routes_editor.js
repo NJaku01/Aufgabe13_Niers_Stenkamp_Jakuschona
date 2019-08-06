@@ -524,8 +524,8 @@ function calculateIntersect(userIDInput, inputRoute, allRoutes) {
     console.log(allRoutes[0]._id);
     for (var j=0; j<allRoutes.length; j++) {
         var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geojson));
-        console.log(intersect);
-        if (intersect.features.length =! 0) {
+        if (intersect.features.length != 0) {
+            console.log(intersect);
             insertItem({collection: "userIntersections", geoJson: intersect, routeID: allRoutes[j]._id, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput});
         }
 
