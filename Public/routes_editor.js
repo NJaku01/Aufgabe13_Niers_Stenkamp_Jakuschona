@@ -303,41 +303,39 @@ async function validateForm(form) {
     try {
         "use strict";
         if (form == "create" || form == "update") {
-            var x = document.forms[form]["geojson"].value;
-            var userID = document.forms[form]["User_ID"].value;
-            if (x == "") {
+            var inputJSON = document.forms[form]["geojson"].value;
+            var userIDInput = document.forms[form]["User_ID"].value;
+            if (inputJSON == "") {
                 alert("A route must be selected");
                 return false;
-            } else if (!checkIfGeoJsonLineString(x)) {
+            } else if (!checkIfGeoJsonLineString(inputJSON)) {
                 alert("No valid GeoJson inserted. Use the Routing Machine to create a valid GeoJson");
                 return false;
             }
-            if (userID == "") {
+            if (userIDInput == "") {
                 alert("A userID must be selected");
                 return false;
             }
-            console.log(x);
-            console.log(userID);
+            console.log(inputJSON);
+            console.log(userIDInput);
 
-            var routeID = Math.random().toString(36);
-            console.log(routeID);
+            var routeIDInput = Math.random().toString(36);
+            document.getElementById("routeID").value = routeIDInput;
+            console.log(routeIDInput);
 
             mongodbJSON = await getFilesFromMongodb("userRoutes");
             console.log(mongodbJSON);
 
-            var intersections = calculateIntersect(routeID, userID, x, mongodbJSON);
+            var intersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSON);
             console.log(intersections);
-
-
-
 
         }
         if (form == "update" || form == "delete") {
-            x = document.forms[form]["_id"].value;
-            if (x == "") {
+            inputJSON = document.forms[form]["_id"].value;
+            if (inputJSON == "") {
                 alert("A id must be selected");
                 return false;
-            } else if (x.length < 12) {
+            } else if (inputJSON.length < 12) {
                 alert("A id must be at least 12 characters long");
                 return false;
             }
