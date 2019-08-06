@@ -13,6 +13,129 @@ var map = L.map("mapdiv", {
 var routesFeature = L.featureGroup();
 
 
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+
+// Testroute
+var line1test = {
+    "_id":"5d41a216205cf30395e99b8221",
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        7.492675781249999,
+                        51.60437164681676
+                    ],
+                    [
+                        8.37158203125,
+                        51.05520733858494
+                    ]
+                ]
+            }
+        }
+    ]
+}
+// console.log(line1test.type);
+
+// Testroute
+var line2test = {
+    "_id":"5d41a216205cf30395e99b8a22",
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        7.18505859375,
+                        51.45400691005982
+                    ],
+                    [
+                        8.50341796875,
+                        51.699799849741936
+                    ]
+                ]
+            }
+        }
+    ]
+}
+
+// Testroute
+var line3test = {
+    "_id":"5d41a216205cf30395e99b8123",
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        8.33587646484375,
+                        51.47796179607121
+                    ],
+                    [
+                        7.87994384765625,
+                        51.037939894299356
+                    ]
+                ]
+            }
+        }
+    ]
+}
+
+// Test AllRoutes
+var lines = [];
+lines.push(line2test, line3test);
+//console.log(lines);
+//console.log(line1test);
+//console.log(line1test._id);
+//console.log(turf.lineIntersect(line1test, line2test));
+
+// console.log(turf);
+//console.log(intersect);
+/**
+ * function which takes one new inputRoute and compares this one with all other animalGeoJson in allRoutes if they intersect.
+ * function returns all given intersections.
+ * @param inputRoute
+ * @param allRoutes
+ * @returns {Array}
+ */
+function calculateIntersect(inputRoute, allRoutes) {
+    var intersectAll=[];
+
+    for (var j=0; j<allRoutes.length; j++) {
+                var intersect = turf.lineIntersect(inputRoute, allRoutes[j]);
+                intersectAll.push(intersect);
+        }
+
+    for (var i=0; i<intersectAll.length; i++) {
+        if (intersectAll[i].features.length == 0) {
+            intersectAll.splice(i, 1);
+        }
+    }
+    return intersectAll;
+}
+
+//console.log(calculateIntersect(line1test, lines));
+
+
 function addMap() {
 
     routesFeature = L.featureGroup();
@@ -140,6 +263,26 @@ function addAnimalroutes(animalRoutes)
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
+function addUserIntersections(userIntersections){
+
+    var userIntersectionsPoints= [];
+    for( var i in userIntersections){
+
+        try{
+          userIntersections.push(JSON.parse(userIntersections[i].geoJson));
+        }
+        catch(e){
+            console.log(e);
+
+        }
+    }
+
+
+}
+
+
+
+
 
 function insertItem(data){
 
@@ -194,7 +337,16 @@ function weatherRequest(long, lat) {
     return response;
 }
 
-async function filter1(){
+function componentDidMount(){
+    var id= getParameterByName('id');
+    if(id !== null){
+        filter1(id)
+    }else{
+        filter1(null)
+    }
+}
+async function filter1(id){
+
 
     var userID = document.forms["filter"]["User_ID"].value;
     var animals = document.forms["filter"]["Animal"].value;
@@ -204,12 +356,56 @@ async function filter1(){
     var wantAnimalIntersections = document.forms["filter"]["animalIntersections"].checked;
     var userRoutes;
     var animalRoutes;
+    var userIntersections;
+    if(id !== null){
+        userID=id;
+        wantAnimalIntersections=false;
+        wantAnimalRoutes=false;
+
+    }
+
+    console.log(userID);
+
 
     map.eachLayer(function (layer) {
         map.removeLayer(layer);
     });
 
     addMap();
+
+    if(wantUserIntersection){
+        var query= {};
+
+        if(userID!= "")
+        {
+            if(userID.indexOf(";")=== -1) {
+                query = "{\"$or\" : [{\"UserId\": \"" + userID + "\"} , { \"UserIDInput\" : \"" + userD + "\"}]}"
+            }
+            else{
+                var user= userID.substring(0,userID.indexOf(";"));
+                userID = userID.substring(userID.indexOf(";")+1, userID.length);
+                query = "{ \"$or\" : [ {\"UserId\": \"" + user + "\"} , { \"UserIDInput\" : \"" + user + "\"} ,  ";
+                while(userID.indexOf(";")!= -1){
+                    user= userID.substring(1,userID.indexOf(";"));
+                    userID = userID.substring(userID.indexOf(";")+1, userID.length);
+                    query += " {\"UserId\": \"" + user + "\"} , { \"UserIDInput\" : \"" + user + "\"} , "
+                }
+                user= userID.substring(1,userID.length);
+                query += " {\"UserId\": \"" + user + "\"} , { \"UserIDInput\" : \"" + user + "\"}]}";
+            }
+        }
+        try {
+            userIntersections = await getDatabaseFiles("userIntersections", query);
+
+        }
+        catch{
+
+        }
+
+        addUserIntersections(userIntersections);
+
+        }
+
 
     if(wantUserRoutes){
         var query= {};

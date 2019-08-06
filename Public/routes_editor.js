@@ -138,6 +138,8 @@ function showLine(route) {
         var length = line.features[0].geometry.coordinates.length;
         if (length > 30) {
             alert("You are only allowed to insert 30 Waypoints to calculate the route");
+            document.getElementById("geojsonUpdate").value = route;
+            document.getElementById("geojson").value = route;
         } else {
             control.spliceWaypoints(0, 10000000);
             for (var i = 0; i < length; i++) {
@@ -151,8 +153,6 @@ function showLine(route) {
 
     } else {
         alert("No valid Line string inserted");
-        document.getElementById("geojsonUpdate").value = route;
-        document.getElementById("geojson").value = route;
     }
 }
 
@@ -526,6 +526,7 @@ function calculateIntersect(userIDInput, inputRoute, allRoutes) {
         var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geojson));
         if (intersect.features.length != 0) {
             console.log(intersect);
+            intersect=JSON.stringify(intersect);
             insertItem({collection: "userIntersections", geoJson: intersect, routeID: allRoutes[j]._id, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput});
         }
 
