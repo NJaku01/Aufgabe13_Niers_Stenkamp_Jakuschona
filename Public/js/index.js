@@ -268,14 +268,26 @@ function addUserIntersections(userIntersections){
     var userIntersectionsPoints= [];
     for( var i in userIntersections){
 
+        var lat;
+        var lng;
+
         try{
-          userIntersections.push(JSON.parse(userIntersections[i].geoJson));
+          userIntersectionsPoints.push(JSON.parse(userIntersections[i].geoJson));
+
+          lng=userIntersectionsPoints[i].features[0].geometry.coordinates[0];
+          lat=userIntersectionsPoints[i].features[0].geometry.coordinates[1];
+          var marker= L.marker([lat,lng]).addTo(map)
+              .bindPopup("User Intersection between: <br/> User1:" + userIntersections[i].UserId +"<br/> User2: " + userIntersections[i].UserIDInput);
+          routesFeature.addLayer(marker);
+
         }
         catch(e){
             console.log(e);
 
         }
     }
+
+    map.fitBounds(routesFeature.getBounds());
 
 
 }
@@ -379,7 +391,7 @@ async function filter1(id){
         if(userID!= "")
         {
             if(userID.indexOf(";")=== -1) {
-                query = "{\"$or\" : [{\"UserId\": \"" + userID + "\"} , { \"UserIDInput\" : \"" + userD + "\"}]}"
+                query = "{\"$or\" : [{\"UserId\": \"" + userID + "\"} , { \"UserIDInput\" : \"" + user + "\"}]}"
             }
             else{
                 var user= userID.substring(0,userID.indexOf(";"));
