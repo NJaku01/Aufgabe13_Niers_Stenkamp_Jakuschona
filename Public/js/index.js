@@ -263,6 +263,30 @@ function addAnimalroutes(animalRoutes)
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
+function addUserIntersections(userIntersections){
+
+    for( var i in userIntersections){
+
+        var lat;
+        var lng;
+
+        try{
+            var test= "userIntersections[i].geoJson[features][0][geometry][coordinates][][0]"
+            console.log(userIntersections[i].geoJson);
+           lat= userIntersections[i].geoJson[features][0][geometry][coordinates][0];
+        }
+        catch(e){
+            console.log(e);
+
+        }
+    }
+
+
+}
+
+
+
+
 
 function insertItem(data){
 
@@ -336,6 +360,7 @@ async function filter1(id){
     var wantAnimalIntersections = document.forms["filter"]["animalIntersections"].checked;
     var userRoutes;
     var animalRoutes;
+    var userIntersections;
     if(id !== null){
         userID=id;
         wantAnimalIntersections=false;
@@ -351,6 +376,41 @@ async function filter1(id){
     });
 
     addMap();
+
+    if(wantUserIntersection){
+        var query= {};
+
+        if(userID!= "")
+        {
+            if(userID.indexOf(";")=== -1) {
+                query = "{\"$or\" : [{\"UserId\": \"" + userID + "\"} , { \"UserIDInput\" : \"" + userD + "\"}]}"
+            }
+            else{
+                var user= userID.substring(0,userID.indexOf(";"));
+                userID = userID.substring(userID.indexOf(";")+1, userID.length);
+                query = "{ \"$or\" : [ {\"UserId\": \"" + user + "\"} , { \"UserIDInput\" : \"" + user + "\"} ,  ";
+                while(userID.indexOf(";")!= -1){
+                    user= userID.substring(1,userID.indexOf(";"));
+                    userID = userID.substring(userID.indexOf(";")+1, userID.length);
+                    query += " {\"UserId\": \"" + user + "\"} , { \"UserIDInput\" : \"" + user + "\"} , "
+                }
+                user= userID.substring(1,userID.length);
+                query += " {\"UserId\": \"" + user + "\"} , { \"UserIDInput\" : \"" + user + "\"}]}";
+            }
+        }
+        try {
+            userIntersections = await getDatabaseFiles("userIntersections", query);
+
+        }
+        catch{
+
+        }
+
+        console.log(userIntersections);
+        addUserIntersections(userIntersections);
+
+        }
+
 
     if(wantUserRoutes){
         var query= {};
