@@ -59,11 +59,11 @@
 <div id="filter">
     <form name="filter" >
         User_ID:
-        <input type="text" name="User_ID"/> To show the routes off all User Routes, just leave this field Empty. To show more than routes from one other please enter the IDs like: "1; 2".<br/>
+        <input type="text" name="User_ID"/> <input type="checkbox" name="filterUser" checked/> Show every User<br>To show more than routes from one other please enter the IDs like: "1; 2".<br/>
         Animal:
-        <input type="text" name="Animal"/><br/>
+        <input type="text" name="Animal"/> <input type="checkbox" name="filterAnimal" checked/> Show every animal  (If not Checked all User Routes were shown)<br/>
         IntersectionIDS:
-        <input type="text" name="InteractionIDs"/><br/>
+        <input type="text" name="InteractionIDs"/> <input type="checkbox" name="filterIntersection" checked/> Show every Interction (If not Checked all User Routes were shown) <br/>
         <input type="checkbox" name="userRoutes" checked/> Show User Routes<br/>
         <input type="checkbox" name="animalRoutes" checked/> Show Animal Routes<br/>
         <input type="checkbox" name="userIntersections" checked/> Show Intersections with user<br/>
