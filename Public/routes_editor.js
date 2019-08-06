@@ -319,11 +319,15 @@ async function validateForm(form) {
             console.log(x);
             console.log(userID);
 
+            var routeID = Math.random().toString(36);
+            console.log(routeID);
+
             mongodbJSON = await getFilesFromMongodb("userRoutes");
             console.log(mongodbJSON);
 
-            var intersections = calculateIntersect(userID, x, mongodbJSON);
+            var intersections = calculateIntersect(routeID, userID, x, mongodbJSON);
             console.log(intersections);
+
 
 
 
@@ -516,7 +520,7 @@ console.log(turf.lineIntersect(line1test, line2test));
  * @param allRoutes
  * @returns {Array}
  */
-function calculateIntersect(userIDInput, inputRoute, allRoutes) {
+function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes) {
     var intersectAll=[];
     var parseInputRoute = JSON.parse(inputRoute);
     console.log(parseInputRoute);
@@ -527,7 +531,7 @@ function calculateIntersect(userIDInput, inputRoute, allRoutes) {
         if (intersect.features.length != 0) {
             console.log(intersect);
             intersect=JSON.stringify(intersect);
-            insertItem({collection: "userIntersections", geoJson: intersect, routeID: allRoutes[j]._id, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput});
+            insertItem({collection: "userIntersections", geoJson: intersect, routeID: allRoutes[j]._id, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
         }
 
         intersectAll.push(intersect);
