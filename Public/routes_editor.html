@@ -133,15 +133,15 @@
 
         <h5>Add Animal Route</h5>
 
-        <form name="createAnimal" action="movebank"><!--onsubmit="getMovebankRoute()" method="GET"-->
+        <form name="createAnimal">
 
             Study ID:<br/>
-            <input type="number" name="Study_ID" id="study_id"/>
+            <input type="number" name="Study_ID"/>
             <br>
             <input type="hidden" name="collection" value="animalRoutes"/>
             <br/>
-            <input type="submit" value="Send"/>
         </form>
+        <button onclick="getFilesFromMovebank()">Get Files from Movebank</button>
     </div>
 
     <button onclick="deleteAll('userRoutes')">Delete all UserRoutes in Database</button>

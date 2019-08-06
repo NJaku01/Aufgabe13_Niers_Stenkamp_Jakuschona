@@ -111,7 +111,7 @@ function addAnimalroutes(animalRoutes)
 {
     var animalGeoJson=[];
     for (var i =0; i<animalRoutes.length; i++){
-        animalGeoJson.push(JSON.parse(animalRoutes[i].geoJson));
+        animalGeoJson.push((animalRoutes[i].geoJson));
     }
     var collectionOfRoutes = [];
     var coordinates = [];
@@ -273,6 +273,7 @@ async function filter1(){
         }
         try {
             animalRoutes = await getDatabaseFiles("animalRoutes", query);
+            console.log(animalRoutes);
         }
         catch(e){
             console.log(e);

@@ -7,6 +7,7 @@ const start_latlng = [lat, lon];
 var drawnItems;
 var mongodbJSON = [];
 
+
 var map = L.map("mapdiv", {
     center: start_latlng,
     zoom: 11
@@ -369,12 +370,11 @@ function transformMovebankJson(movebankResponse) {
     var coordinates = [];
     var latlon = [];
 
-    console.log(movebankResponse);
 
     for (i = 0; i < movebankResponse.individuals.length; i++){
 
         var json = {"User_ID":"","Name":"","Type":"","date":"","time":"",
-            "geojson":{"type":"FeatureCollection","features":{"type":"Feature","properties":{},"geometry":{"type":"LineString","coordinates":[]}}}};
+            "geoJson":{"type":"FeatureCollection","features":{"type":"Feature","properties":{},"geometry":{"type":"LineString","coordinates":[]}}}};
 
         json.User_ID = movebankResponse.individuals[i].individual_taxon_canonical_name;
         json.Name = movebankResponse.individuals[i].individual_local_identifier;
@@ -389,7 +389,7 @@ function transformMovebankJson(movebankResponse) {
             coordinates.push(latlon);
         }
 
-        json.geojson.features.geometry.coordinates = coordinates;
+        json.geoJson.features.geometry.coordinates = coordinates;
 
         jsonArray.push(json);
     }
@@ -397,31 +397,45 @@ function transformMovebankJson(movebankResponse) {
 }
 
 
+function getFilesFromMovebank() {
+
     /**
-    var resource = "movebank";
+     * Working Study IDs:
+     * Belgien: 604806671
+     * Galapagos: 2911040
+     * Süddeutschland / Osteuropa: 446579
+     * Süddeutschland bis Spanien: 186178781, 173641633
+     *
+     * Mit Agreement:
+     * Dänemark: 49535504
+     * Spiekeroog: 183209639
+     * NIederland: 163020445
+     * Nord- & Osteuropa: 467107447
+     * Schweden bis Holland: 350174730
+     *
+     */
 
-    $.get(resource, function(response, status, x){
-    */
+    var study = document.forms["createAnimal"]["Study_ID"].value;;
 
+    var resource = "movebank/" + study;
+
+    $.get(resource, function(response, status, x) {
+
+        /**
         let formatted_response = JSON.stringify(response, null, 4);
         $("#movebankJson").text(formatted_response);
+        */
 
         let transMovebankResponse = transformMovebankJson(response);
-        console.log(transMovebankResponse);
-        console.log(transMovebankResponse[0].geojson.features.geometry.coordinates);
-
-        var coordinates = [];
 
         for (i = 0; i < transMovebankResponse.length; i++) {
-            insertItem({collection: "animalRoutes", geoJson: transMovebankResponse[i].geojson});
-            coordinates.push(transMovebankResponse[i].geojson.features.geometry.coordinates)
+            insertItem({collection: "animalRoutes", User_ID: transMovebankResponse[i].User_ID, Name: transMovebankResponse[i].Name,
+                Type: transMovebankResponse[i].Type, date: transMovebankResponse[i].date, time: transMovebankResponse[i].time,
+                geoJson: JSON.stringify(transMovebankResponse[i].geoJson)});
         }
 
-        console.log(coordinates);
-        var polyline = L.polyline(coordinates).addTo(map);
-        map.fitBounds(polyline.getBounds());
-
-
+    })
+}
 
 // Testroute
 var line1test = {
