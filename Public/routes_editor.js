@@ -370,8 +370,8 @@ async function validateForm(form) {
             var UserIntersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSONUserRoutes, "userIntersections");
             console.log(UserIntersections);
 
-            var AnimalIntersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSONAnimalRoutes, "animalIntersections");
-            console.log(AnimalIntersections);
+            var animalIntersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSONAnimalRoutes, "animalIntersections");
+            console.log(animalIntersections);
 
 
         }
@@ -391,13 +391,6 @@ async function validateForm(form) {
             deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
         }
-        /*
-        if (form == "createAnimal") {
-            mongodbJSON = await getFilesFromMongodb("userRoutes");
-            console.log(mongodbJSON);
-        }
-
-         */
     }
     catch(e){ console.log(e)}
 }
@@ -481,54 +474,69 @@ function transformMovebankJson(movebankResponse) {
 }
 
 
-function getFilesFromMovebank() {
-
-    /**
-     * Working Study IDs:
-     * Belgien: 604806671
-     * Galapagos: 2911040
-     * Süddeutschland / Osteuropa: 446579
-     * Süddeutschland bis Spanien: 186178781, 173641633
-     * Nord-Osteuropa: 92261778
-     * Litauen bis Spanien: 195375760
-     * Litauen bis Afrika: 150764908
-     *
-     * Mit Agreement:
-     * Dänemark: 49535504
-     * Spiekeroog: 183209639
-     * NIederland: 163020445
-     * Nord- & Osteuropa: 467107447
-     * Schweden bis Holland: 350174730
-     * Schweden bis Spanien: 10722328
-     *
-     */
-
-    var study = document.forms["createAnimal"]["Study_ID"].value;;
-
-    var resource = "movebank/" + study;
-
-    $('body').css('cursor','progress');
-
-    $.get(resource, function(response, status, x) {
-
+async function getFilesFromMovebank() {
+    try {
         /**
-        let formatted_response = JSON.stringify(response, null, 4);
-        $("#movebankJson").text(formatted_response);
-        */
+         * Working Study IDs:
+         * Belgien: 604806671
+         * Galapagos: 2911040
+         * Süddeutschland / Osteuropa: 446579
+         * Süddeutschland bis Spanien: 186178781, 173641633
+         * Nord-Osteuropa: 92261778
+         * Litauen bis Spanien: 195375760
+         * Litauen bis Afrika: 150764908
+         *
+         * Mit Agreement:
+         * Dänemark: 49535504
+         * Spiekeroog: 183209639
+         * NIederland: 163020445
+         * Nord- & Osteuropa: 467107447
+         * Schweden bis Holland: 350174730
+         * Schweden bis Spanien: 10722328
+         *
+         */
 
-        let transMovebankResponse = transformMovebankJson(response);
+        var study = document.forms["createAnimal"]["Study_ID"].value;
+        ;
 
-        for (i = 0; i < transMovebankResponse.length; i++) {
-            insertItem({collection: "animalRoutes", User_ID: transMovebankResponse[i].User_ID, Name: transMovebankResponse[i].Name,
-                Type: transMovebankResponse[i].Type, date: transMovebankResponse[i].date, time: transMovebankResponse[i].time, routeID: transMovebankResponse[i].routeID,
-                geoJson: JSON.stringify(transMovebankResponse[i].geoJson)});
-        }
+        var resource = "movebank/" + study;
 
-        $('body').css('cursor','default');
+        $('body').css('cursor', 'progress');
 
-        alert("Routes of Study No. " + study + " have been added to the Database!");
+        $.get(resource, async function (response, status, x) {
 
-    })
+            /**
+             let formatted_response = JSON.stringify(response, null, 4);
+             $("#movebankJson").text(formatted_response);
+             */
+
+            let transMovebankResponse = transformMovebankJson(response);
+
+            // variable for all the userRoutes stored in Mongodb
+            mongodbJSONUserRoutes = await getFilesFromMongodb("userRoutes");
+
+            for (i = 0; i < transMovebankResponse.length; i++) {
+                insertItem({
+                    collection: "animalRoutes",
+                    Study_ID: study,
+                    User_ID: transMovebankResponse[i].User_ID,
+                    Name: transMovebankResponse[i].Name,
+                    Type: transMovebankResponse[i].Type,
+                    date: transMovebankResponse[i].date,
+                    time: transMovebankResponse[i].time,
+                    routeID: transMovebankResponse[i].routeID,
+                    geoJson: JSON.stringify(transMovebankResponse[i].geoJson)
+                });
+
+                calculateIntersect(transMovebankResponse[i].routeID, transMovebankResponse[i].User_ID, JSON.stringify(transMovebankResponse[i].geoJson), mongodbJSONUserRoutes, "animalIntersections");
+            }
+
+            $('body').css('cursor', 'default');
+
+            alert("Routes of Study No. " + study + " have been added to the Database!");
+
+        })
+    } catch {}
 }
 
 // Testroute
@@ -631,10 +639,10 @@ var line3test = {
  */
 function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, collection) {
     var parseInputRoute = JSON.parse(inputRoute);
-    console.log(parseInputRoute);
-    console.log(collection);
-    console.log(allRoutes);
-    console.log(JSON.parse(allRoutes[0].geoJson));
+    // console.log(parseInputRoute);
+    // console.log(collection);
+    // console.log(allRoutes);
+    // console.log(JSON.parse(allRoutes[0].geoJson));
     for (var j=0; j<allRoutes.length; j++) {
         console.log("hello");
         var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geoJson));
