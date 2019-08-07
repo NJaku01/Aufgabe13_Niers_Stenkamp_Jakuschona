@@ -243,13 +243,11 @@ function addAnimalroutes(animalRoutes)
 
         coordinates.push(animalGeoJson[i].features[0].geometry.coordinates);
 
-        console.log(coordinates);
         for(var j in coordinates[i]) {
             var help = coordinates[i][j][0];
             coordinates[i][j][0] = coordinates[i][j][1];
             coordinates[i][j][1] = help;
         }
-        console.log(coordinates);
 
         var polyline = L.polyline(coordinates[i]).addTo(map);
         collectionOfRoutes.push(polyline);
@@ -436,7 +434,7 @@ async function filter1(id){
     var wantAnimalRoutes = document.forms["filter"]["animalRoutes"].checked;
     var wantUserIntersection = document.forms["filter"]["userIntersections"].checked;
     var wantAnimalIntersections = document.forms["filter"]["animalIntersections"].checked;
-    var showEverthing= false;
+    var showEverything= false;
     var userRoutes;
     var animalRoutes;
     var userIntersections = [];
@@ -450,8 +448,8 @@ async function filter1(id){
     }
 
     if(userID==="" && animals==="" && intersections ===""){
-        showEverthing=true;
-        wantUserRoutes=false;
+        showEverything=true;
+
     }
 
 
@@ -485,7 +483,7 @@ async function filter1(id){
 
     if(wantUserIntersection || intersections !="") {
         query ={};
-        if (!showEverthing) {
+        if (!showEverything) {
             if (intersections.indexOf(";") === -1) {
                 query = "{\"id\": \"" + intersections + "\"}"
             } else {
@@ -501,7 +499,7 @@ async function filter1(id){
                 query += " {\"id\": \"" + intersection + "\"}]}";
             }
         }
-        if(intersections != "" || showEverthing) {
+        if(intersections != "" || showEverything) {
             try {
                 userIntersections = await getDatabaseFiles("userIntersections", query);
 
@@ -512,7 +510,7 @@ async function filter1(id){
 
         query ={};
 
-        if (!showEverthing) {
+        if (!showEverything) {
                 if (userID.indexOf(";") === -1) {
                     query = "{\"$or\" : [{\"UserId\": \"" + userID + "\"} , { \"UserIDInput\" : \"" + userID + "\"}]}"
                 } else {
@@ -529,7 +527,7 @@ async function filter1(id){
                 }
 
             }
-        if(userID != "" || showEverthing)
+        if(userID != "" || showEverything)
         try {
             var userIntersections2 = await getDatabaseFiles("userIntersections", query);
             userIntersections= userIntersections.concat(userIntersections2);
@@ -595,11 +593,12 @@ async function filter1(id){
                 query += " {\"User_ID\": \"" + user + "\"}]}";
             }
         }
-        if(showEverthing || userID!="") {
+        if(showEverything || userID!="") {
             try {
                 userRoutes = await getDatabaseFiles("userRoutes", query);
 
-            } catch {
+            } catch(e) {
+                console.log(e);
 
             }
 
@@ -635,7 +634,7 @@ async function filter1(id){
                 query += " {\"USER_ID\": \"" + animal  + "\"}]}";
             }
         }
-        if(showEverthing || animals!="") {
+        if(showEverything || animals!="") {
 
 
             try {
