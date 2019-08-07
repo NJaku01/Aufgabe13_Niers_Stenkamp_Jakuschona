@@ -168,7 +168,7 @@ function addUserRoutes(userRoutes){
     var routes=[];
     var midpoints=[];
     for (var j in userRoutes) {
-        var geojson = userRoutes[j].geojson;
+        var geojson = userRoutes[j].geoJson;
         geojsons.push(JSON.parse(geojson));
 
     }
@@ -241,7 +241,15 @@ function addAnimalroutes(animalRoutes)
     var coordinates = [];
     for (var i = 0; i < animalGeoJson.length; i++) {
 
-        coordinates.push(animalGeoJson[i].features.geometry.coordinates);
+        coordinates.push(animalGeoJson[i].features[0].geometry.coordinates);
+
+        console.log(coordinates);
+        for(var j in coordinates[i]) {
+            var help = coordinates[i][j][0];
+            coordinates[i][j][0] = coordinates[i][j][1];
+            coordinates[i][j][1] = help;
+        }
+        console.log(coordinates);
 
         var polyline = L.polyline(coordinates[i]).addTo(map);
         collectionOfRoutes.push(polyline);
@@ -279,7 +287,7 @@ function addUserIntersections(userIntersections){
           lng=userIntersectionsPoints[i].features[0].geometry.coordinates[0];
           lat=userIntersectionsPoints[i].features[0].geometry.coordinates[1];
           var marker= L.marker([lat,lng]).addTo(map)
-              .bindPopup("User Intersection between: <br/> User1:" + userIntersections[i].UserId +"<br/> User2: " + userIntersections[i].UserIDInput +"<br/> Link to this Intersection: localhost:3000/" + userIntersections[i].id);
+             // .bindPopup("User Intersection between: <br/> User1:" + userIntersections[i].UserId +"<br/> User2: " + userIntersections[i].UserIDInput +"<br/> Link to this Intersection: localhost:3000/" + userIntersections[i].id);
           routesFeature.addLayer(marker);
           routesToShow.push(userIntersections[i].routeID);
           routesToShow.push(userIntersections[i].routeIDInput);
@@ -395,6 +403,21 @@ async function filter1(id){
     });
 
     addMap();
+
+    if(wantAnimalIntersections){
+        query={};
+        try {
+
+
+            var animalIntersections = await getDatabaseFiles("animalIntersections", query);
+            addUserIntersections(animalIntersections);
+        }
+        catch{
+
+        }
+
+
+    }
 
     if(wantUserIntersection) {
         query ={};
