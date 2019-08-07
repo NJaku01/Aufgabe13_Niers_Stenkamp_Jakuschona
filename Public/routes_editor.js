@@ -5,7 +5,8 @@ const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
 var drawnItems;
-var mongodbJSON = [];
+var mongodbJSONUserRoutes = [];
+var mongodbJSONAnimalRoutes = [];
 
 
 var map = L.map("mapdiv", {
@@ -67,7 +68,7 @@ function events() {
 }
 
 /**
- * Shows the Items from mongodb in a textarea
+ * Shows the Items from mongodb in a textarea, by calling the function getFilesFromMongodb.
  * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
  * @author Nick Jakuschona n_jaku01@wwu.de
  */
@@ -85,7 +86,7 @@ catch {}
 }
 
 /**
- * Gets the Items from mongodb.
+ * Gets the Items from mongodb depending on the collection in which the items are stored in the mongodb.
  * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
  * @author Nick Jakuschona n_jaku01@wwu.de
  */
@@ -100,8 +101,11 @@ async function getFilesFromMongodb(collection, query) {
 
 }
 
+/**
+ * Function for inserting an item into mongodb
+ * @param data
+ */
 function insertItem(data){
-
 $.ajax({
     url: "/item/create", // URL der Abfrage,
     data: data,
@@ -302,7 +306,7 @@ function setCookie(cname, cvalue, exdays) {
  * @returns {boolean} if the form is correct
  */
 async function validateForm(form) {
-
+    "use strict";
     if(form === "update"){
         var id = document.forms[form]["_id"].value;
         console.log(id);
@@ -311,9 +315,9 @@ async function validateForm(form) {
     }
 
     try {
-        "use strict";
+        // If there is a new userRoute added or if a userRoute is updated
         if (form == "create" || form == "update") {
-            var inputJSON = document.forms[form]["geojson"].value;
+            var inputJSON = document.forms[form]["geoJson"].value;
             var userIDInput = document.forms[form]["User_ID"].value;
            if (inputJSON == "") {
                 alert("A route must be selected");
@@ -329,6 +333,10 @@ async function validateForm(form) {
             console.log(inputJSON);
             console.log(userIDInput);
 
+            /*
+             There is a random routeID for each added userRoute. This routeID gets only created if there is a new
+             userRoute, but not if the userRoute is only updated
+             */
             var routeIDInput;
             if(form=== "create") {
                 routeIDInput = Math.random().toString(36).substring(2, 15);
@@ -339,18 +347,35 @@ async function validateForm(form) {
                 routeIDInput = id;
             }
 
-            mongodbJSON = await getFilesFromMongodb("userRoutes");
-            for (var i in mongodbJSON){
-                if(mongodbJSON[i].routeID == id){
-                    mongodbJSON.splice(i, 1);
+            // variable for all the userRoutes stored in Mongodb
+            mongodbJSONUserRoutes = await getFilesFromMongodb("userRoutes");
+            /*
+            If the userRoute with the corresponding routeID is already in Mongodb, the userRoute will not be added again
+             */
+            for (var i in mongodbJSONUserRoutes){
+                if(mongodbJSONUserRoutes[i].routeID == id){
+                    mongodbJSONUserRoutes.splice(i, 1);
                 }
             }
-            console.log(mongodbJSON);
+            console.log(mongodbJSONUserRoutes);
 
-            var intersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSON);
-            console.log(intersections);
+            // variable for all the animalRoutes stored in Mongodb
+            mongodbJSONAnimalRoutes = await getFilesFromMongodb("animalRoutes");
+            console.log(mongodbJSONAnimalRoutes);
+
+            /*
+             Calculation of the Intersects between the userRoutes stored in Mongodb and the new input userRoute. If
+             there is an intersection, its stored in mongo db under the collection userIntersections.
+             */
+            var UserIntersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSONUserRoutes, "userIntersections");
+            console.log(UserIntersections);
+
+            var animalIntersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSONAnimalRoutes, "animalIntersections");
+            console.log(animalIntersections);
+
 
         }
+        // if a userRoute gets updated or delete there is a need for the corresponding id.
         if (form == "update" || form == "delete") {
             var id = document.forms[form]["_id"].value;
             if (id == "") {
@@ -427,12 +452,14 @@ function transformMovebankJson(movebankResponse) {
 
     for (i = 0; i < movebankResponse.individuals.length; i++){
 
-        var json = {"User_ID":"","Name":"","Type":"","date":"","time":"",
-            "geoJson":{"type":"FeatureCollection","features":{"type":"Feature","properties":{},"geometry":{"type":"LineString","coordinates":[]}}}};
+        var json = {"User_ID":"","Name":"","Type":"","date":"","time":"", "routeID": "",
+            "geoJson":{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"LineString","coordinates":[]}}]}};
 
         json.User_ID = movebankResponse.individuals[i].individual_taxon_canonical_name;
         json.Name = movebankResponse.individuals[i].individual_local_identifier;
         json.Type = "animal";
+        json.routeID=  Math.random().toString(36).substring(2, 15);
+        console.log("Timestamp: " + movebankResponse.individuals[i].locations[0].timestamp);
         var date = new Date(movebankResponse.individuals[i].locations[0].timestamp);
         json.date = date.toISOString().substring(0, 10);;
         json.time = date.toISOString().substring(12, 16);;
@@ -441,12 +468,12 @@ function transformMovebankJson(movebankResponse) {
 
         for (j = 0; j < movebankResponse.individuals[i].locations.length; j++) {
             latlon = [];
-            latlon[0] = movebankResponse.individuals[i].locations[j].location_lat;
-            latlon[1] = movebankResponse.individuals[i].locations[j].location_long;
+            latlon[1] = movebankResponse.individuals[i].locations[j].location_lat;
+            latlon[0] = movebankResponse.individuals[i].locations[j].location_long;
             coordinates.push(latlon);
         }
 
-        json.geoJson.features.geometry.coordinates = coordinates;
+        json.geoJson.features[0].geometry.coordinates = coordinates;
 
         jsonArray.push(json);
     }
@@ -454,55 +481,69 @@ function transformMovebankJson(movebankResponse) {
 }
 
 
-function getFilesFromMovebank() {
-
-    /**
-     * Working Study IDs:
-     * Belgien bis Afrika: 604806671
-     * Galapagos: 2911040
-     * Süddeutschland / Osteuropa: 446579
-     * Süddeutschland bis Spanien: 186178781, 173641633
-     * Nord-Osteuropa: 92261778
-     * Litauen bis Spanien: 195375760
-     * Litauen bis Afrika: 150764908
-     *
-     * Mit Agreement:
-     * Dänemark: 49535504
-     * Spiekeroog: 183209639
-     * NIederland: 163020445
-     * Nord- & Osteuropa: 467107447
-     * Schweden bis Holland: 350174730
-     * Schweden bis Spanien: 10722328
-     *
-     */
-
-    var study = document.forms["createAnimal"]["Study_ID"].value;;
-
-    var resource = "movebank/" + study;
-
-    $('body').css('cursor','progress');
-
-    $.get(resource, function(response, status, x) {
-
+async function getFilesFromMovebank() {
+    try {
         /**
-        let formatted_response = JSON.stringify(response, null, 4);
-        $("#movebankJson").text(formatted_response);
-        */
+         * Working Study IDs:
+         * Belgien bis Afrika: 604806671
+         * Galapagos: 2911040
+         * Süddeutschland / Osteuropa: 446579
+         * Süddeutschland bis Spanien: 186178781, 173641633
+         * Nord-Osteuropa: 92261778
+         * Litauen bis Spanien: 195375760
+         * Litauen bis Afrika: 150764908
+         *
+         * Mit Agreement:
+         * Dänemark: 49535504
+         * Spiekeroog: 183209639
+         * NIederland: 163020445
+         * Nord- & Osteuropa: 467107447
+         * Schweden bis Holland: 350174730
+         * Schweden bis Spanien: 10722328
+         *
+         */
 
-        let transMovebankResponse = transformMovebankJson(response);
+        var study = document.forms["createAnimal"]["Study_ID"].value;
+        ;
 
-        for (i = 0; i < transMovebankResponse.length; i++) {
-            insertItem({collection: "animalRoutes", User_ID: transMovebankResponse[i].User_ID,
-                Name: transMovebankResponse[i].Name, Type: transMovebankResponse[i].Type,
-                date: transMovebankResponse[i].date, time: transMovebankResponse[i].time, Study_ID: study,
-                geoJson: JSON.stringify(transMovebankResponse[i].geoJson)});
-        }
+        var resource = "movebank/" + study;
 
-        $('body').css('cursor','default');
+        $('body').css('cursor', 'progress');
 
-        alert("Routes of Study No. " + study + " have been added to the Database!");
+        $.get(resource, async function (response, status, x) {
 
-    })
+            /**
+             let formatted_response = JSON.stringify(response, null, 4);
+             $("#movebankJson").text(formatted_response);
+             */
+
+            let transMovebankResponse = transformMovebankJson(response);
+
+            // variable for all the userRoutes stored in Mongodb
+            mongodbJSONUserRoutes = await getFilesFromMongodb("userRoutes");
+
+            for (i = 0; i < transMovebankResponse.length; i++) {
+                insertItem({
+                    collection: "animalRoutes",
+                    Study_ID: study,
+                    User_ID: transMovebankResponse[i].User_ID,
+                    Name: transMovebankResponse[i].Name,
+                    Type: transMovebankResponse[i].Type,
+                    date: transMovebankResponse[i].date,
+                    time: transMovebankResponse[i].time,
+                    routeID: transMovebankResponse[i].routeID,
+                    geoJson: JSON.stringify(transMovebankResponse[i].geoJson)
+                });
+
+                calculateIntersect(transMovebankResponse[i].routeID, transMovebankResponse[i].User_ID, JSON.stringify(transMovebankResponse[i].geoJson), mongodbJSONUserRoutes, "animalIntersections");
+            }
+
+            $('body').css('cursor', 'default');
+
+            alert("Routes of Study No. " + study + " have been added to the Database!");
+
+        })
+    } catch {}
 }
 
 // Testroute
@@ -582,34 +623,42 @@ var line3test = {
 }
 
 // Test AllRoutes
-/*
-var lines = [];
-lines.push(line2test, line3test);
-console.log(lines);
-console.log(line1test);
-console.log(line1test._id);
-console.log(turf.lineIntersect(line1test, line2test));
-*/
+
+//var lines = [];
+//lines.push(line2test, line3test);
+//console.log(lines);
+//console.log(line1test);
+//console.log(line1test._id);
+//console.log(turf.lineIntersect(line1test, line2test));
+
 
 // console.log(turf);
 //console.log(intersect);
 /**
- * function which takes one new inputRoute and compares this one with all other routes in allRoutes if they intersect.
- * function returns all given intersections.
+ * function which takes one new inputRoute with the corresponding routeID and userID and compares this one with
+ * all other routes in allRoutes. If there is an intersection this intersection will be saved in the proportionate
+ * collection in mongodb. For example intersections between userRoute and userRoute are saved in collection
+ * userIntersections and intersections between userRoute and animalRoute are saved in the collection
+ * animalIntersections. For each intersection there is a random userInteractionsID created.
  * @param inputRoute
  * @param allRoutes
  * @returns {Array}
  */
-function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes) {
+function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, collection) {
     var parseInputRoute = JSON.parse(inputRoute);
-    console.log(parseInputRoute);
+    // console.log(parseInputRoute);
+    // console.log(collection);
+    // console.log(allRoutes);
+    // console.log(JSON.parse(allRoutes[0].geoJson));
     for (var j=0; j<allRoutes.length; j++) {
-        var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geojson));
+        console.log("hello");
+        var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geoJson));
+        console.log(intersect);
         if (intersect.features.length != 0) {
-            console.log(intersect);
+            console.log(intersect + collection);
             intersect=JSON.stringify(intersect);
-            var userInteractionsID = Math.random().toString(36).substring(2, 15);
-            insertItem({collection: "userIntersections", geoJson: intersect, id: userInteractionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
+            var intersectionsID = Math.random().toString(36).substring(2, 15);
+            insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
         }
 
       intersect = {};
