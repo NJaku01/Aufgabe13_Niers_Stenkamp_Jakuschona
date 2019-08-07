@@ -75,6 +75,7 @@
     <div>
         <button onclick="showFiles('userRoutes')">Show UserRoutes in Database</button>
         <button onclick="showFiles('animalRoutes')">Show AnimalRoutes in Database</button>
+        <button onclick="showFiles('userIntersections')">Show UserIntersections in Database</button>
         <textarea readonly id="database" style="width: 100%; height: 400px;"> </textarea>
     </div>
     <div id="form">
@@ -102,7 +103,7 @@
 
         <h5>Update Item</h5>
 
-        <form name="update" action="item/update" onsubmit="return validateForm('update')" method="POST">
+        <form name="update" action="item/update" target="_blank" onsubmit="return validateForm('update')" method="POST">
             ID:<br/>
             <input type="text" name="_id"/><br>
             User_ID:<br/>
@@ -123,7 +124,7 @@
 
         <h5>Delete Item</h5>
 
-        <form name="delete" action="item/delete" onsubmit="return validateForm('delete')" method="POST">
+        <form name="delete" action="item/deleteOne" target="_blank" onsubmit="return validateForm('delete')" method="POST">
 
 
             ID:<br/>
