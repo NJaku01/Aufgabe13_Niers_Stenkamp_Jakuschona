@@ -264,6 +264,19 @@ function addAnimalroutes(animalRoutes)
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
+function copy(id){
+    console.log("run");
+    var existsTextarea = document.getElementById('id');
+    existsTextarea.value="localhost:3000/" + id;
+    existsTextarea.select();
+    var status= document.execCommand('copy');
+    if(!status){
+        console.error("Cannot copy text");
+    }else{
+        console.log("The text is now on the clipboard");
+    }
+}
+
 function addUserIntersections(userIntersections){
 
     var routesToShow= []
@@ -278,8 +291,10 @@ function addUserIntersections(userIntersections){
 
           lng=userIntersectionsPoints[i].features[0].geometry.coordinates[0];
           lat=userIntersectionsPoints[i].features[0].geometry.coordinates[1];
+          var link= userIntersections[i].id;
           var marker= L.marker([lat,lng]).addTo(map)
-              .bindPopup("User Intersection between: <br/> User1:" + userIntersections[i].UserId +"<br/> User2: " + userIntersections[i].UserIDInput +"<br/> Link to this Intersection: localhost:3000/" + userIntersections[i].id);
+              .bindPopup("User Intersection between: <br/> User1:" + userIntersections[i].UserId +"<br/> User2: " + userIntersections[i].UserIDInput +"<br/>" +
+                  "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
           routesFeature.addLayer(marker);
           routesToShow.push(userIntersections[i].routeID);
           routesToShow.push(userIntersections[i].routeIDInput);
@@ -291,7 +306,7 @@ function addUserIntersections(userIntersections){
         }
     }
 
-    map.fitBounds(routesFeature.getBounds());
+   // map.fitBounds(routesFeature.getBounds());
     return routesToShow;
 
 
