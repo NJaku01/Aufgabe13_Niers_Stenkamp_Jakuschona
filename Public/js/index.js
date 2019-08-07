@@ -309,7 +309,7 @@ function addUserIntersections(userIntersections){
         }
     }
 
-   // map.fitBounds(routesFeature.getBounds());
+    map.fitBounds(routesFeature.getBounds());
     return routesToShow;
 
 
@@ -416,7 +416,7 @@ async function filter1(id){
 
     addMap();
 
-    if(wantUserIntersection) {
+    if(wantUserIntersection || intersections !="") {
         query ={};
         if (!showEverthing) {
             if (intersections.indexOf(";") === -1) {
