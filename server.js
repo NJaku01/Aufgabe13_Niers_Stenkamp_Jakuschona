@@ -1,6 +1,7 @@
 // jshint esversion: 6
 
 const express = require('express');
+var bodyParser = require('body-parser')
 const app = express();
 
 var https = require("https");
@@ -56,6 +57,13 @@ app.use(express.json());
 
 // middleware for handling urlencoded request data
 // https://expressjs.com/en/4x/api.html#express.urlencoded
+
+app.use(bodyParser.urlencoded({
+    extended: true,
+    limit: '50mb',
+    type: 'application/x-www-form-urlencoded'
+}));
+
 app.use(express.urlencoded({extended: false}));
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
@@ -65,7 +73,6 @@ app.use("/pub-pkg-bootstrap-min", express.static(__dirname + "/node_modules/pub-
 app.use("/jquery", express.static(__dirname + "/node_modules/jquery/dist"));
 app.use("/turf", express.static(__dirname + "/node_modules/@turf/turf"));
 app.use("/token.js", express.static(__dirname + "/private/token.js"));
-
 
 
 app.get('/:id', function (req, res) {
@@ -181,7 +188,10 @@ app.get("/movebank/:id", (req, res) => {
     console.log(req.params.id);
 
     var study = req.params.id;
-    var endpoint = movebankEndpoint + study + "&max_events_per_individual=10&sensor_type=gps";
+    var endpoint = movebankEndpoint + study +
+        // &max_events_per_individual=10 +
+        "&sensor_type=gps";
+
 
     https.get(endpoint, options, (httpResponse) => {
         // concatenate updates from datastream
