@@ -323,6 +323,44 @@ function addUserIntersections(userIntersections){
 
 }
 
+function addAnimalIntersections(userIntersections){
+
+    var routesToShow= []
+    var userIntersectionsPoints= [];
+    for( var i in userIntersections){
+
+        var lat;
+        var lng;
+
+        try{
+            userIntersectionsPoints.push(JSON.parse(userIntersections[i].geoJson));
+
+            for(var j in userIntersectionsPoints[i].features) {
+
+                lng = userIntersectionsPoints[i].features[j].geometry.coordinates[0];
+                lat = userIntersectionsPoints[i].features[j].geometry.coordinates[1];
+                var link = userIntersections[i].id;
+                var marker = L.marker([lat, lng]).addTo(map)
+                    .bindPopup("User Intersection between: <br/> User:" + userIntersections[i].UserIDInput + "<br/> Animal: " + userIntersections[i].UserId + "<br/>" +
+                        "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
+                routesFeature.addLayer(marker);
+                routesToShow.push(userIntersections[i].routeID);
+                routesToShow.push(userIntersections[i].routeIDInput);
+            }
+
+        }
+        catch(e){
+            console.log(e);
+
+        }
+    }
+
+    map.fitBounds(routesFeature.getBounds());
+    return routesToShow;
+
+
+}
+
 
 
 
@@ -430,7 +468,7 @@ async function filter1(id){
 
 
             var animalIntersections = await getDatabaseFiles("animalIntersections", query);
-            addUserIntersections(animalIntersections);
+            addAnimalIntersections(animalIntersections);
         }
         catch{
 
@@ -439,7 +477,6 @@ async function filter1(id){
 
     }
 
-    if(wantUserIntersection) {
     if(wantUserIntersection || intersections !="") {
         query ={};
         if (!showEverthing) {
