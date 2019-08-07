@@ -642,8 +642,8 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
         if (intersect.features.length != 0) {
             console.log(intersect + collection);
             intersect=JSON.stringify(intersect);
-            var userInteractionsID = Math.random().toString(36).substring(2, 15);
-            insertItem({collection: collection, geoJson: intersect, id: userInteractionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
+            var intersectionsID = Math.random().toString(36).substring(2, 15);
+            insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
         }
 
       intersect = {};
