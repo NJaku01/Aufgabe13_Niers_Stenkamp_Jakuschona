@@ -360,6 +360,15 @@ async function validateForm(form) {
             console.log(id);
         }
 
+        if (form == "deleteAnimal") {
+            var id = document.forms[form]["Study_ID"].value;
+            if (id == "") {
+                alert("A Study_ID must be selected");
+                return false;
+            }
+            console.log(id);
+        }
+
         if(form === "delete"){
             var id = document.forms[form]["_id"].value;
             console.log(id);
@@ -424,10 +433,7 @@ function transformMovebankJson(movebankResponse) {
         json.User_ID = movebankResponse.individuals[i].individual_taxon_canonical_name;
         json.Name = movebankResponse.individuals[i].individual_local_identifier;
         json.Type = "animal";
-        console.log("Timestamp: " + movebankResponse.individuals[i].locations[0].timestamp);
         var date = new Date(movebankResponse.individuals[i].locations[0].timestamp);
-        console.log(date);
-        console.log(date.toISOString());
         json.date = date.toISOString().substring(0, 10);;
         json.time = date.toISOString().substring(12, 16);;
 
@@ -452,7 +458,7 @@ function getFilesFromMovebank() {
 
     /**
      * Working Study IDs:
-     * Belgien: 604806671
+     * Belgien bis Afrika: 604806671
      * Galapagos: 2911040
      * Süddeutschland / Osteuropa: 446579
      * Süddeutschland bis Spanien: 186178781, 173641633
@@ -486,8 +492,9 @@ function getFilesFromMovebank() {
         let transMovebankResponse = transformMovebankJson(response);
 
         for (i = 0; i < transMovebankResponse.length; i++) {
-            insertItem({collection: "animalRoutes", User_ID: transMovebankResponse[i].User_ID, Name: transMovebankResponse[i].Name,
-                Type: transMovebankResponse[i].Type, date: transMovebankResponse[i].date, time: transMovebankResponse[i].time,
+            insertItem({collection: "animalRoutes", User_ID: transMovebankResponse[i].User_ID,
+                Name: transMovebankResponse[i].Name, Type: transMovebankResponse[i].Type,
+                date: transMovebankResponse[i].date, time: transMovebankResponse[i].time, Study_ID: study,
                 geoJson: JSON.stringify(transMovebankResponse[i].geoJson)});
         }
 

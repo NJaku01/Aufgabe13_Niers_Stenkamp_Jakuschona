@@ -144,6 +144,16 @@
             <br/>
         </form>
         <button onclick="getFilesFromMovebank()">Get Files from Movebank</button>
+
+        <h5>Delete Animal Route</h5>
+        <form name="deleteAnimal" action="item/deleteMany" onsubmit="return validateForm('deleteAnimal')" method="POST" target="_self">
+            Study ID:<br/>
+            <input type="number" name="Study_ID"/>
+            <br>
+            <input type="submit" value="Send"/>
+            <br/>
+        </form>
+
     </div>
 
     <button onclick="deleteAll('userRoutes')">Delete all UserRoutes in Database</button>
