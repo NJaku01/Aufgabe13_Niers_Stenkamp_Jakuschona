@@ -272,6 +272,19 @@ function addAnimalroutes(animalRoutes)
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
+function copy(id){
+    console.log("run");
+    var existsTextarea = document.getElementById('id');
+    existsTextarea.value="localhost:3000/" + id;
+    existsTextarea.select();
+    var status= document.execCommand('copy');
+    if(!status){
+        console.error("Cannot copy text");
+    }else{
+        console.log("The text is now on the clipboard");
+    }
+}
+
 function addUserIntersections(userIntersections){
 
     var routesToShow= []
@@ -284,13 +297,56 @@ function addUserIntersections(userIntersections){
         try{
           userIntersectionsPoints.push(JSON.parse(userIntersections[i].geoJson));
 
-          lng=userIntersectionsPoints[i].features[0].geometry.coordinates[0];
-          lat=userIntersectionsPoints[i].features[0].geometry.coordinates[1];
-          var marker= L.marker([lat,lng]).addTo(map)
-             // .bindPopup("User Intersection between: <br/> User1:" + userIntersections[i].UserId +"<br/> User2: " + userIntersections[i].UserIDInput +"<br/> Link to this Intersection: localhost:3000/" + userIntersections[i].id);
-          routesFeature.addLayer(marker);
-          routesToShow.push(userIntersections[i].routeID);
-          routesToShow.push(userIntersections[i].routeIDInput);
+          for(var j in userIntersectionsPoints[i].features) {
+
+              lng = userIntersectionsPoints[i].features[j].geometry.coordinates[0];
+              lat = userIntersectionsPoints[i].features[j].geometry.coordinates[1];
+              var link = userIntersections[i].id;
+              var marker = L.marker([lat, lng]).addTo(map)
+                  .bindPopup("User Intersection between: <br/> User1:" + userIntersections[i].UserId + "<br/> User2: " + userIntersections[i].UserIDInput + "<br/>" +
+                      "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
+              routesFeature.addLayer(marker);
+              routesToShow.push(userIntersections[i].routeID);
+              routesToShow.push(userIntersections[i].routeIDInput);
+          }
+
+        }
+        catch(e){
+            console.log(e);
+
+        }
+    }
+
+    map.fitBounds(routesFeature.getBounds());
+    return routesToShow;
+
+
+}
+
+function addAnimalIntersections(userIntersections){
+
+    var routesToShow= []
+    var userIntersectionsPoints= [];
+    for( var i in userIntersections){
+
+        var lat;
+        var lng;
+
+        try{
+            userIntersectionsPoints.push(JSON.parse(userIntersections[i].geoJson));
+
+            for(var j in userIntersectionsPoints[i].features) {
+
+                lng = userIntersectionsPoints[i].features[j].geometry.coordinates[0];
+                lat = userIntersectionsPoints[i].features[j].geometry.coordinates[1];
+                var link = userIntersections[i].id;
+                var marker = L.marker([lat, lng]).addTo(map)
+                    .bindPopup("User Intersection between: <br/> User:" + userIntersections[i].UserIDInput + "<br/> Animal: " + userIntersections[i].UserId + "<br/>" +
+                        "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
+                routesFeature.addLayer(marker);
+                routesToShow.push(userIntersections[i].routeID);
+                routesToShow.push(userIntersections[i].routeIDInput);
+            }
 
         }
         catch(e){
@@ -380,9 +436,7 @@ async function filter1(id){
     var wantAnimalRoutes = document.forms["filter"]["animalRoutes"].checked;
     var wantUserIntersection = document.forms["filter"]["userIntersections"].checked;
     var wantAnimalIntersections = document.forms["filter"]["animalIntersections"].checked;
-    var filterUser= document.forms["filter"]["filterUser"].checked;
-    var filterAnimal= document.forms["filter"]["filterAnimal"].checked;
-    var filterIntersection= document.forms["filter"]["filterIntersection"].checked;
+    var showEverthing= false;
     var userRoutes;
     var animalRoutes;
     var userIntersections = [];
@@ -392,8 +446,12 @@ async function filter1(id){
         wantUserIntersection =true;
         wantAnimalRoutes=false;
         wantUserRoutes=false;
-        filterUser = false;
-        filterIntersection= false;
+
+    }
+
+    if(userID==="" && animals==="" && intersections ===""){
+        showEverthing=true;
+        wantUserRoutes=false;
     }
 
 
@@ -410,44 +468,51 @@ async function filter1(id){
 
 
             var animalIntersections = await getDatabaseFiles("animalIntersections", query);
-            addUserIntersections(animalIntersections);
+
         }
         catch{
 
+        }
+        if(animalIntersections.length !== 0) {
+            addAnimalIntersections(animalIntersections);
+        }
+        else{
+            alert("No User Intersections found")
         }
 
 
     }
 
-    if(wantUserIntersection) {
+    if(wantUserIntersection || intersections !="") {
         query ={};
-        if (!filterIntersection) {
+        if (!showEverthing) {
             if (intersections.indexOf(";") === -1) {
                 query = "{\"id\": \"" + intersections + "\"}"
             } else {
-                var interaction = intersections.substring(0, intersections.indexOf(";"));
-                userID = userID.substring(userID.indexOf(";") + 1, intersections.length);
-                query = "{ \"$or\" : [ {\"id\": \"" + interaction + "\"} , ";
+                var intersection = intersections.substring(0, intersections.indexOf(";"));
+                intersections = intersections.substring(intersections.indexOf(";") + 1, intersections.length);
+                query = "{ \"$or\" : [ {\"id\": \"" + intersection + "\"} , ";
                 while (intersections.indexOf(";") != -1) {
-                    interaction = intersections.substring(1, intersections.indexOf(";"));
+                    intersection = intersections.substring(1, intersections.indexOf(";"));
                     intersections = intersections.substring(intersections.indexOf(";") + 1, intersections.length);
-                    query += "{\"id\" : \"" + interaction + "\" , "
+                    query += "{\"id\" : \"" + intersection + "\" } , "
                 }
-                interaction = userID.substring(1, intersections.length);
-                query += " {\"id\": \"" + interaction + "\"}]}";
+                intersection = intersections.substring(1, intersections.length);
+                query += " {\"id\": \"" + intersection + "\"}]}";
             }
         }
-        if(filterIntersection || intersections != "")
-        try {
-            userIntersections = await getDatabaseFiles("userIntersections", query);
+        if(intersections != "" || showEverthing) {
+            try {
+                userIntersections = await getDatabaseFiles("userIntersections", query);
 
-        } catch {
+            } catch {
 
+            }
         }
 
         query ={};
 
-        if (!filterUser) {
+        if (!showEverthing) {
                 if (userID.indexOf(";") === -1) {
                     query = "{\"$or\" : [{\"UserId\": \"" + userID + "\"} , { \"UserIDInput\" : \"" + userID + "\"}]}"
                 } else {
@@ -464,7 +529,7 @@ async function filter1(id){
                 }
 
             }
-        if(filterUser || userID != "")
+        if(userID != "" || showEverthing)
         try {
             var userIntersections2 = await getDatabaseFiles("userIntersections", query);
             userIntersections= userIntersections.concat(userIntersections2);
@@ -509,6 +574,7 @@ async function filter1(id){
 
 
     if(wantUserRoutes){
+
         var query= {};
 
         if(userID!="")
@@ -529,22 +595,23 @@ async function filter1(id){
                 query += " {\"User_ID\": \"" + user + "\"}]}";
             }
         }
-        try {
-            userRoutes = await getDatabaseFiles("userRoutes", query);
+        if(showEverthing || userID!="") {
+            try {
+                userRoutes = await getDatabaseFiles("userRoutes", query);
 
-        }
-        catch{
+            } catch {
 
-        }
-        if (userRoutes.length === 0){
-            alert("The API didn't found User Routes to show. Please makes sure there are User Routes in the Database or the UserID really exists. " +
-                "Maybe you enteret the UserID the wrong way:" +
-                "To Show all routes just leave the field empty" +
-                "Tho Show routes of just on User enter only the UserID" +
-                "Tho Show routes of more Users seperate the UserIDs by \";\" eg. \"1; 2\" ")
-        }
-        else{
-            addUserRoutes(userRoutes);
+            }
+
+            if (userRoutes.length === 0) {
+                alert("The API didn't found User Routes to show. Please makes sure there are User Routes in the Database or the UserID really exists. " +
+                    "Maybe you enteret the UserID the wrong way:" +
+                    "To Show all routes just leave the field empty" +
+                    "Tho Show routes of just on User enter only the UserID" +
+                    "Tho Show routes of more Users seperate the UserIDs by \";\" eg. \"1; 2\" ")
+            } else {
+                addUserRoutes(userRoutes);
+            }
         }
     }
     if(wantAnimalRoutes){
@@ -568,18 +635,21 @@ async function filter1(id){
                 query += " {\"USER_ID\": \"" + animal  + "\"}]}";
             }
         }
-        try {
-            animalRoutes = await getDatabaseFiles("animalRoutes", query);
-            console.log(animalRoutes);
-        }
-        catch(e){
-            console.log(e);
-        }
-        if (animalRoutes.length === 0){
-            alert("No animal routes found");
-        }
-        else{
-            addAnimalroutes(animalRoutes);
+        if(showEverthing || animals!="") {
+
+
+            try {
+                animalRoutes = await getDatabaseFiles("animalRoutes", query);
+                console.log(animalRoutes);
+            } catch (e) {
+                console.log(e);
+            }
+
+            if (animalRoutes.length === 0) {
+                alert("No animal routes found");
+            } else {
+                addAnimalroutes(animalRoutes);
+            }
         }
 
 

@@ -450,12 +450,13 @@ function transformMovebankJson(movebankResponse) {
 
     for (i = 0; i < movebankResponse.individuals.length; i++){
 
-        var json = {"User_ID":"","Name":"","Type":"","date":"","time":"",
+        var json = {"User_ID":"","Name":"","Type":"","date":"","time":"", "routeID": "",
             "geoJson":{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"LineString","coordinates":[]}}]}};
 
         json.User_ID = movebankResponse.individuals[i].individual_taxon_canonical_name;
         json.Name = movebankResponse.individuals[i].individual_local_identifier;
         json.Type = "animal";
+        json.routeID=  Math.random().toString(36).substring(2, 15);
         console.log("Timestamp: " + movebankResponse.individuals[i].locations[0].timestamp);
         var date = new Date(movebankResponse.individuals[i].locations[0].timestamp);
         console.log(date);
@@ -519,7 +520,7 @@ function getFilesFromMovebank() {
 
         for (i = 0; i < transMovebankResponse.length; i++) {
             insertItem({collection: "animalRoutes", User_ID: transMovebankResponse[i].User_ID, Name: transMovebankResponse[i].Name,
-                Type: transMovebankResponse[i].Type, date: transMovebankResponse[i].date, time: transMovebankResponse[i].time,
+                Type: transMovebankResponse[i].Type, date: transMovebankResponse[i].date, time: transMovebankResponse[i].time, routeID: transMovebankResponse[i].routeID,
                 geoJson: JSON.stringify(transMovebankResponse[i].geoJson)});
         }
 
