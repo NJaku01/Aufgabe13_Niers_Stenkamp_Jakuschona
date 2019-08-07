@@ -382,6 +382,12 @@ function transformMovebankJson(movebankResponse) {
         json.User_ID = movebankResponse.individuals[i].individual_taxon_canonical_name;
         json.Name = movebankResponse.individuals[i].individual_local_identifier;
         json.Type = "animal";
+        console.log("Timestamp: " + movebankResponse.individuals[i].locations[0].timestamp);
+        var date = new Date(movebankResponse.individuals[i].locations[0].timestamp);
+        console.log(date);
+        console.log(date.toISOString());
+        json.date = date.toISOString().substring(0, 10);;
+        json.time = date.toISOString().substring(12, 16);;
 
         coordinates = [];
 
@@ -408,6 +414,9 @@ function getFilesFromMovebank() {
      * Galapagos: 2911040
      * Süddeutschland / Osteuropa: 446579
      * Süddeutschland bis Spanien: 186178781, 173641633
+     * Nord-Osteuropa: 92261778
+     * Litauen bis Spanien: 195375760
+     * Litauen bis Afrika: 150764908
      *
      * Mit Agreement:
      * Dänemark: 49535504
