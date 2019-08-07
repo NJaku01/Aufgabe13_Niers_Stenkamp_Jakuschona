@@ -468,10 +468,16 @@ async function filter1(id){
 
 
             var animalIntersections = await getDatabaseFiles("animalIntersections", query);
-            addAnimalIntersections(animalIntersections);
+
         }
         catch{
 
+        }
+        if(animalIntersections.length !== 0) {
+            addAnimalIntersections(animalIntersections);
+        }
+        else{
+            alert("No User Intersections found")
         }
 
 
