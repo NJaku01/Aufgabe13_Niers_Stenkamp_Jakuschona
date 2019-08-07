@@ -168,7 +168,7 @@ function addUserRoutes(userRoutes){
     var routes=[];
     var midpoints=[];
     for (var j in userRoutes) {
-        var geojson = userRoutes[j].geojson;
+        var geojson = userRoutes[j].geoJson;
         geojsons.push(JSON.parse(geojson));
 
     }
@@ -241,7 +241,15 @@ function addAnimalroutes(animalRoutes)
     var coordinates = [];
     for (var i = 0; i < animalGeoJson.length; i++) {
 
-        coordinates.push(animalGeoJson[i].features.geometry.coordinates);
+        coordinates.push(animalGeoJson[i].features[0].geometry.coordinates);
+
+        console.log(coordinates);
+        for(var j in coordinates[i]) {
+            var help = coordinates[i][j][0];
+            coordinates[i][j][0] = coordinates[i][j][1];
+            coordinates[i][j][1] = help;
+        }
+        console.log(coordinates);
 
         var polyline = L.polyline(coordinates[i]).addTo(map);
         collectionOfRoutes.push(polyline);
@@ -416,6 +424,22 @@ async function filter1(id){
 
     addMap();
 
+    if(wantAnimalIntersections){
+        query={};
+        try {
+
+
+            var animalIntersections = await getDatabaseFiles("animalIntersections", query);
+            addUserIntersections(animalIntersections);
+        }
+        catch{
+
+        }
+
+
+    }
+
+    if(wantUserIntersection) {
     if(wantUserIntersection || intersections !="") {
         query ={};
         if (!showEverthing) {
