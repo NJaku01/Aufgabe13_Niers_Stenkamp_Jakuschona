@@ -1,4 +1,3 @@
-//Nick Jakuschona 450709
 // jshint esversion: 6
 
 const lat = 51.96;
@@ -42,9 +41,7 @@ control.addTo(map);
 
 
 /**
- * Some events that happen if the page is loaded, to reload the last result or set the navigation bar
- * @desc Abgabe zu Aufgabe 5, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * Some events that happen if the page is loaded, to reload the last result or set the navigation bar.
  */
 function events() {
     $(function () {
@@ -69,8 +66,9 @@ function events() {
 
 /**
  * Shows the Items from mongodb in a textarea, by calling the function getFilesFromMongodb.
- * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * @param collection
+ * @param query
+ * @returns {Promise<void>}
  */
 async function showFiles(collection, query) {
 try {
@@ -79,7 +77,6 @@ try {
     if (mongodbJSON.length == 0) {
         alert("no routes in database");
     }
-    console.log(mongodbJSON);
     document.getElementById("database").value = JSON.stringify(mongodbJSON);
 }
 catch {}
@@ -87,14 +84,16 @@ catch {}
 
 /**
  * Gets the Items from mongodb depending on the collection in which the items are stored in the mongodb.
- * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * @param collection
+ * @param query
+ * @returns {Promise<*|jQuery|{getAllResponseHeaders, abort, setRequestHeader, readyState,
+ *          getResponseHeader, overrideMimeType, statusCode}>}
  */
 async function getFilesFromMongodb(collection, query) {
 
     //Example query: "{\"User_ID\" : \"1234\"}"
     return $.ajax({
-        url: "/item", // URL der Abfrage,
+        url: "/item", // URL of the request
         data: {collection: collection, query: query},
         type: "POST"
     })
@@ -102,18 +101,17 @@ async function getFilesFromMongodb(collection, query) {
 }
 
 /**
- * Function for inserting an item into mongodb
+ * Function for inserting an item into mongodb.
  * @param data
  */
 function insertItem(data){
 $.ajax({
-    url: "/item/create", // URL der Abfrage,
+    url: "/item/create", // URL of the request
     data: data,
     type: "POST"
 })
     .done(function (response) {
         // parse + use data here
-        console.log("insert data" +data);
     })
     .fail(function (xhr, status, errorThrown) {
         // handle errors
@@ -126,9 +124,8 @@ $.ajax({
 }
 
 /**
- * If the textfield will be edited the Inserted Route will be loaded in the Route Creator, so it is possible to edit the route.
- * @desc Abgabe zu Aufgabe 5, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * If the textfield will be edited the Inserted Route will be loaded in the Route Creator,
+ * so it is possible to edit the route.
  * @param route the route that can be edited
  */
 function showLine(route) {
@@ -163,9 +160,7 @@ function showLine(route) {
 }
 
 /**
- * Proofs if the the given string is a valid GeoJson Feature collection of LineStings
- * @desc Abgabe zu Aufgabe 4, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * Proofs if the the given string is a valid GeoJson Feature collection of LineStings.
  * @param text the text to proof
  * @returns {boolean} true if the text is a geojson Linestring
  */
@@ -186,9 +181,7 @@ function checkIfGeoJsonLineString(text) {
 }
 
 /**
- * Transforms an array of coordinates in a correct GeoJSON LineString
- * @desc Abgabe zu Aufgabe 5, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * Transforms an array of coordinates in a correct GeoJSON LineString.
  * @param coord the coordinates of the line string
  * @returns {{features: Array, type: string}} the GeoJSON LineString
  */
@@ -216,9 +209,7 @@ function getGeoJson(coord) {
 }
 
 /**
- * Changes the coordinates lat,lng
- * @desc Abgabe zu Aufgabe 5, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * Changes the coordinates lat,lng.
  * @param coord coordinates to change
  * @returns {Array} changed coordinnates
  */
@@ -235,9 +226,7 @@ function switchCoordinates(coord) {
 }
 
 /**
- * clears the Text area
- * @desc Abgabe zu Aufgabe 5, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * Clears the Text area.
  */
 function deleteText() {
     "use strict";
@@ -246,9 +235,7 @@ function deleteText() {
 }
 
 /**
- * creates a geojson text representation from the the drawnItems with a FeatureCollection as root element
- * @desc Abgabe zu Aufgabe 5, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * Creates a geojson text representation from the the drawnItems with a FeatureCollection as root element.
  */
 function updateText() {
     "use strict";
@@ -261,9 +248,7 @@ function updateText() {
 }
 
 /**
- * Function that return the vale of the cookie with the name cname
- * @desc Abgabe zu Aufgabe 5, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * Function that return the vale of the cookie with the name cname.
  * @param cname the name of the cookie
  * @returns {string} the value of the cookie
  */
@@ -285,9 +270,7 @@ function getCookie(cname) {
 }
 
 /**
- * Function to set a cookie
- * @desc Abgabe zu Aufgabe 5, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * Function to set a cookie.
  * @param cname name of the cookie
  * @param cvalue value of the cookie
  * @param exdays days when the cookie extend
@@ -301,15 +284,16 @@ function setCookie(cname, cvalue, exdays) {
 }
 
 /**
- * validate the form, if the values can svaed/updated/deleted in the database
- * @param form to validate
- * @returns {boolean} if the form is correct
+ * Validate the form, if the values are saved(created)/updated/deleted in the mongodb. Besides if there are
+ * intersections between stored animalRoutes/ userRoutes and the input userRoute, the intersections are stored
+ * in mongodb.
+ * @param form
+ * @returns {Promise<boolean>}
  */
 async function validateForm(form) {
     "use strict";
     if(form === "update"){
         var id = document.forms[form]["_id"].value;
-        console.log(id);
         deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
         deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
     }
@@ -330,8 +314,6 @@ async function validateForm(form) {
                 alert("A userID must be selected");
                 return false;
             }
-            console.log(inputJSON);
-            console.log(userIDInput);
 
             /*
              There is a random routeID for each added userRoute. This routeID gets only created if there is a new
@@ -341,7 +323,6 @@ async function validateForm(form) {
             if(form=== "create") {
                 routeIDInput = Math.random().toString(36).substring(2, 15);
                 document.getElementById("routeID").value = routeIDInput;
-                console.log(routeIDInput);
             }
             else{
                 routeIDInput = id;
@@ -357,23 +338,21 @@ async function validateForm(form) {
                     mongodbJSONUserRoutes.splice(i, 1);
                 }
             }
-            console.log(mongodbJSONUserRoutes);
 
             // variable for all the animalRoutes stored in Mongodb
             mongodbJSONAnimalRoutes = await getFilesFromMongodb("animalRoutes");
-            console.log(mongodbJSONAnimalRoutes);
 
             /*
              Calculation of the Intersects between the userRoutes stored in Mongodb and the new input userRoute. If
              there is an intersection, its stored in mongo db under the collection userIntersections.
              */
-            var UserIntersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSONUserRoutes, "userIntersections");
-            console.log(UserIntersections);
+            calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSONUserRoutes, "userIntersections");
 
-            var animalIntersections = calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSONAnimalRoutes, "animalIntersections");
-            console.log(animalIntersections);
-
-
+            /*
+             Calculation of the Intersects between the userRoutes stored in Mongodb and the new input animalRoute. If
+             there is an intersection, its stored in mongo db under the collection userIntersections.
+             */
+            calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSONAnimalRoutes, "animalIntersections");
         }
         // if a userRoute gets updated or delete there is a need for the corresponding id.
         if (form == "update" || form == "delete") {
@@ -382,21 +361,19 @@ async function validateForm(form) {
                 alert("A id must be selected");
                 return false;
             }
-            console.log(id);
         }
 
+        // depending on the input id the corresponding element in mongodb is deleted.
         if (form == "deleteAnimal") {
             var id = document.forms[form]["Study_ID"].value;
             if (id == "") {
                 alert("A Study_ID must be selected");
                 return false;
             }
-            console.log(id);
         }
 
         if(form === "delete"){
             var id = document.forms[form]["_id"].value;
-            console.log(id);
             deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
         }
@@ -405,16 +382,15 @@ async function validateForm(form) {
 }
 
 /**
- * Shows the Items from mongodb in a textarea
- * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
+ * If the function is called, the item in mongodb depending on collection and query is deleted.
+ * @param collection
+ * @param query
+ * @returns {Promise<void>}
  */
 async function deleteDatabaseFiles(collection, query) {
-
     //Example query: "{\"User_ID\" : \"1234\"}"
-
     $.ajax({
-        url: "/item/delete", // URL der Abfrage,
+        url: "/item/delete", // URL of the request
         data: {collection: collection, query: query},
         type: "POST"
     })
@@ -422,15 +398,18 @@ async function deleteDatabaseFiles(collection, query) {
 
 };
 
+/**
+ * All items in mongodb depending on collection will get deleted.
+ * @param collection
+ */
 function deleteAll(collection){
     $.ajax({
-        url: "/item/deleteAll", // URL der Abfrage,
+        url: "/item/deleteAll", // URL of the request
         data: {collection: collection},
         type: "POST"
     })
         .done(function (response) {
             // parse + use data here
-            console.log("inerst data" +data);
         })
         .fail(function (xhr, status, errorThrown) {
             // handle errors
@@ -459,7 +438,6 @@ function transformMovebankJson(movebankResponse) {
         json.Name = movebankResponse.individuals[i].individual_local_identifier;
         json.Type = "animal";
         json.routeID=  Math.random().toString(36).substring(2, 15);
-        console.log("Timestamp: " + movebankResponse.individuals[i].locations[0].timestamp);
         var date = new Date(movebankResponse.individuals[i].locations[0].timestamp);
         json.date = date.toISOString().substring(0, 10);;
         json.time = date.toISOString().substring(12, 16);;
@@ -546,94 +524,6 @@ async function getFilesFromMovebank() {
     } catch {}
 }
 
-// Testroute
-var line1test = {
-    "_id":"5d41a216205cf30395e99b8221",
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        7.492675781249999,
-                        51.60437164681676
-                    ],
-                    [
-                        8.37158203125,
-                        51.05520733858494
-                    ]
-                ]
-            }
-        }
-    ]
-}
-// console.log(line1test.type);
-
-// Testroute
-var line2test = {
-    "_id":"5d41a216205cf30395e99b8a22",
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        7.18505859375,
-                        51.45400691005982
-                    ],
-                    [
-                        8.50341796875,
-                        51.699799849741936
-                    ]
-                ]
-            }
-        }
-    ]
-}
-
-// Testroute
-var line3test = {
-    "_id":"5d41a216205cf30395e99b8123",
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        8.33587646484375,
-                        51.47796179607121
-                    ],
-                    [
-                        7.87994384765625,
-                        51.037939894299356
-                    ]
-                ]
-            }
-        }
-    ]
-}
-
-// Test AllRoutes
-
-//var lines = [];
-//lines.push(line2test, line3test);
-//console.log(lines);
-//console.log(line1test);
-//console.log(line1test._id);
-//console.log(turf.lineIntersect(line1test, line2test));
-
-
-// console.log(turf);
-//console.log(intersect);
 /**
  * function which takes one new inputRoute with the corresponding routeID and userID and compares this one with
  * all other routes in allRoutes. If there is an intersection this intersection will be saved in the proportionate
@@ -642,28 +532,28 @@ var line3test = {
  * animalIntersections. For each intersection there is a random userInteractionsID created.
  * @param inputRoute
  * @param allRoutes
- * @returns {Array}
+ * @param routeIDInput
+ * @param userIDInput
+ * @param inputRoute
+ * @param allRoutes
+ * @param collection
  */
 function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, collection) {
     var parseInputRoute = JSON.parse(inputRoute);
-    // console.log(parseInputRoute);
-    // console.log(collection);
-    // console.log(allRoutes);
-    // console.log(JSON.parse(allRoutes[0].geoJson));
+
     for (var j=0; j<allRoutes.length; j++) {
-        console.log("hello");
+
         var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geoJson));
-        console.log(intersect);
+        /*
+        The turf function returns an empty array with length 0 if there is no intersection, therefore only the arrays
+        with an content are stored in mongodb.
+         */
         if (intersect.features.length != 0) {
-            console.log(intersect + collection);
             intersect=JSON.stringify(intersect);
             var intersectionsID = Math.random().toString(36).substring(2, 15);
             insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
         }
-
       intersect = {};
     }
-
 }
 
-// console.log(calculateIntersect(line1test, lines));
