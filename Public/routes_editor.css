@@ -29,7 +29,7 @@ input[type=text], select {
 
 button {
     display: inline-block;
-    margin-left: 45%;
+    margin-left: 7px;
     margin-bottom: 30px;
     text-decoration: none;
     font-family: Arial;
