@@ -421,6 +421,12 @@ function deleteAll(collection){
 
 }
 
+/**
+ * Transforms the Response from the Movebank Request into an json with the necessary information
+ * including a valid geojson.
+ * @param movebankResponse
+ * @returns {Array} of json animal routes
+ */
 function transformMovebankJson(movebankResponse) {
 
     var jsonArray = [];
@@ -428,7 +434,7 @@ function transformMovebankJson(movebankResponse) {
     var coordinates = [];
     var latlon = [];
 
-
+    // compose a json for every animal returned by the movebank api
     for (i = 0; i < movebankResponse.individuals.length; i++){
 
         var json = {"User_ID":"","Name":"","Type":"","date":"","time":"", "routeID": "",
@@ -444,6 +450,7 @@ function transformMovebankJson(movebankResponse) {
 
         coordinates = [];
 
+        // compose coordinates
         for (j = 0; j < movebankResponse.individuals[i].locations.length; j++) {
             latlon = [];
             latlon[1] = movebankResponse.individuals[i].locations[j].location_lat;
@@ -451,6 +458,7 @@ function transformMovebankJson(movebankResponse) {
             coordinates.push(latlon);
         }
 
+        // add coordinates to json
         json.geoJson.features[0].geometry.coordinates = coordinates;
 
         jsonArray.push(json);
@@ -458,7 +466,11 @@ function transformMovebankJson(movebankResponse) {
     return jsonArray;
 }
 
-
+/**
+ * Sends the server-request to the movebank-API, converts the response, calculates the Intersections between users and
+ * animals and saves everything to the database.
+ * @returns {Promise<void>}
+ */
 async function getFilesFromMovebank() {
     try {
         /**
@@ -481,8 +493,8 @@ async function getFilesFromMovebank() {
          *
          */
 
+        // get study id from the form
         var study = document.forms["createAnimal"]["Study_ID"].value;
-        ;
 
         var resource = "movebank/" + study;
 
@@ -513,11 +525,12 @@ async function getFilesFromMovebank() {
                     geoJson: JSON.stringify(transMovebankResponse[i].geoJson)
                 });
 
+                // Calculates intersections between user and new animal routes if there are any
                 calculateIntersect(transMovebankResponse[i].routeID, transMovebankResponse[i].User_ID, JSON.stringify(transMovebankResponse[i].geoJson), mongodbJSONUserRoutes, "animalIntersections");
             }
 
+            // request progress finished
             $('body').css('cursor', 'default');
-
             alert("Routes of Study No. " + study + " have been added to the Database!");
 
         })
