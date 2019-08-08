@@ -26,7 +26,7 @@ function getParameterByName(name, url) {
 
 // Testroute
 var line1test = {
-    "_id":"5d41a216205cf30395e99b8221",
+    "_id": "5d41a216205cf30395e99b8221",
     "type": "FeatureCollection",
     "features": [
         {
@@ -52,7 +52,7 @@ var line1test = {
 
 // Testroute
 var line2test = {
-    "_id":"5d41a216205cf30395e99b8a22",
+    "_id": "5d41a216205cf30395e99b8a22",
     "type": "FeatureCollection",
     "features": [
         {
@@ -77,7 +77,7 @@ var line2test = {
 
 // Testroute
 var line3test = {
-    "_id":"5d41a216205cf30395e99b8123",
+    "_id": "5d41a216205cf30395e99b8123",
     "type": "FeatureCollection",
     "features": [
         {
@@ -118,14 +118,14 @@ lines.push(line2test, line3test);
  * @returns {Array}
  */
 function calculateIntersect(inputRoute, allRoutes) {
-    var intersectAll=[];
+    var intersectAll = [];
 
-    for (var j=0; j<allRoutes.length; j++) {
-                var intersect = turf.lineIntersect(inputRoute, allRoutes[j]);
-                intersectAll.push(intersect);
-        }
+    for (var j = 0; j < allRoutes.length; j++) {
+        var intersect = turf.lineIntersect(inputRoute, allRoutes[j]);
+        intersectAll.push(intersect);
+    }
 
-    for (var i=0; i<intersectAll.length; i++) {
+    for (var i = 0; i < intersectAll.length; i++) {
         if (intersectAll[i].features.length == 0) {
             intersectAll.splice(i, 1);
         }
@@ -161,12 +161,12 @@ function addMap() {
     $("#mapdiv")[0].style.visibility = "visible";
 }
 
-function addUserRoutes(userRoutes){
+function addUserRoutes(userRoutes) {
 
-    var geojsons=[];
-    var linesArray=[];
-    var routes=[];
-    var midpoints=[];
+    var geojsons = [];
+    var linesArray = [];
+    var routes = [];
+    var midpoints = [];
     for (var j in userRoutes) {
         var geojson = userRoutes[j].geoJson;
         geojsons.push(JSON.parse(geojson));
@@ -187,8 +187,8 @@ function addUserRoutes(userRoutes){
             linesArray[i][j][1] = help;
         }
 
-        var weather = weatherRequest(midpoints[i].geometry.coordinates[0],midpoints[i].geometry.coordinates[1]);
-        weather= JSON.parse(weather);
+        var weather = weatherRequest(midpoints[i].geometry.coordinates[0], midpoints[i].geometry.coordinates[1]);
+        weather = JSON.parse(weather);
 
         var route = L.polyline(linesArray[i], {color: 'red'}).addTo(map);
         routes.push(route);
@@ -196,7 +196,7 @@ function addUserRoutes(userRoutes){
 
         //add all Routes to the Map
         var popup = L.popup();
-        popup.setContent('Route: ' + userRoutes[i].routeID + "<br/>" +  "UserID:" + userRoutes[i].User_ID + "<br/> <img src=\"http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png\" /> <br/>" +"Weather: " + weather.weather[0].description);
+        popup.setContent('Route: ' + userRoutes[i].routeID + "<br/>" + "UserID:" + userRoutes[i].User_ID + "<br/> <img src=\"http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png\" /> <br/>" + "Weather: " + weather.weather[0].description);
         routes[i].bindPopup(popup);
 
         routes[i].on('mouseover', function (e) {
@@ -229,11 +229,10 @@ function addUserRoutes(userRoutes){
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
-function addAnimalRoutes(animalRoutes)
-{
+function addAnimalRoutes(animalRoutes) {
     console.log(animalRoutes);
-    var animalGeoJson=[];
-    for (var i =0; i<animalRoutes.length; i++){
+    var animalGeoJson = [];
+    for (var i = 0; i < animalRoutes.length; i++) {
         animalGeoJson.push((JSON.parse(animalRoutes[i].geoJson)));
     }
     console.log(animalGeoJson);
@@ -243,7 +242,7 @@ function addAnimalRoutes(animalRoutes)
 
         coordinates.push(animalGeoJson[i].features[0].geometry.coordinates);
 
-        for(var j in coordinates[i]) {
+        for (var j in coordinates[i]) {
             var help = coordinates[i][j][0];
             coordinates[i][j][0] = coordinates[i][j][1];
             coordinates[i][j][1] = help;
@@ -270,46 +269,45 @@ function addAnimalRoutes(animalRoutes)
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
-function copy(id){
+function copy(id) {
     console.log("run");
     var existsTextarea = document.getElementById('id');
-    existsTextarea.value="localhost:3000/" + id;
+    existsTextarea.value = "localhost:3000/" + id;
     existsTextarea.select();
-    var status= document.execCommand('copy');
-    if(!status){
+    var status = document.execCommand('copy');
+    if (!status) {
         console.error("Cannot copy text");
-    }else{
+    } else {
         console.log("The text is now on the clipboard");
     }
 }
 
-function addUserIntersections(userIntersections){
+function addUserIntersections(userIntersections) {
 
-    var routesToShow= []
-    var userIntersectionsPoints= [];
-    for( var i in userIntersections){
+    var routesToShow = []
+    var userIntersectionsPoints = [];
+    for (var i in userIntersections) {
 
         var lat;
         var lng;
 
-        try{
-          userIntersectionsPoints.push(JSON.parse(userIntersections[i].geoJson));
+        try {
+            userIntersectionsPoints.push(JSON.parse(userIntersections[i].geoJson));
 
-          for(var j in userIntersectionsPoints[i].features) {
+            for (var j in userIntersectionsPoints[i].features) {
 
-              lng = userIntersectionsPoints[i].features[j].geometry.coordinates[0];
-              lat = userIntersectionsPoints[i].features[j].geometry.coordinates[1];
-              var link = userIntersections[i].id;
-              var marker = L.marker([lat, lng]).addTo(map)
-                  .bindPopup("User Intersection between: <br/> User1:" + userIntersections[i].UserId + "<br/> User2: " + userIntersections[i].UserIDInput + "<br/>" +
-                      "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
-              routesFeature.addLayer(marker);
-              routesToShow.push(userIntersections[i].routeID);
-              routesToShow.push(userIntersections[i].routeIDInput);
-          }
+                lng = userIntersectionsPoints[i].features[j].geometry.coordinates[0];
+                lat = userIntersectionsPoints[i].features[j].geometry.coordinates[1];
+                var link = userIntersections[i].id;
+                var marker = L.marker([lat, lng]).addTo(map)
+                    .bindPopup("User Intersection between: <br/> User1:" + userIntersections[i].UserId + "<br/> User2: " + userIntersections[i].UserIDInput + "<br/>" +
+                        "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
+                routesFeature.addLayer(marker);
+                routesToShow.push(userIntersections[i].routeID);
+                routesToShow.push(userIntersections[i].routeIDInput);
+            }
 
-        }
-        catch(e){
+        } catch (e) {
             console.log(e);
 
         }
@@ -321,20 +319,21 @@ function addUserIntersections(userIntersections){
 
 }
 
-function addAnimalIntersections(userIntersections){
+function addAnimalIntersections(userIntersections) {
 
-    var userRoutesToShow= [];
-    var animalRoutesToShow= [];
-    var userIntersectionsPoints= [];
-    for( var i in userIntersections){
+    var userRoutesToShow = [];
+    var animalRoutesToShow = [];
+    var userIntersectionsPoints = [];
+    var answer = {userRoutes: [], animalRoutes: []};
+    for (var i in userIntersections) {
 
         var lat;
         var lng;
 
-        try{
+        try {
             userIntersectionsPoints.push(JSON.parse(userIntersections[i].geoJson));
 
-            for(var j in userIntersectionsPoints[i].features) {
+            for (var j in userIntersectionsPoints[i].features) {
 
                 lng = userIntersectionsPoints[i].features[j].geometry.coordinates[0];
                 lat = userIntersectionsPoints[i].features[j].geometry.coordinates[1];
@@ -347,24 +346,22 @@ function addAnimalIntersections(userIntersections){
                 animalRoutesToShow.push(userIntersections[i].routeID);
             }
 
-        }
-        catch(e){
+        } catch (e) {
             console.log(e);
 
         }
     }
 
     map.fitBounds(routesFeature.getBounds());
-    return {userRoutes: userRoutesToShow, animalRoutes: animalRoutesToShow};
+    answer.userRoutes = userRoutesToShow;
+    answer.animalRoutes = animalRoutesToShow;
+    return answer;
 
 
 }
 
 
-
-
-
-function insertItem(data){
+function insertItem(data) {
 
     $.ajax({
         url: "/item/create", // URL der Abfrage,
@@ -373,7 +370,7 @@ function insertItem(data){
     })
         .done(function (response) {
             // parse + use data here
-            console.log("insert data" +data);
+            console.log("insert data" + data);
         })
         .fail(function (xhr, status, errorThrown) {
             // handle errors
@@ -417,14 +414,15 @@ function weatherRequest(long, lat) {
     return response;
 }
 
-function componentDidMount(){
-    var id= getParameterByName('id');
-    if(id !== null){
+function componentDidMount() {
+    var id = getParameterByName('id');
+    if (id !== null) {
         filter1(id)
-    }else{
+    } else {
         filter1(null)
     }
 }
+
 async function filter1(id) {
 
 
@@ -437,6 +435,7 @@ async function filter1(id) {
     var wantAnimalIntersections = document.forms["filter"]["animalIntersections"].checked;
     var showEverything = false;
     var userRoutes;
+    var routesToShow;
     var animalRoutes;
     var userIntersections = [];
     if (id !== null) {
@@ -478,7 +477,7 @@ async function filter1(id) {
                 query += " {\"id\": \"" + intersection + "\"}]}";
             }
         }
-        var animalIntersections;
+        var animalIntersections = [];
 
         if (intersections != "" || showEverything) {
             try {
@@ -490,47 +489,47 @@ async function filter1(id) {
         }
         if (animalIntersections.length !== 0) {
             routesToShow = addAnimalIntersections(animalIntersections);
-        } else {
-            alert("No Animal Intersections found")
-        }
 
-        if (routesToShow.userRoutes.length != 0) {
-            var userRoutes
-            query = "{\"$or\" : [ { \"routeID\" : \"" + routesToShow.userRoutes[0] + "\"}, ";
-            for (var i = 1; i < routesToShow.userRoutes.length - 1; i++) {
-                query += "{ \"routeID\" : \"" + routesToShow.userRoutes[i] + "\"},"
-            }
-            query += "{ \"routeID\" : \"" + routesToShow.userRoutes[routesToShow.userRoutes.length - 1] + "\"}]}"
-
-
-            try {
-                userRoutes = await getDatabaseFiles("userRoutes", query);
-
-            } catch (e) {
-                console.log(e)
-
-            }
-
-            addUserRoutes(userRoutes);
-
-            if (routesToShow.animalRoutes.length != 0) {
-                query = "{\"$or\" : [ { \"routeID\" : \"" + routesToShow.animalRoutes[0] + "\"}, ";
-                for (var i = 1; i < routesToShow.animalRoutes.length - 1; i++) {
-                    query += "{ \"routeID\" : \"" + routesToShow.animalRoutes[i] + "\"},"
+            if (routesToShow.userRoutes.length != 0) {
+                var userRoutes
+                query = "{\"$or\" : [ { \"routeID\" : \"" + routesToShow.userRoutes[0] + "\"}, ";
+                for (var i = 1; i < routesToShow.userRoutes.length - 1; i++) {
+                    query += "{ \"routeID\" : \"" + routesToShow.userRoutes[i] + "\"},"
                 }
-                query += "{ \"routeID\" : \"" + routesToShow.animalRoutes[routesToShow.animalRoutes.length - 1] + "\"}]}"
+                query += "{ \"routeID\" : \"" + routesToShow.userRoutes[routesToShow.userRoutes.length - 1] + "\"}]}"
 
 
                 try {
-                    routesToShow = await getDatabaseFiles("animalRoutes", query);
+                    userRoutes = await getDatabaseFiles("userRoutes", query);
 
                 } catch (e) {
                     console.log(e)
 
                 }
 
-                addAnimalRoutes(routesToShow);
+                addUserRoutes(userRoutes);
+
+                if (routesToShow.animalRoutes.length != 0) {
+                    query = "{\"$or\" : [ { \"routeID\" : \"" + routesToShow.animalRoutes[0] + "\"}, ";
+                    for (var i = 1; i < routesToShow.animalRoutes.length - 1; i++) {
+                        query += "{ \"routeID\" : \"" + routesToShow.animalRoutes[i] + "\"},"
+                    }
+                    query += "{ \"routeID\" : \"" + routesToShow.animalRoutes[routesToShow.animalRoutes.length - 1] + "\"}]}"
+
+
+                    try {
+                        routesToShow = await getDatabaseFiles("animalRoutes", query);
+
+                    } catch (e) {
+                        console.log(e)
+
+                    }
+
+                    addAnimalRoutes(routesToShow);
+                }
             }
+        } else {
+            alert("No Animal Intersections found")
         }
     }
 
@@ -563,6 +562,7 @@ async function filter1(id) {
             }
 
             query = {};
+            routesToShow = [];
 
             if (!showEverything) {
                 if (userID.indexOf(";") === -1) {
@@ -590,9 +590,6 @@ async function filter1(id) {
                 } catch (e) {
                     console.log(e)
                 }
-
-
-            var routesToShow;
 
             if (userIntersections.length !== 0) {
                 routesToShow = addUserIntersections(userIntersections);
@@ -703,31 +700,31 @@ async function filter1(id) {
         }
 
 
-}
+    }
 
 
-/**
- * Shows the Items from mongodb in a textarea
- * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
- * @author Nick Jakuschona n_jaku01@wwu.de
- */
-async function getDatabaseFiles(collection, query) {
+    /**
+     * Shows the Items from mongodb in a textarea
+     * @desc Abgabe zu Aufgabe 7, Geosoft 1, SoSe 2019
+     * @author Nick Jakuschona n_jaku01@wwu.de
+     */
+    async function getDatabaseFiles(collection, query) {
 
         //Example query: "{\"User_ID\" : \"1234\"}"
 
-      return  $.ajax({
+        return $.ajax({
             url: "/item", // URL der Abfrage,
             data: {collection: collection, query: query},
             type: "POST"
         })
 
 
-};
+    };
 
-var resource = "movebank";
+    var resource = "movebank";
 
 /**
-$.get(resource, function(response, status, x){
+ $.get(resource, function(response, status, x){
     let formatted_response = JSON.stringify(response,null,4);
     $("#movebankJson").text(formatted_response);
 
@@ -746,5 +743,5 @@ $.get(resource, function(response, status, x){
     //var polyline = L.polyline(coordinates).addTo(map);
     //map.fitBounds(polyline.getBounds());
 });
-*/
+ */
 

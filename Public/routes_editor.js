@@ -321,7 +321,7 @@ async function validateForm(form) {
              */
             var routeIDInput;
             if(form=== "create") {
-                routeIDInput = Math.random().toString(36).substring(2, 15);
+                routeIDInput = "U" + Math.random().toString(36).substring(3, 15);
                 document.getElementById("routeID").value = routeIDInput;
             }
             else{
@@ -370,6 +370,12 @@ async function validateForm(form) {
                 alert("A Study_ID must be selected");
                 return false;
             }
+        }
+
+        if(form == "deleteAnimal"){
+            var id = document.forms[form]["Study_ID"].value;
+            // deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
+            deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
         }
 
         if(form === "delete"){
@@ -443,7 +449,7 @@ function transformMovebankJson(movebankResponse) {
         json.User_ID = movebankResponse.individuals[i].individual_taxon_canonical_name;
         json.Name = movebankResponse.individuals[i].individual_local_identifier;
         json.Type = "animal";
-        json.routeID=  Math.random().toString(36).substring(2, 15);
+        json.routeID = "A" +  Math.random().toString(36).substring(3, 15);
         var date = new Date(movebankResponse.individuals[i].locations[0].timestamp);
         json.date = date.toISOString().substring(0, 10);;
         json.time = date.toISOString().substring(12, 16);;
@@ -564,7 +570,12 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
         if (intersect.features.length != 0) {
             intersect=JSON.stringify(intersect);
             var intersectionsID = Math.random().toString(36).substring(2, 15);
-            insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
+            if (routeIDInput.substring(0,0)== "U") {
+                insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
+            } else {
+                insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: userIDInput, UserIDInput: allRoutes[j].User_ID, routeIDInput: routeIDInput});
+            }
+
         }
       intersect = {};
     }
