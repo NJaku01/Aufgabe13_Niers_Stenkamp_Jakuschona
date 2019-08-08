@@ -477,7 +477,7 @@ async function filter1(id) {
                 query += " {\"id\": \"" + intersection + "\"}]}";
             }
         }
-        var animalIntersections;
+        var animalIntersections = [];
 
         if (intersections != "" || showEverything) {
             try {
