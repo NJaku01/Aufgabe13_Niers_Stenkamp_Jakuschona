@@ -321,7 +321,7 @@ async function validateForm(form) {
              */
             var routeIDInput;
             if(form=== "create") {
-                routeIDInput = Math.random().toString(36).substring(2, 15);
+                routeIDInput = "U" + Math.random().toString(36).substring(3, 15);
                 document.getElementById("routeID").value = routeIDInput;
             }
             else{
@@ -370,6 +370,12 @@ async function validateForm(form) {
                 alert("A Study_ID must be selected");
                 return false;
             }
+        }
+
+        if(form == "deleteAnimal"){
+            var id = document.forms[form]["Study_ID"].value;
+            // deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
+            deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
         }
 
         if(form === "delete"){
@@ -421,6 +427,12 @@ function deleteAll(collection){
 
 }
 
+/**
+ * Transforms the Response from the Movebank Request into an json with the necessary information
+ * including a valid geojson.
+ * @param movebankResponse
+ * @returns {Array} of json animal routes
+ */
 function transformMovebankJson(movebankResponse) {
 
     var jsonArray = [];
@@ -428,7 +440,7 @@ function transformMovebankJson(movebankResponse) {
     var coordinates = [];
     var latlon = [];
 
-
+    // compose a json for every animal returned by the movebank api
     for (i = 0; i < movebankResponse.individuals.length; i++){
 
         var json = {"User_ID":"","Name":"","Type":"","date":"","time":"", "routeID": "",
@@ -437,13 +449,14 @@ function transformMovebankJson(movebankResponse) {
         json.User_ID = movebankResponse.individuals[i].individual_taxon_canonical_name;
         json.Name = movebankResponse.individuals[i].individual_local_identifier;
         json.Type = "animal";
-        json.routeID=  Math.random().toString(36).substring(2, 15);
+        json.routeID = "A" +  Math.random().toString(36).substring(3, 15);
         var date = new Date(movebankResponse.individuals[i].locations[0].timestamp);
         json.date = date.toISOString().substring(0, 10);;
         json.time = date.toISOString().substring(12, 16);;
 
         coordinates = [];
 
+        // compose coordinates
         for (j = 0; j < movebankResponse.individuals[i].locations.length; j++) {
             latlon = [];
             latlon[1] = movebankResponse.individuals[i].locations[j].location_lat;
@@ -451,6 +464,7 @@ function transformMovebankJson(movebankResponse) {
             coordinates.push(latlon);
         }
 
+        // add coordinates to json
         json.geoJson.features[0].geometry.coordinates = coordinates;
 
         jsonArray.push(json);
@@ -458,7 +472,11 @@ function transformMovebankJson(movebankResponse) {
     return jsonArray;
 }
 
-
+/**
+ * Sends the server-request to the movebank-API, converts the response, calculates the Intersections between users and
+ * animals and saves everything to the database.
+ * @returns {Promise<void>}
+ */
 async function getFilesFromMovebank() {
     try {
         /**
@@ -481,8 +499,8 @@ async function getFilesFromMovebank() {
          *
          */
 
+        // get study id from the form
         var study = document.forms["createAnimal"]["Study_ID"].value;
-        ;
 
         var resource = "movebank/" + study;
 
@@ -513,11 +531,12 @@ async function getFilesFromMovebank() {
                     geoJson: JSON.stringify(transMovebankResponse[i].geoJson)
                 });
 
+                // Calculates intersections between user and new animal routes if there are any
                 calculateIntersect(transMovebankResponse[i].routeID, transMovebankResponse[i].User_ID, JSON.stringify(transMovebankResponse[i].geoJson), mongodbJSONUserRoutes, "animalIntersections");
             }
 
+            // request progress finished
             $('body').css('cursor', 'default');
-
             alert("Routes of Study No. " + study + " have been added to the Database!");
 
         })
@@ -551,7 +570,12 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
         if (intersect.features.length != 0) {
             intersect=JSON.stringify(intersect);
             var intersectionsID = Math.random().toString(36).substring(2, 15);
-            insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
+            if (routeIDInput.substring(0,0)== "U") {
+                insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
+            } else {
+                insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: userIDInput, UserIDInput: allRoutes[j].User_ID, routeIDInput: routeIDInput});
+            }
+
         }
       intersect = {};
     }
