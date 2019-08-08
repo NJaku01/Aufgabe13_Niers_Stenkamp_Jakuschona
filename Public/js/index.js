@@ -229,7 +229,7 @@ function addUserRoutes(userRoutes){
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
-function addAnimalroutes(animalRoutes)
+function addAnimalRoutes(animalRoutes)
 {
     console.log(animalRoutes);
     var animalGeoJson=[];
@@ -323,7 +323,8 @@ function addUserIntersections(userIntersections){
 
 function addAnimalIntersections(userIntersections){
 
-    var routesToShow= []
+    var userRoutesToShow= [];
+    var animalRoutesToShow= [];
     var userIntersectionsPoints= [];
     for( var i in userIntersections){
 
@@ -339,11 +340,11 @@ function addAnimalIntersections(userIntersections){
                 lat = userIntersectionsPoints[i].features[j].geometry.coordinates[1];
                 var link = userIntersections[i].id;
                 var marker = L.marker([lat, lng]).addTo(map)
-                    .bindPopup("User Intersection between: <br/> User:" + userIntersections[i].UserIDInput + "<br/> Animal: " + userIntersections[i].UserId + "<br/>" +
+                    .bindPopup("Animal Intersection between: <br/> User:" + userIntersections[i].UserIDInput + "<br/> Animal: " + userIntersections[i].UserId + "<br/>" +
                         "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
                 routesFeature.addLayer(marker);
-                routesToShow.push(userIntersections[i].routeID);
-                routesToShow.push(userIntersections[i].routeIDInput);
+                userRoutesToShow.push(userIntersections[i].routeIDInput);
+                animalRoutesToShow.push(userIntersections[i].routeID);
             }
 
         }
@@ -354,7 +355,7 @@ function addAnimalIntersections(userIntersections){
     }
 
     map.fitBounds(routesFeature.getBounds());
-    return routesToShow;
+    return {userRoutes: userRoutesToShow, animalRoutes: animalRoutesToShow};
 
 
 }
@@ -424,34 +425,33 @@ function componentDidMount(){
         filter1(null)
     }
 }
-async function filter1(id){
+async function filter1(id) {
 
 
     var userID = document.forms["filter"]["User_ID"].value;
     var animals = document.forms["filter"]["Animal"].value;
-    var intersections= document.forms["filter"]["InteractionIDs"].value;
+    var intersections = document.forms["filter"]["InteractionIDs"].value;
     var wantUserRoutes = document.forms["filter"]["userRoutes"].checked;
     var wantAnimalRoutes = document.forms["filter"]["animalRoutes"].checked;
     var wantUserIntersection = document.forms["filter"]["userIntersections"].checked;
     var wantAnimalIntersections = document.forms["filter"]["animalIntersections"].checked;
-    var showEverything= false;
+    var showEverything = false;
     var userRoutes;
     var animalRoutes;
     var userIntersections = [];
-    if(id !== null){
-        intersections =id;
-        wantAnimalIntersections=true;
-        wantUserIntersection =true;
-        wantAnimalRoutes=false;
-        wantUserRoutes=false;
+    if (id !== null) {
+        intersections = id;
+        wantAnimalIntersections = true;
+        wantUserIntersection = true;
+        wantAnimalRoutes = false;
+        wantUserRoutes = false;
 
     }
 
-    if(userID==="" && animals==="" && intersections ===""){
-        showEverything=true;
+    if (userID === "" && animals === "" && intersections === "") {
+        showEverything = true;
 
     }
-
 
 
     map.eachLayer(function (layer) {
@@ -460,30 +460,9 @@ async function filter1(id){
 
     addMap();
 
-    if(wantAnimalIntersections){
-        query={};
-        try {
-
-
-            var animalIntersections = await getDatabaseFiles("animalIntersections", query);
-
-        }
-        catch{
-
-        }
-        if(animalIntersections.length !== 0) {
-            addAnimalIntersections(animalIntersections);
-        }
-        else{
-            alert("No User Intersections found")
-        }
-
-
-    }
-
-    if(wantUserIntersection || intersections !="") {
-        query ={};
-        if (!showEverything) {
+    if (wantAnimalIntersections) {
+        query = {};
+        if (!showEverything || intersections != "") {
             if (intersections.indexOf(";") === -1) {
                 query = "{\"id\": \"" + intersections + "\"}"
             } else {
@@ -499,18 +478,93 @@ async function filter1(id){
                 query += " {\"id\": \"" + intersection + "\"}]}";
             }
         }
-        if(intersections != "" || showEverything) {
+        var animalIntersections;
+
+        if (intersections != "" || showEverything) {
             try {
-                userIntersections = await getDatabaseFiles("userIntersections", query);
+                animalIntersections = await getDatabaseFiles("animalIntersections", query);
 
             } catch {
 
             }
         }
+        if (animalIntersections.length !== 0) {
+            routesToShow = addAnimalIntersections(animalIntersections);
+        } else {
+            alert("No Animal Intersections found")
+        }
 
-        query ={};
+        if (routesToShow.userRoutes.length != 0) {
+            var userRoutes
+            query = "{\"$or\" : [ { \"routeID\" : \"" + routesToShow.userRoutes[0] + "\"}, ";
+            for (var i = 1; i < routesToShow.userRoutes.length - 1; i++) {
+                query += "{ \"routeID\" : \"" + routesToShow.userRoutes[i] + "\"},"
+            }
+            query += "{ \"routeID\" : \"" + routesToShow.userRoutes[routesToShow.userRoutes.length - 1] + "\"}]}"
 
-        if (!showEverything) {
+
+            try {
+                userRoutes = await getDatabaseFiles("userRoutes", query);
+
+            } catch (e) {
+                console.log(e)
+
+            }
+
+            addUserRoutes(userRoutes);
+
+            if (routesToShow.animalRoutes.length != 0) {
+                query = "{\"$or\" : [ { \"routeID\" : \"" + routesToShow.animalRoutes[0] + "\"}, ";
+                for (var i = 1; i < routesToShow.animalRoutes.length - 1; i++) {
+                    query += "{ \"routeID\" : \"" + routesToShow.animalRoutes[i] + "\"},"
+                }
+                query += "{ \"routeID\" : \"" + routesToShow.animalRoutes[routesToShow.animalRoutes.length - 1] + "\"}]}"
+
+
+                try {
+                    routesToShow = await getDatabaseFiles("animalRoutes", query);
+
+                } catch (e) {
+                    console.log(e)
+
+                }
+
+                addAnimalRoutes(routesToShow);
+            }
+        }
+    }
+
+
+        if (wantUserIntersection || intersections != "") {
+            query = {};
+            if (!showEverything) {
+                if (intersections.indexOf(";") === -1) {
+                    query = "{\"id\": \"" + intersections + "\"}"
+                } else {
+                    var intersection = intersections.substring(0, intersections.indexOf(";"));
+                    intersections = intersections.substring(intersections.indexOf(";") + 1, intersections.length);
+                    query = "{ \"$or\" : [ {\"id\": \"" + intersection + "\"} , ";
+                    while (intersections.indexOf(";") != -1) {
+                        intersection = intersections.substring(1, intersections.indexOf(";"));
+                        intersections = intersections.substring(intersections.indexOf(";") + 1, intersections.length);
+                        query += "{\"id\" : \"" + intersection + "\" } , "
+                    }
+                    intersection = intersections.substring(1, intersections.length);
+                    query += " {\"id\": \"" + intersection + "\"}]}";
+                }
+            }
+            if (intersections != "" || showEverything) {
+                try {
+                    userIntersections = await getDatabaseFiles("userIntersections", query);
+
+                } catch {
+
+                }
+            }
+
+            query = {};
+
+            if (!showEverything) {
                 if (userID.indexOf(";") === -1) {
                     query = "{\"$or\" : [{\"UserId\": \"" + userID + "\"} , { \"UserIDInput\" : \"" + userID + "\"}]}"
                 } else {
@@ -527,134 +581,127 @@ async function filter1(id){
                 }
 
             }
-        if(userID != "" || showEverything)
-        try {
-            var userIntersections2 = await getDatabaseFiles("userIntersections", query);
-            userIntersections= userIntersections.concat(userIntersections2);
+            if (userID != "" || showEverything)
+                try {
+                    var userIntersections2 = await getDatabaseFiles("userIntersections", query);
+                    userIntersections = userIntersections.concat(userIntersections2);
 
 
-        } catch(e) {
-            console.log(e)
-        }
-
-
-            var routesToShow = [];
-
-        if(userIntersections.length !== 0) {
-            routesToShow = addUserIntersections(userIntersections);
-        }
-        else{
-            alert("No User Intersections found")
-        }
-
-        if (routesToShow.length != 0) {
-           query = "{\"$or\" : [ { \"routeID\" : \"" + routesToShow[0] + "\"}, ";
-            for(var i=1;i < routesToShow.length-1; i++){
-                query+= "{ \"routeID\" : \"" + routesToShow[i] + "\"},"
-            }
-            query+= "{ \"routeID\" : \"" + routesToShow[routesToShow.length-1] + "\"}]}"
-
-
-
-            try {
-                routesToShow = await getDatabaseFiles("userRoutes", query);
-
-            } catch(e) {
-                console.log(e)
-
-            }
-
-            addUserRoutes(routesToShow);
-
-        }
-
-    }
-
-
-    if(wantUserRoutes){
-
-        var query= {};
-
-        if(userID!="")
-        {
-            if(userID.indexOf(";")=== -1) {
-                query = "{\"User_ID\": \"" + userID + "\"}"
-            }
-            else{
-                var user= userID.substring(0,userID.indexOf(";"));
-                userID = userID.substring(userID.indexOf(";")+1, userID.length);
-                query = "{ \"$or\" : [ {\"User_ID\": \"" + user + "\"} , ";
-                while(userID.indexOf(";")!= -1){
-                    user= userID.substring(1,userID.indexOf(";"));
-                    userID = userID.substring(userID.indexOf(";")+1, userID.length);
-                    query += " {\"User_ID\": \"" + user + "\"} , "
+                } catch (e) {
+                    console.log(e)
                 }
-                user= userID.substring(1,userID.length);
-                query += " {\"User_ID\": \"" + user + "\"}]}";
-            }
-        }
-        if(showEverything || userID!="") {
-            try {
-                userRoutes = await getDatabaseFiles("userRoutes", query);
 
-            } catch(e) {
-                console.log(e);
 
-            }
+            var routesToShow;
 
-            if (userRoutes.length === 0) {
-                alert("The API didn't found User Routes to show. Please makes sure there are User Routes in the Database or the UserID really exists. " +
-                    "Maybe you enteret the UserID the wrong way:" +
-                    "To Show all routes just leave the field empty" +
-                    "Tho Show routes of just on User enter only the UserID" +
-                    "Tho Show routes of more Users seperate the UserIDs by \";\" eg. \"1; 2\" ")
+            if (userIntersections.length !== 0) {
+                routesToShow = addUserIntersections(userIntersections);
             } else {
-                addUserRoutes(userRoutes);
+                alert("No User Intersections found")
             }
-        }
-    }
-    if(wantAnimalRoutes){
 
-        var query={};
-        if(animals!="")
-        {
-            if(animals.indexOf(";")=== -1) {
-                query = "{\"USER_ID\": \"" + animals + "\"}"
-            }
-            else{
-                var animal = animals.substring(0,animals.indexOf(";"));
-                animals = animals.substring(animals.indexOf(";")+1, animals.length);
-                query = "{ \"$or\" : [ {\"USER_ID\": \"" + animal  + "\"} , ";
-                while(animals.indexOf(";")!= -1){
-                    animal = animals.substring(1,animals.indexOf(";"));
-                    animals = animals.substring(animals.indexOf(";")+1, animals.length);
-                    query += " {\"USER_ID\": \"" + animal  + "\"} , "
+            if (routesToShow.length != 0) {
+                query = "{\"$or\" : [ { \"routeID\" : \"" + routesToShow[0] + "\"}, ";
+                for (var i = 1; i < routesToShow.length - 1; i++) {
+                    query += "{ \"routeID\" : \"" + routesToShow[i] + "\"},"
                 }
-                animal = animals.substring(1, animals.length);
-                query += " {\"USER_ID\": \"" + animal  + "\"}]}";
-            }
-        }
-        if(showEverything || animals!="") {
+                query += "{ \"routeID\" : \"" + routesToShow[routesToShow.length - 1] + "\"}]}"
 
 
-            try {
-                animalRoutes = await getDatabaseFiles("animalRoutes", query);
-                console.log(animalRoutes);
-            } catch (e) {
-                console.log(e);
+                try {
+                    routesToShow = await getDatabaseFiles("userRoutes", query);
+
+                } catch (e) {
+                    console.log(e)
+
+                }
+
+                addUserRoutes(routesToShow);
+
             }
 
-            if (animalRoutes.length === 0) {
-                alert("No animal routes found");
-            } else {
-                addAnimalroutes(animalRoutes);
-            }
         }
 
 
+        if (wantUserRoutes) {
+
+            var query = {};
+
+            if (userID != "") {
+                if (userID.indexOf(";") === -1) {
+                    query = "{\"User_ID\": \"" + userID + "\"}"
+                } else {
+                    var user = userID.substring(0, userID.indexOf(";"));
+                    userID = userID.substring(userID.indexOf(";") + 1, userID.length);
+                    query = "{ \"$or\" : [ {\"User_ID\": \"" + user + "\"} , ";
+                    while (userID.indexOf(";") != -1) {
+                        user = userID.substring(1, userID.indexOf(";"));
+                        userID = userID.substring(userID.indexOf(";") + 1, userID.length);
+                        query += " {\"User_ID\": \"" + user + "\"} , "
+                    }
+                    user = userID.substring(1, userID.length);
+                    query += " {\"User_ID\": \"" + user + "\"}]}";
+                }
+            }
+            if (showEverything || userID != "") {
+                try {
+                    userRoutes = await getDatabaseFiles("userRoutes", query);
+
+                } catch (e) {
+                    console.log(e);
+
+                }
+
+                if (userRoutes.length === 0) {
+                    alert("The API didn't found User Routes to show. Please makes sure there are User Routes in the Database or the UserID really exists. " +
+                        "Maybe you enteret the UserID the wrong way:" +
+                        "To Show all routes just leave the field empty" +
+                        "Tho Show routes of just on User enter only the UserID" +
+                        "Tho Show routes of more Users seperate the UserIDs by \";\" eg. \"1; 2\" ")
+                } else {
+                    addUserRoutes(userRoutes);
+                }
+            }
+        }
+        if (wantAnimalRoutes) {
+
+            var query = {};
+            if (animals != "") {
+                if (animals.indexOf(";") === -1) {
+                    query = "{\"USER_ID\": \"" + animals + "\"}"
+                } else {
+                    var animal = animals.substring(0, animals.indexOf(";"));
+                    animals = animals.substring(animals.indexOf(";") + 1, animals.length);
+                    query = "{ \"$or\" : [ {\"USER_ID\": \"" + animal + "\"} , ";
+                    while (animals.indexOf(";") != -1) {
+                        animal = animals.substring(1, animals.indexOf(";"));
+                        animals = animals.substring(animals.indexOf(";") + 1, animals.length);
+                        query += " {\"USER_ID\": \"" + animal + "\"} , "
+                    }
+                    animal = animals.substring(1, animals.length);
+                    query += " {\"USER_ID\": \"" + animal + "\"}]}";
+                }
+            }
+            if (showEverything || animals != "") {
 
 
-    }
+                try {
+                    animalRoutes = await getDatabaseFiles("animalRoutes", query);
+                    console.log(animalRoutes);
+                } catch (e) {
+                    console.log(e);
+                }
+
+                if (animalRoutes.length === 0) {
+                    alert("No animal routes found");
+                } else {
+                    addAnimalRoutes(animalRoutes);
+                }
+            }
+
+
+        }
+
 
 }
 

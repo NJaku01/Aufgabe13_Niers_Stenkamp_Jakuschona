@@ -364,6 +364,14 @@ async function validateForm(form) {
         }
 
         // depending on the input id the corresponding element in mongodb is deleted.
+        if (form == "deleteAnimal") {
+            var id = document.forms[form]["Study_ID"].value;
+            if (id == "") {
+                alert("A Study_ID must be selected");
+                return false;
+            }
+        }
+
         if(form === "delete"){
             var id = document.forms[form]["_id"].value;
             deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
@@ -455,7 +463,7 @@ async function getFilesFromMovebank() {
     try {
         /**
          * Working Study IDs:
-         * Belgien: 604806671
+         * Belgien bis Afrika: 604806671
          * Galapagos: 2911040
          * Süddeutschland / Osteuropa: 446579
          * Süddeutschland bis Spanien: 186178781, 173641633

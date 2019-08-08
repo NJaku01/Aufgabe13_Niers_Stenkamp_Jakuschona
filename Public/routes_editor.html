@@ -67,19 +67,22 @@
             <div class="col-md-6">
                 <div id="data">
                     <textarea id="geojsontextarea" onchange="showLine(this.value)"
-                              style="width: 100%; height: 400px; "></textarea><br/>
+                              style="width: 100%; height: 400px; "
+                              placeholder="The JSON of the calculated Route will appear here"></textarea><br/>
                 </div>
             </div>
         </div>
     </div>
-    <div>
-        <button onclick="showFiles('userRoutes')">Show UserRoutes in Database</button>
-        <button onclick="showFiles('animalRoutes')">Show AnimalRoutes in Database</button>
-        <button onclick="showFiles('userIntersections')">Show UserIntersections in Database</button>
+    <br/>
+    <div class="text-left">
+        <button onclick="showFiles('userRoutes')" class="btn btn-secondary text-left">Show UserRoutes in Database</button><br>
+        <button onclick="showFiles('animalRoutes')" class="btn btn-secondary">Show AnimalRoutes in Database</button><br>
+        <button onclick="showFiles('userIntersections')" class="btn btn-secondary">Show UserIntersections in Database</button><br>
         <button onclick="showFiles('animalIntersections')">Show AnimalIntersections in Database</button>
-        <textarea readonly id="database" style="width: 100%; height: 400px;"> </textarea>
+        <textarea readonly id="database" style="width: 100%; height: 400px;"
+                  placeholder="Here you can show the database content"> </textarea>
     </div>
-    <div id="form">
+    <div id="form" class="text-left">
         <h5>Add Item (POST Request)</h5>
 
 
@@ -96,8 +99,8 @@
             <input type="time" name="time"/><br>
             <input type="hidden" id="geojson" name="geoJson"/>
             <input type="hidden" name="collection" value="userRoutes"/>
-            <input type="hidden" id="routeID" name="routeID" />
-            <input type="submit" value="Send"/>
+            <input type="hidden" id="routeID" name="routeID" /><br>
+            <button type="submit" value="Send" class="btn btn-secondary">Send</button><br/>
         </form>
 
         <br/>
@@ -117,8 +120,8 @@
             <input type="date" name="date"/><br>
             Time:<br/>
             <input type="time" name="time"/><br>
-            <input type="hidden" id="geojsonUpdate" name="geojson">
-            <input type="submit" value="Send"/>
+            <input type="hidden" id="geojsonUpdate" name="geojson"><br>
+            <button class="btn btn-secondary" type="submit" value="Send">Send</button>
         </form>
 
         <br/>
@@ -126,12 +129,9 @@
         <h5>Delete Item</h5>
 
         <form name="delete" action="item/deleteOne" target="_blank" onsubmit="return validateForm('delete')" method="POST">
-
-
             ID:<br/>
             <input type="text" name="_id"/><br>
-            <br/>
-            <input type="submit" value="Send"/>
+            <button class="btn btn-secondary" type="submit" value="Send">Send</button>
         </form>
 
         <h5>Add Animal Route</h5>
@@ -139,12 +139,21 @@
         <form name="createAnimal">
 
             Study ID:<br/>
-            <input type="number" name="Study_ID"/>
+            <input type="text" name="Study_ID"/>
             <br>
             <input type="hidden" name="collection" value="animalRoutes"/>
+        </form>
+        <button onclick="getFilesFromMovebank()" class="btn btn-secondary">Send</button>
+
+        <h5>Delete Animal Route</h5>
+        <form name="deleteAnimal" action="item/deleteMany" onsubmit="return validateForm('deleteAnimal')" method="POST" target="_self">
+            Study ID:<br/>
+            <input type="text" name="Study_ID"/>
+            <br>
+            <button class="btn btn-secondary" type="submit" value="Send">Send</button>
             <br/>
         </form>
-        <button onclick="getFilesFromMovebank()">Get Files from Movebank</button>
+
     </div>
 
     <button onclick="deleteAll('userRoutes')">Delete all UserRoutes in Database</button>
