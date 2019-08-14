@@ -78,7 +78,7 @@
         <button onclick="showFiles('userRoutes')" class="btn btn-secondary text-left">Show UserRoutes in Database</button><br>
         <button onclick="showFiles('animalRoutes')" class="btn btn-secondary">Show AnimalRoutes in Database</button><br>
         <button onclick="showFiles('userIntersections')" class="btn btn-secondary">Show UserIntersections in Database</button><br>
-        <button onclick="showFiles('animalIntersections')">Show AnimalIntersections in Database</button>
+        <button onclick="showFiles('animalIntersections')" class="btn btn-secondary">Show AnimalIntersections in Database</button>
         <textarea readonly id="database" style="width: 100%; height: 400px;"
                   placeholder="Here you can show the database content"> </textarea>
     </div>
@@ -138,7 +138,39 @@
 
         <form name="createAnimal">
 
-            Study ID:<br/>
+            Study ID: <span id="showInfo" onclick="showMovebankInformation()"><b> !&#9432;!</b></span><br/>
+            <div id="movebankInfo" class="d-none">
+                <br/>
+                <p>Here you can enter a Study-ID from <a href="https://www.movebank.org/panel_embedded_movebank_webapp">Movebank</a> to download the Animal Movement Data.<br/>
+                Because the Movebank-API is not so easy to use we prepared a list of Study-IDs you can use without problems:
+                    <ul>
+                        <li>604806671: Western Marsh Harriers moving from Belgium to Africa.</li>
+                        <li>446579: Activity of Mallarda in Germany in East-Europe</li>
+                        <li>186178781: Raptors moving from Germany to Spain.</li>
+                        <li>173641633: White Stork moving from Germany to Spain.</li>
+                        <li>92261778: Whooper Swans between Germany and Finland.</li>
+                        <li>195375760: Common Crane movement from Lithuania to Spain</li>
+                        <li>150764908: Spotted Eagle Movement from Lithuania to East- and West-Africa.</li>
+                    </ul>
+                </p>
+                <p>
+                    In the following there are some Study-IDs for which you have to <b>agree the licence terms</b> on the Movebank page first:<br/>
+                    Dänemark: 49535504, Spiekeroog: 183209639, NIederlande: 163020445, Nord- & Osteuropa: 467107447,
+                    Schweden bis Holland: 350174730, Schweden bis Spanien: 10722328
+                    <br/>
+                    <b>How to</b> agree the licence terms: Go to <a href="https://www.movebank.org/panel_embedded_movebank_webapp">Movebank</a>,
+                    search for your study (via the ID), enter the Studies Page, click "Download" -> "Download Data", agree the terms. <br/>
+                    Then go to the Routes-Editor page again, enter the Study-ID and click "Send".
+                </p>
+                <p>
+                    Furthermore you can use Data from other Studies if they are available for Download and if you agreed
+                    to the licence terms (when its necessary). <br/>
+                    Easiest way to find them: <br>
+                    Movebank -> "Studies" -> "Studies where I can download data"
+                    -> Search for a Study you are interested in and check if GPS data is available for it ->
+                    Agree to the licence terms -> Copy the Movebank ID and use it as Study-ID on the Routes-Editor page.
+                </p>
+            </div>
             <input type="text" name="Study_ID"/>
             <br>
             <input type="hidden" name="collection" value="animalRoutes"/>
@@ -156,10 +188,10 @@
 
     </div>
 
-    <button onclick="deleteAll('userRoutes')">Delete all UserRoutes in Database</button>
-    <button onclick="deleteAll('animalRoutes')">Delete all AnimalRoutes in Database</button>
-    <button onclick="deleteAll('userIntersections')">Delete all UserIntersections in Database</button>
-    <button onclick="deleteAll('animalIntersections')">Delete all AnimalIntersections in Database</button>
+    <button onclick="deleteAll('userRoutes')" class="btn btn-secondary">Delete all UserRoutes in Database</button><br/>
+    <button onclick="deleteAll('animalRoutes')" class="btn btn-secondary">Delete all AnimalRoutes in Database</button><br/>
+    <button onclick="deleteAll('userIntersections')" class="btn btn-secondary">Delete all UserIntersections in Database</button><br/>
+    <button onclick="deleteAll('animalIntersections')" class="btn btn-secondary">Delete all AnimalIntersections in Database</button><br/>
 
 </div>
 
