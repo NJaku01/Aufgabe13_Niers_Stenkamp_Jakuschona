@@ -319,31 +319,32 @@ function addUserIntersections(userIntersections) {
 
 }
 
-function addAnimalIntersections(userIntersections) {
+function addAnimalIntersections(animalIntersections) {
 
     var userRoutesToShow = [];
     var animalRoutesToShow = [];
-    var userIntersectionsPoints = [];
+    var animalIntersectionsPoints = [];
     var answer = {userRoutes: [], animalRoutes: []};
-    for (var i in userIntersections) {
+    console.log(animalIntersections)
+    for (var i in animalIntersections) {
 
         var lat;
         var lng;
 
         try {
-            userIntersectionsPoints.push(JSON.parse(userIntersections[i].geoJson));
+            animalIntersectionsPoints.push(JSON.parse(animalIntersections[i].geoJson));
 
-            for (var j in userIntersectionsPoints[i].features) {
+            for (var j in animalIntersectionsPoints[i].features) {
 
-                lng = userIntersectionsPoints[i].features[j].geometry.coordinates[0];
-                lat = userIntersectionsPoints[i].features[j].geometry.coordinates[1];
-                var link = userIntersections[i].id;
+                lng = animalIntersectionsPoints[i].features[j].geometry.coordinates[0];
+                lat = animalIntersectionsPoints[i].features[j].geometry.coordinates[1];
+                var link = animalIntersections[i].id;
                 var marker = L.marker([lat, lng]).addTo(map)
-                    .bindPopup("Animal Intersection between: <br/> User:" + userIntersections[i].UserIDInput + "<br/> Animal: " + userIntersections[i].UserId + "<br/>" +
+                    .bindPopup("Animal Intersection between: <br/> User:" + animalIntersections[i].UserIDInput + "<br/> Animal: " + animalIntersections[i].UserId + "<br/>" +
                         "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
                 routesFeature.addLayer(marker);
-                userRoutesToShow.push(userIntersections[i].routeIDInput);
-                animalRoutesToShow.push(userIntersections[i].routeID);
+                userRoutesToShow.push(animalIntersections[i].routeIDInput);
+                animalRoutesToShow.push(animalIntersections[i].routeID);
             }
 
         } catch (e) {
@@ -491,6 +492,7 @@ async function filter1(id) {
 
             }
         }
+        var animalIntersections2 = [];
         if (!showEverything || userID != "") { //filter by user
             if (userID.indexOf(";") === -1) {
                 query = "{\"UserIDInput\": \"" + userID + "\"}"
@@ -508,9 +510,10 @@ async function filter1(id) {
             }
 
 
-        var animalIntersections2 = [];
+
             try {
                 animalIntersections2 = await getDatabaseFiles("animalIntersections", query);
+                console.log(animalIntersections2);
 
             } catch {
 
@@ -543,9 +546,11 @@ async function filter1(id) {
 
             }
             animalIntersections = animalIntersections.concat(animalIntersections2);
+
         }
 
 
+        console.log(animalIntersections);
         if (animalIntersections.length !== 0) {//if the database Found some Intersections show them
             routesToShow = addAnimalIntersections(animalIntersections);
 
