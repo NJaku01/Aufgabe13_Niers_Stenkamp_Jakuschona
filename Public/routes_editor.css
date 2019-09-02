@@ -65,7 +65,7 @@ input[type=submit] {
      box-shadow: 3px 3px 4px #8CA0B2;
      text-shadow: 1px 1px 2px #6E91B2;
  }
-input[type=submit]:hover {
+input[type=submit]:hover, #showInfo:hover {
     background-color: lawngreen;
     cursor: pointer;
 }

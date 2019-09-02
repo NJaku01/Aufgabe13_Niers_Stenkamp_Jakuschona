@@ -394,7 +394,8 @@ function insertItem(data) {
 function weatherRequest(long, lat) {
     "use strict";
 
-    var resource = "https://api.openweathermap.org/data/2.5/weather?units=metric&lat=" + lat + "&lon=" + long + "&appid=" + OPENWEATHERMAP_TOKEN;
+    console.log("Jungs: Bitte token in der Form speichern wie in der README angegeben, damit wir das einheitlich halten können!");
+    var resource = "https://api.openweathermap.org/data/2.5/weather?units=metric&lat=" + lat + "&lon=" + long + "&appid=" + token.OPENWEATHERMAP_TOKEN;
     var response = null;
 
     var xhttp = new XMLHttpRequest();

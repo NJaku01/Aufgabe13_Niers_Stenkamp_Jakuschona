@@ -543,6 +543,11 @@ async function getFilesFromMovebank() {
     } catch {}
 }
 
+function showMovebankInformation() {
+    $("#movebankInfo").toggleClass('d-none');
+}
+
+
 /**
  * function which takes one new inputRoute with the corresponding routeID and userID and compares this one with
  * all other routes in allRoutes. If there is an intersection this intersection will be saved in the proportionate
