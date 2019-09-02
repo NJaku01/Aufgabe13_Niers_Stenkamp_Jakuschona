@@ -196,7 +196,7 @@ function addUserRoutes(userRoutes) {
 
         //add all Routes to the Map
         var popup = L.popup();
-        popup.setContent('Route: ' + userRoutes[i].routeID + "<br/>" + "UserID:" + userRoutes[i].User_ID + "<br/> <img src=\"http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png\" /> <br/>" + "Weather: " + weather.weather[0].description);
+        popup.setContent('Route: ' + userRoutes[i].routeID + "<br/>" + "UserID:" + userRoutes[i].User_ID + "<br/>" + "Route Name:" + userRoutes[i].Name + "<br/> <img src=\"http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png\" /> <br/>" + "Weather: " + weather.weather[0].description);
         routes[i].bindPopup(popup);
 
         routes[i].on('mouseover', function (e) {
@@ -204,9 +204,9 @@ function addUserRoutes(userRoutes) {
             popup.setLatLng(e.latlng).openOn(map);
         });
 
-        routes[i].on('mouseout', function (e) {
+        /*routes[i].on('mouseout', function (e) {
             e.target.closePopup();
-        });
+        });*/
         //add  the PopUps to the Map for the Routes
 
 
@@ -253,7 +253,7 @@ function addAnimalRoutes(animalRoutes) {
         routesFeature.addLayer(polyline);
 
         var popup = L.popup();
-        popup.setContent("Animal:" + animalRoutes[i].User_ID);
+        popup.setContent("Animal: " + animalRoutes[i].User_ID + "<br/>" + "Study_ID: " + animalRoutes[i].Study_ID);
         collectionOfRoutes[i].bindPopup(popup);
 
         collectionOfRoutes[i].on('mouseover', function (e) {
@@ -261,9 +261,9 @@ function addAnimalRoutes(animalRoutes) {
             popup.setLatLng(e.latlng).openOn(map);
         });
 
-        collectionOfRoutes[i].on('mouseout', function (e) {
+        /* collectionOfRoutes[i].on('mouseout', function (e) {
             e.target.closePopup();
-        });
+        }); */
     }
 
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
@@ -340,7 +340,7 @@ function addAnimalIntersections(animalIntersections) {
                 lat = animalIntersectionsPoints[i].features[j].geometry.coordinates[1];
                 var link = animalIntersections[i].id;
                 var marker = L.marker([lat, lng]).addTo(map)
-                    .bindPopup("Animal Intersection between: <br/> User:" + animalIntersections[i].UserIDInput + "<br/> Animal: " + animalIntersections[i].UserId + "<br/>" +
+                    .bindPopup("Animal Intersection between: <br/> User: " + animalIntersections[i].UserIDInput + "<br/> Animal: " + animalIntersections[i].UserId + "<br/>" +
                         "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
                 routesFeature.addLayer(marker);
                 userRoutesToShow.push(animalIntersections[i].routeIDInput);
