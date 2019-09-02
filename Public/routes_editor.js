@@ -363,8 +363,25 @@ async function validateForm(form) {
             }
         }
 
+
+
         // depending on the input id the corresponding element in mongodb is deleted.
-        if (form == "deleteAnimal") {
+        if (form == "deleteAnimalRoute") {
+            var id = document.forms[form]["Route_ID"].value;
+            if (id == "") {
+                alert("A Route_ID must be selected");
+                return false;
+            }
+        }
+
+        if(form == "deleteAnimalRoute"){
+            var id = document.forms[form]["Route_ID"].value;
+            // deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
+            deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
+        }
+
+        // depending on the input id the corresponding element in mongodb is deleted.
+        if (form == "deleteAnimalStudy") {
             var id = document.forms[form]["Study_ID"].value;
             if (id == "") {
                 alert("A Study_ID must be selected");
@@ -372,10 +389,10 @@ async function validateForm(form) {
             }
         }
 
-        if(form == "deleteAnimal"){
+        if(form == "deleteAnimalStudy"){
             var id = document.forms[form]["Study_ID"].value;
             // deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
-            deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
+            deleteDatabaseFiles("animalIntersections", "{\"studyID\" : \"" + id + "\"}")
         }
 
         if(form === "delete"){
@@ -578,7 +595,10 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
             if (routeIDInput.substring(0,0)== "U") {
                 insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
             } else {
-                insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: userIDInput, UserIDInput: allRoutes[j].User_ID, routeIDInput: routeIDInput});
+                // get study id from the form
+                var study = document.forms["createAnimal"]["Study_ID"].value;
+
+                insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: userIDInput, UserIDInput: allRoutes[j].User_ID, routeIDInput: routeIDInput, studyID: study});
             }
 
         }

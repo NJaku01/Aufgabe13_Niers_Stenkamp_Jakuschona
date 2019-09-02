@@ -253,7 +253,7 @@ function addAnimalRoutes(animalRoutes) {
         routesFeature.addLayer(polyline);
 
         var popup = L.popup();
-        popup.setContent("Animal: " + animalRoutes[i].User_ID + "<br/>" + "Study_ID: " + animalRoutes[i].Study_ID);
+        popup.setContent("Animal: " + animalRoutes[i].User_ID + "<br/>" + "Study_ID: " + animalRoutes[i].Study_ID + "<br/>" + "Route_ID: " + animalRoutes[i].routeID);
         collectionOfRoutes[i].bindPopup(popup);
 
         collectionOfRoutes[i].on('mouseover', function (e) {

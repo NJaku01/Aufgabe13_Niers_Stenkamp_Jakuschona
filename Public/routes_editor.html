@@ -180,8 +180,17 @@
         </form>
         <button onclick="getFilesFromMovebank()" class="btn btn-secondary">Send</button>
 
-        <h5>Delete Animal Route</h5>
-        <form name="deleteAnimal" action="item/deleteMany" onsubmit="return validateForm('deleteAnimal')" method="POST" target="_blank">
+        <h5>Delete One Animal Route</h5>
+        <form name="deleteAnimalRoute" action="item/deleteOneAnimalRoute" onsubmit="return validateForm('deleteAnimalRoute')" method="POST" target="_blank">
+            Route ID:<br/>
+            <input type="text" name="Route_ID"/>
+            <br>
+            <button class="btn btn-secondary" type="submit" value="Send">Send</button>
+            <br/>
+        </form>
+
+        <h5>Delete One Animal Study</h5>
+        <form name="deleteAnimalStudy" action="item/deleteOneAnimalStudy" onsubmit="return validateForm('deleteAnimalStudy')" method="POST" target="_blank">
             Study ID:<br/>
             <input type="text" name="Study_ID"/>
             <br>
