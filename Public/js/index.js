@@ -4,6 +4,16 @@ const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
 
+var cla = JL.createConsoleAppender("ConsoleAppenderClient");
+
+cla.setOptions( { "batchSize": 1, "batchTimeout": 1000 });
+
+JL("ClientConsole").setOptions({"appenders": [cla]});
+
+JL().warn("Logger active");
+
+
+
 var map = L.map("mapdiv", {
     center: start_latlng,
     zoom: 11
@@ -394,7 +404,6 @@ function insertItem(data) {
 function weatherRequest(long, lat) {
     "use strict";
 
-    console.log("Jungs: Bitte token in der Form speichern wie in der README angegeben, damit wir das einheitlich halten können!");
     var resource = "https://api.openweathermap.org/data/2.5/weather?units=metric&lat=" + lat + "&lon=" + long + "&appid=" + token.OPENWEATHERMAP_TOKEN;
     var response = null;
 
@@ -409,6 +418,7 @@ function weatherRequest(long, lat) {
         xhttp.open("GET", resource, false);
         xhttp.send();
     } catch (err) {
+        JS.fatal("OpenWeatherMap not working");
         alert("no connection to OpenWeatherMap. Please check your internet connection.");
     }
 
