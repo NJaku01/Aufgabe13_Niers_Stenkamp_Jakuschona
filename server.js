@@ -1,15 +1,45 @@
 // jshint esversion: 6
 
 const express = require('express');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
 const app = express();
 
 var https = require("https");
 
 var server = require('http').createServer(app);
 
-
 const mongodb = require('mongodb');
+
+var JL = require('jsnlog').JL;
+var jsnlog_nodejs = require('jsnlog-nodejs').jsnlog_nodejs;
+
+var cla = JL.createConsoleAppender("ServerConsoleAppender");
+JL("ServerConsole").setOptions({"appenders": [cla]});
+JL("ServerConsole").info("a startup message by ServerConsole");
+
+
+app.get("/jsnlog.js", (req, res) => {
+    res.set("content-type", 'application/javascript');
+    res.sendFile(__dirname + "/node_modules/jsnlog/jsnlog.min.js");
+});
+
+app.post("*.logger", (req, res) => {
+
+    let received = "";
+    req.on("data", (chunk) => {
+        received += chunk;
+    });
+
+    req.on("end",() => {
+
+        // handing client side jsnlog-msg over to server side jsnlog
+        jsnlog_nodejs(JL, JSON.parse(received));
+
+        // Send empty response. This is ok, because client side jsnlog does not use response from server.
+        res.send("");
+    });
+
+});
 
 
 function connectMongoDb() {
@@ -36,7 +66,6 @@ function connectMongoDb() {
                 console.log("Using db: " + app.locals.db.databaseName);
             } catch (error2) {
                 console.dir(error2);
-
                 console.dir(error);
                 setTimeout(connectMongoDb, 3000); // retry until db-server is up
             }
@@ -65,6 +94,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use(express.urlencoded({extended: false}));
+
 
 app.use("/leaflet", express.static(__dirname + "/node_modules/leaflet/dist"));
 app.use("/leaflet-control-geocoder", express.static(__dirname + "/node_modules/leaflet-control-geocoder/dist"));
@@ -207,41 +237,50 @@ app.get("/movebank/:id", (req, res) => {
         "&sensor_type=gps";
 
 
-    https.get(endpoint, options, (httpResponse) => {
-        // concatenate updates from datastream
+        https.get(endpoint, options, (httpResponse) => {
+            // concatenate updates from datastream
 
-        console.log(endpoint);
-        var body = "";
-        httpResponse.on("data", (chunk) => {
-            //console.log("chunk: " + chunk);
-            body += chunk;
-        });
+            console.log(endpoint);
+            var body = "";
+            httpResponse.on("data", (chunk) => {
+                //console.log("chunk: " + chunk);
+                body += chunk;
+            });
 
-        httpResponse.on("end", () => {
-            console.log("Body:" + body);
+            httpResponse.on("end", () => {
+                console.log("Body:" + body);
 
-            var weather = JSON.parse(body);
+                try {
+                    var weather = JSON.parse(body);
+                }
+                catch(err){
+                    console.dir(err);
+                    res.status(500).send({error: "no vaild study id"})
+                    return;
+                }
 
-            console.log("Req.query: " + req.query.collection);
 
-            /**
-            app.locals.db.collection("animalRoutes").insertMany(movebankJson, (error, result) => {
+                console.log("Req.query: " + req.query.collection);
+
+                /**
+                 app.locals.db.collection("animalRoutes").insertMany(movebankJson, (error, result) => {
                 if (error) {
                     console.dir(error);
                 }
                 res.redirect('/routes_editor.html');
             });
-             */
-            res.json(weather);
+                 */
+                res.json(weather);
 
+            });
+
+            httpResponse.on("error", (error) => {
+                JL().warn("Movebank Api not working" + error);
+                res.send("Movebank Api is not working")
+            });
         });
 
-        httpResponse.on("error", (error) => {
-            throw error;
-        });
 
-
-    });
 
 });
 

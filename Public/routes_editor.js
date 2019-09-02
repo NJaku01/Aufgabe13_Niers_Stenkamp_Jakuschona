@@ -8,6 +8,18 @@ var mongodbJSONUserRoutes = [];
 var mongodbJSONAnimalRoutes = [];
 
 
+
+var cla = JL.createConsoleAppender("ConsoleAppenderClient");
+
+cla.setOptions( { "batchSize": 1, "batchTimeout": 1000 });
+
+JL("ClientConsole").setOptions({"appenders": [cla]});
+
+JL().warn("Logger active");
+
+
+
+
 var map = L.map("mapdiv", {
     center: start_latlng,
     zoom: 11
@@ -20,6 +32,7 @@ var osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors",
     id: "osm"
 }).addTo(map);
+
 
 
 var control = L.Routing.control({
@@ -506,41 +519,53 @@ async function getFilesFromMovebank() {
 
         $('body').css('cursor', 'progress');
 
-        $.get(resource, async function (response, status, x) {
+        $.ajax({
+            url: resource,
+            success: async function (response, status, x) {
 
-            /**
-             let formatted_response = JSON.stringify(response, null, 4);
-             $("#movebankJson").text(formatted_response);
-             */
+                /**
+                 let formatted_response = JSON.stringify(response, null, 4);
+                 $("#movebankJson").text(formatted_response);
+                 */
 
-            let transMovebankResponse = transformMovebankJson(response);
 
-            // variable for all the userRoutes stored in Mongodb
-            mongodbJSONUserRoutes = await getFilesFromMongodb("userRoutes");
+                let transMovebankResponse = transformMovebankJson(response);
 
-            for (i = 0; i < transMovebankResponse.length; i++) {
-                insertItem({
-                    collection: "animalRoutes",
-                    Study_ID: study,
-                    User_ID: transMovebankResponse[i].User_ID,
-                    Name: transMovebankResponse[i].Name,
-                    Type: transMovebankResponse[i].Type,
-                    date: transMovebankResponse[i].date,
-                    time: transMovebankResponse[i].time,
-                    routeID: transMovebankResponse[i].routeID,
-                    geoJson: JSON.stringify(transMovebankResponse[i].geoJson)
-                });
+                // variable for all the userRoutes stored in Mongodb
+                mongodbJSONUserRoutes = await getFilesFromMongodb("userRoutes");
 
-                // Calculates intersections between user and new animal routes if there are any
-                calculateIntersect(transMovebankResponse[i].routeID, transMovebankResponse[i].User_ID, JSON.stringify(transMovebankResponse[i].geoJson), mongodbJSONUserRoutes, "animalIntersections");
+                for (i = 0; i < transMovebankResponse.length; i++) {
+                    insertItem({
+                        collection: "animalRoutes",
+                        Study_ID: study,
+                        User_ID: transMovebankResponse[i].User_ID,
+                        Name: transMovebankResponse[i].Name,
+                        Type: transMovebankResponse[i].Type,
+                        date: transMovebankResponse[i].date,
+                        time: transMovebankResponse[i].time,
+                        routeID: transMovebankResponse[i].routeID,
+                        geoJson: JSON.stringify(transMovebankResponse[i].geoJson)
+                    });
+
+                    // Calculates intersections between user and new animal routes if there are any
+                    calculateIntersect(transMovebankResponse[i].routeID, transMovebankResponse[i].User_ID, JSON.stringify(transMovebankResponse[i].geoJson), mongodbJSONUserRoutes, "animalIntersections");
+                }
+
+                // request progress finished
+                $('body').css('cursor', 'default');
+                alert("Routes of Study No. " + study + " have been added to the Database!");
+
+            },
+            error: function (response) {
+                alert(response.responseJSON.error);
+                $('body').css('cursor', 'default');
             }
-
-            // request progress finished
-            $('body').css('cursor', 'default');
-            alert("Routes of Study No. " + study + " have been added to the Database!");
-
-        })
-    } catch {}
+        });
+    } catch (err) {
+        alert(err);
+        $('body').css('cursor', 'default');
+        return ;
+    }
 }
 
 function showMovebankInformation() {
@@ -568,10 +593,12 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
     for (var j=0; j<allRoutes.length; j++) {
 
         var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geoJson));
-        /*
+
+        /**
         The turf function returns an empty array with length 0 if there is no intersection, therefore only the arrays
         with an content are stored in mongodb.
          */
+
         if (intersect.features.length != 0) {
             intersect=JSON.stringify(intersect);
             var intersectionsID = Math.random().toString(36).substring(2, 15);

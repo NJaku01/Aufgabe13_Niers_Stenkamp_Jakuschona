@@ -4,6 +4,16 @@ const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
 
+var cla = JL.createConsoleAppender("ConsoleAppenderClient");
+
+cla.setOptions( { "batchSize": 1, "batchTimeout": 1000 });
+
+JL("ClientConsole").setOptions({"appenders": [cla]});
+
+JL().warn("Logger active");
+
+
+
 var map = L.map("mapdiv", {
     center: start_latlng,
     zoom: 11
@@ -242,11 +252,14 @@ function addAnimalRoutes(animalRoutes) {
 
         coordinates.push(animalGeoJson[i].features[0].geometry.coordinates);
 
+
         for (var j in coordinates[i]) {
             var help = coordinates[i][j][0];
             coordinates[i][j][0] = coordinates[i][j][1];
             coordinates[i][j][1] = help;
         }
+
+
 
         var polyline = L.polyline(coordinates[i]).addTo(map);
         collectionOfRoutes.push(polyline);
@@ -340,8 +353,8 @@ function addAnimalIntersections(animalIntersections) {
                 lat = animalIntersectionsPoints[i].features[j].geometry.coordinates[1];
                 var link = animalIntersections[i].id;
                 var marker = L.marker([lat, lng]).addTo(map)
-                    .bindPopup("Animal Intersection between: <br/> User:" + animalIntersections[i].UserIDInput + "<br/> Animal: " + animalIntersections[i].UserId + "<br/>" +
-                        "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
+                    .bindPopup("Animal Intersection between: <br/>  Animal:" + animalIntersections[i].UserIDInput + "<br/> User: " + animalIntersections[i].UserId + "<br/>" +
+                        "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br>" + animalIntersectionsPoints[i].features[j].geometry.coordinates + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
                 routesFeature.addLayer(marker);
                 userRoutesToShow.push(animalIntersections[i].routeIDInput);
                 animalRoutesToShow.push(animalIntersections[i].routeID);
@@ -394,7 +407,6 @@ function insertItem(data) {
 function weatherRequest(long, lat) {
     "use strict";
 
-    console.log("Jungs: Bitte token in der Form speichern wie in der README angegeben, damit wir das einheitlich halten können!");
     var resource = "https://api.openweathermap.org/data/2.5/weather?units=metric&lat=" + lat + "&lon=" + long + "&appid=" + token.OPENWEATHERMAP_TOKEN;
     var response = null;
 
@@ -409,6 +421,7 @@ function weatherRequest(long, lat) {
         xhttp.open("GET", resource, false);
         xhttp.send();
     } catch (err) {
+        JS.fatal("OpenWeatherMap not working");
         alert("no connection to OpenWeatherMap. Please check your internet connection.");
     }
 
