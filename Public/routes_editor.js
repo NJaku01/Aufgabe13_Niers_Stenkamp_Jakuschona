@@ -88,7 +88,7 @@ try {
     mongodbJSON = await getFilesFromMongodb(collection, query);
 
     if (mongodbJSON.length == 0) {
-        alert("no routes in database");
+        alert("No items in database! First select an userRoute or animalRoute!");
     }
     document.getElementById("database").value = JSON.stringify(mongodbJSON);
 }
@@ -376,9 +376,14 @@ async function validateForm(form) {
             }
         }
 
+        /*
+        In the following only the Intersections are deleted, the Routes get deleted by the server.js.
+         */
 
-
-        // depending on the input id the corresponding element in mongodb is deleted.
+        /*
+        If there is a Route_ID as input, the corresponding animalIntersections which belong to the animalRoute are
+        deleted.
+         */
         if (form == "deleteAnimalRoute") {
             var id = document.forms[form]["Route_ID"].value;
             if (id == "") {
@@ -393,7 +398,10 @@ async function validateForm(form) {
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
         }
 
-        // depending on the input id the corresponding element in mongodb is deleted.
+        /*
+        If there is a Study_ID as input, the corresponding animalIntersections, which belong to the animalRoutes of the
+        study, are deleted.
+         */
         if (form == "deleteAnimalStudy") {
             var id = document.forms[form]["Study_ID"].value;
             if (id == "") {
@@ -408,6 +416,9 @@ async function validateForm(form) {
             deleteDatabaseFiles("animalIntersections", "{\"studyID\" : \"" + id + "\"}")
         }
 
+        /*
+        All animalIntersections or userIntersections are deleted, if the corresponding button is pushed.
+         */
         if(form === "delete"){
             var id = document.forms[form]["_id"].value;
             deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
@@ -626,6 +637,10 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
                 var study = document.forms["createAnimal"]["Study_ID"].value;
 
                 insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: userIDInput, UserIDInput: allRoutes[j].User_ID, routeIDInput: routeIDInput, studyID: study});
+                /*
+                 The collection animalIntersections needs additionally the attribut "study_ID", to provide the user to
+                 delete all routes which belong to a certain study.
+                 */
             }
 
         }
