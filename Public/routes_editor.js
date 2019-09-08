@@ -38,7 +38,8 @@ var osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 var control = L.Routing.control({
     waypoints: [], routeWhileDragging: true,
     geocoder: L.Control.Geocoder.nominatim()
-}).on('routesfound', function (e) {
+})
+    .on('routesfound', function (e) {
     "use strict";
     layers.clearLayers();
     drawnItems = e.routes[0];
@@ -49,6 +50,11 @@ var control = L.Routing.control({
     document.getElementById("geojsonUpdate").value = JSON.stringify(drawnItems.toGeoJSON());
     updateText();
     // alert('Found ' + .length + ' route(s).');
+})
+    .on('routingerror', function (e){
+    console.log(e);
+    JL().error("The Routing machine has Thorn an Error: " +e.error.status);
+    alert("The Routing machine has Thorn an Error: " +e.error.status);
 });
 control.addTo(map);
 
