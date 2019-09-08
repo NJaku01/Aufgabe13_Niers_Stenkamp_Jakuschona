@@ -1,16 +1,21 @@
 # Aufgabe13_Niers_Stenkamp_Jakuschona
 
 ##### Start des Projekts:
-Mit node.js:
+
+##### Immer: 
 - repository downloaden
 - in shell zum Projektordner wechseln
+
+Mit node.js:
+- Docker Local starten
+- Befehle in der Shell eingeben: 
   - npm install 
   - npm start
 - öffne localhost:3000 im Browser deiner Wahl
 
-##### Mit Docker:
-...
-
+Mit Docker:
+- docker-compose up in der Shell eingeben
+- öffne localhost:3000 im Browser deiner Wahl
 
 ##### Benötigte API-Keys:
 - Bei openweathermap (https://openweathermap.org/) und movebank (https://www.movebank.org/) registrieren
