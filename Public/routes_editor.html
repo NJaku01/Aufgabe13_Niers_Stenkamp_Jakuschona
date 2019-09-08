@@ -29,13 +29,13 @@
 
 
     <link href="routes_editor.css" rel="stylesheet">
-    <title>Routes Creator</title>
+    <title>Route-Editor</title>
 </head>
 <body onload="events()">
 
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <span class="navbar-brand">Geosoftware-Projekt</span>
+    <span class="navbar-brand">Geosoftware-Project</span>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -45,19 +45,24 @@
             <li class="nav-item">
                 <a class="nav-link" href="index.html">Home</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="routes_editor.html">Routen-Editor</a>
+            <li class="nav-item active">
+                <a class="nav-link" href="routes_editor.html">Route-Editor</a>
             </li>
         </ul>
     </div>
 </nav>
 
-
-<h1>Routes Creator</h1>
-<p id="description">With this function a route can be calculated. The result will be shown as JSON on the right side.
-    The result is also saved and can be uploaded to the main page.
-    Furthermore, it is possible to load a route with a maximum of 30 waypoints into the text field. From this a route is
-    calculated and displayed.</p>
+<p> Here you can calculate a route which will be shown as JSON on the right side. It is possible to
+    load a route with a maximum of 30 waypoints into the text field. From this a route is calculated and displayed.
+    The route can be added so that it is shown on the map in Home. Besides you can update a route and delete a single or
+    all routes.
+    <br/>
+    In addition you can add animal routes of different studys, which will be also shown on the map in Home. You can
+    delete a single route, a single study or all animal routes
+    (<a href="#AddAnimalRoute">further information concerning animal routes by pushing the info button</a>).
+    <br/>
+    Furthermore you can see all routes as JSONs, which are actually shown on the map, below.
+</p>
 <div id="main" style="overflow: auto;">
     <div class="container-fluid">
         <div class="row">
@@ -134,7 +139,7 @@
             <input type="text" name="_id"/><br>
             <button class="btn btn-secondary" type="submit" value="Send">Send</button>
         </form>
-
+        <div id="AddAnimalRoute">
         <h5>Add Animal Route</h5>
 
         <form name="createAnimal">
@@ -175,10 +180,12 @@
                     This information was last updated on 02.08.19.
                 </p>
             </div>
+
             <input type="text" name="Study_ID"/>
             <br>
             <input type="hidden" name="collection" value="animalRoutes"/>
         </form>
+        </div>
         <button onclick="getFilesFromMovebank()" class="btn btn-secondary">Send</button>
 
         <h5>Delete One Animal Route</h5>
@@ -214,9 +221,9 @@
 <footer class="page-footer font-small">
 
     <div class="footer-copyright text-center py-3">
-        © 2019 Copyright: <a href="https://www.wickueler.de/index.php">Wicküler</a>
+        © 2019 Copyright: KillerBoys
         <br/>
-        <a href="impressum.html">Impressum</a>
+        <a href="impressum.html">Legal Notice</a>
     </div>
 
 </footer>

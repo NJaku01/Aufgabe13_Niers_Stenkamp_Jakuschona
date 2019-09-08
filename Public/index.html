@@ -33,29 +33,37 @@
     <script src="token.js"></script>
     <script src="jsnlog.js"></script>
 
+    <link href="index.css" rel="stylesheet">
+
+
 
 </head>
 
 <body onload="componentDidMount()">
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <span class="navbar-brand">Geosoftware-Projekt</span>
+    <span class="navbar-brand">Geosoftware-Project</span>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
+            <li class="nav-item active">
                 <a class="nav-link" href="index.html">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="routes_editor.html">Routen-Editor</a>
+                <a class="nav-link" href="routes_editor.html">Route-Editor</a>
             </li>
         </ul>
     </div>
 </nav>
 
+<p> Here all routes will be shown on the map, which have been added with the
+    (<a href="http://localhost:3000/routes_editor.html">Route-Editor</a>). For each meeting of an userRoute with an
+    other userRoute or animalRoute there is an intersection marked on the map. <br/>
+    By the filter below you can manage which of the routes and intersections you want to be shown.
+</p>
 
 <div id="mapdiv" style="width: device-width; height: 500px;"></div>
 <div id="filter">
@@ -92,9 +100,9 @@
 <footer class="page-footer font-small">
 
     <div class="footer-copyright text-center py-3">
-        © 2019 Copyright: <a href="https://www.wickueler.de/index.php">Wicküler</a>
+        © 2019 Copyright: KillerBoys
     <br/>
-        <a href="impressum.html">Impressum</a>
+        <a href="impressum.html">Legal Notice</a>
     </div>
 
 </footer>
