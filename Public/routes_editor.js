@@ -315,6 +315,7 @@ async function validateForm(form) {
     $('body').css('cursor', 'progress');
 
     var formItem = null;
+    var id =null;
 
     /*
  There is a random routeID for each added userRoute. This routeID gets only created if there is a new
@@ -340,6 +341,7 @@ async function validateForm(form) {
 
     if(form === "update"){
         var id = document.forms["update"]["_id"].value;
+        console.log(id);
         formItem={
             User_ID: document.forms["update"]["User_ID"].value,
             Name: document.forms["update"]["Name"].value,
@@ -350,14 +352,14 @@ async function validateForm(form) {
             collection: "userRoutes",
             routeID: id,
         };
-        deleteDatabaseFiles("userRoutes", "{\"routeID\" : \":" +id + "\"}");
+        deleteDatabaseFiles("userRoutes", "{\"routeID\" : \"" +id + "\"}" );
         deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
         deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
     }
 
     // if a userRoute gets updated or delete there is a need for the corresponding id.
     if (form == "update" || form == "delete") {
-        var id = document.forms[form]["_id"].value;
+        id = document.forms[form]["_id"].value;
         if (id == "") {
             alert("A id must be selected");
             $('body').css('cursor', 'default');
@@ -402,6 +404,7 @@ async function validateForm(form) {
             /*
             If the userRoute with the corresponding routeID is already in Mongodb, the userRoute will not be added again
              */
+            console.log(routeIDInput);
             for(var i in mongodbJSONUserRoutes){
 
                 if(routeIDInput == mongodbJSONUserRoutes[i].routeID){
