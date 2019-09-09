@@ -94,7 +94,7 @@
         <h5>Add Item (POST Request)</h5>
 
 
-        <form name="create" action="item/create" onsubmit="return validateForm('create')"  method="POST">
+        <form name="create">
             User_ID:<br/>
             <input type="text" name="User_ID"/><br>
             Name of the route:<br/>
@@ -105,17 +105,15 @@
             <input type="date" name="date"/><br>
             Time:<br/>
             <input type="time" name="time"/><br>
-            <input type="hidden" id="geojson" name="geoJson"/>
-            <input type="hidden" name="collection" value="userRoutes"/>
-            <input type="hidden" id="routeID" name="routeID" /><br>
-            <button type="submit" value="Send" class="btn btn-secondary">Send</button><br/>
+            <input type="hidden" id="geojson" name="geoJson"/><br>
+            <button type="button" onclick="validateForm('create')" class="btn btn-secondary">Send</button><br/>
         </form>
 
         <br/>
 
         <h5>Update Item</h5>
 
-        <form name="update" action="item/update" onsubmit="return validateForm('update')" method="POST">
+        <form name="update">
             ID:<br/>
             <input type="text" name="_id"/><br>
             User_ID:<br/>
@@ -129,7 +127,7 @@
             Time:<br/>
             <input type="time" name="time"/><br>
             <input type="hidden" id="geojsonUpdate" name="geoJson"><br>
-            <button class="btn btn-secondary" type="submit" value="Send">Send</button>
+            <button class="btn btn-secondary" type="submit" onclick="validateForm('update')">Send</button>
         </form>
 
         <br/>
@@ -137,10 +135,10 @@
         <h5>Delete Item</h5>
 
         <div id="JumpAddAnimalRoute">
-        <form name="delete" action="item/deleteOne" onsubmit="return validateForm('delete')" method="POST">
+        <form name="delete" >
             ID:<br/>
             <input type="text" name="_id"/><br>
-            <button class="btn btn-secondary" type="submit" value="Send">Send</button>
+            <button class="btn btn-secondary" type="button" onclick="validateForm('delete')">Send</button>
         </form>
         </div>
 

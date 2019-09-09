@@ -14,6 +14,7 @@ JL("ClientConsole").setOptions({"appenders": [cla]});
 JL().warn("Logger active");
 
 
+
 var map = L.map("mapdiv", {
     center: start_latlng,
     zoom: 11
@@ -22,7 +23,12 @@ var map = L.map("mapdiv", {
 
 var routesFeature = L.featureGroup();
 
-
+/**
+ * Extract an Parameter out of an URL
+ * @param name of the parameter
+ * @param url to extract
+ * @returns {*} value of the parameter
+ */
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, '\\$&');
@@ -33,29 +39,10 @@ function getParameterByName(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
+
 /**
- * function which takes one new inputRoute and compares this one with all other animalGeoJson in allRoutes if they intersect.
- * function returns all given intersections.
- * @param inputRoute
- * @param allRoutes
- * @returns {Array}
+ * Adds a Background Map
  */
-function calculateIntersect(inputRoute, allRoutes) {
-    var intersectAll = [];
-
-    for (var j = 0; j < allRoutes.length; j++) {
-        var intersect = turf.lineIntersect(inputRoute, allRoutes[j]);
-        intersectAll.push(intersect);
-    }
-
-    for (var i = 0; i < intersectAll.length; i++) {
-        if (intersectAll[i].features.length == 0) {
-            intersectAll.splice(i, 1);
-        }
-    }
-    return intersectAll;
-}
-
 function addMap() {
 
     routesFeature = L.featureGroup();
@@ -80,6 +67,10 @@ function addMap() {
     $("#mapdiv")[0].style.visibility = "visible";
 }
 
+/**
+ * Shows the userRoutes on the Map
+ * @param userRoutes Array of the routes to show
+ */
 function addUserRoutes(userRoutes) {
 
     var geojsons = [];
@@ -123,9 +114,6 @@ function addUserRoutes(userRoutes) {
             popup.setLatLng(e.latlng).openOn(map);
         });
 
-        /*routes[i].on('mouseout', function (e) {
-            e.target.closePopup();
-        });*/
         //add  the PopUps to the Map for the Routes
 
 
@@ -136,16 +124,19 @@ function addUserRoutes(userRoutes) {
         }
     }
 
+
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
+/**
+ * Shows the animal Routes on the Map
+ * @param animalRoutes Array of the routes to Show
+ */
 function addAnimalRoutes(animalRoutes) {
-
     var animalGeoJson = [];
     for (var i = 0; i < animalRoutes.length; i++) {
         animalGeoJson.push((JSON.parse(animalRoutes[i].geoJson)));
     }
-
     var collectionOfRoutes = [];
     var coordinates = [];
     for (var i = 0; i < animalGeoJson.length; i++) {
@@ -176,19 +167,22 @@ function addAnimalRoutes(animalRoutes) {
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
+/**
+ * Copies the Link to the intersection
+ * @param id of the intersection
+ */
 function copy(id) {
-    console.log("run");
     var existsTextarea = document.getElementById('id');
     existsTextarea.value = "localhost:3000/" + id;
     existsTextarea.select();
-    var status = document.execCommand('copy');
-    if (!status) {
-        console.error("Cannot copy text");
-    } else {
-        console.log("The text is now on the clipboard");
-    }
+    document.execCommand('copy');
 }
 
+/**
+ * Shows the User Intersections on the Map
+ * @param userIntersections
+ * @returns {Array}
+ */
 function addUserIntersections(userIntersections) {
 
     var routesToShow = []
@@ -226,6 +220,11 @@ function addUserIntersections(userIntersections) {
 }
 
 
+/**
+ * Shows the animal Intersections on the Map
+ * @param animalIntersections the Intersections to show
+ * @returns {{userRoutes: Array, animalRoutes: Array}} the User Routes and animal routes which belong to the Intersections
+ */
 function addAnimalIntersections(animalIntersections) {
 
     var userRoutesToShow = [];
@@ -269,28 +268,6 @@ function addAnimalIntersections(animalIntersections) {
 }
 
 
-function insertItem(data) {
-
-    $.ajax({
-        url: "/item/create", // URL der Abfrage,
-        data: data,
-        type: "POST"
-    })
-        .done(function (response) {
-            // parse + use data here
-            console.log("insert data" + data);
-        })
-        .fail(function (xhr, status, errorThrown) {
-            // handle errors
-        })
-        .always(function (xhr, status) {
-
-
-        });
-
-}
-
-
 /**
  * Ask the openWeatherMap for the actual weather
  * @desc Abgabe zu Aufgabe 4, Geosoft 1, SoSe 2019
@@ -323,7 +300,7 @@ function weatherRequest(long, lat) {
 }
 
 /**
- * Function that runs when index.html is loaded
+ * Function that runs when index.html is loaded. Show all available Data or if an ID is given as Parameter, only the wanted Intersection
  */
 function componentDidMount() {
     var id = getParameterByName('id'); //get Parameter from URL
@@ -334,6 +311,11 @@ function componentDidMount() {
     }
 }
 
+/**
+ * Filters the shown Data, by the ID given in the URL or in the form of the Filter.
+ * @param id the id of intersection to show
+ * @returns {Promise<void>}
+ */
 async function filter1(id) {
 
 //get Values from Form
@@ -590,7 +572,6 @@ async function filter1(id) {
 
     }
 
-
     if (wantUserRoutes) {
 
         var query = {};
@@ -663,10 +644,7 @@ async function filter1(id) {
             } else {
                 addAnimalRoutes(animalRoutes);
             }
-
         }
-
-
     }
 
     if (isThereAnAlert = true) {
@@ -674,8 +652,6 @@ async function filter1(id) {
         alertRoutes += "\n- Proof if your selection in the filter is right! \n";
     }
     alert(alertRoutes);
-
-
 }
 
 
@@ -686,13 +662,12 @@ async function filter1(id) {
  */
 async function getDatabaseFiles(collection, query) {
 
-    //Example query: "{\"User_ID\" : \"1234\"}"
-
     return $.ajax({
         url: "/item", // URL der Abfrage,
         data: {collection: collection, query: query},
         type: "POST"
     })
-
-
 };
+
+
+
