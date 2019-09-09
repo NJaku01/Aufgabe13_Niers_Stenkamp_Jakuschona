@@ -182,17 +182,6 @@ app.post("/item/deleteOne", (req, res) => {
     });
 });
 
-app.post("/item/deleteOneAnimalRoute", (req, res) => {
-    // delete item
-    console.log("delete item " + JSON.stringify(req.body));
-    let objectId = "ObjectId(" + req.body._id + ")";
-    app.locals.db.collection('animalRoutes').deleteOne({routeID: req.body.Route_ID}, (error, result) => {
-        if (error) {
-            console.dir(error);
-        }
-        res.redirect('/routes_editor.html');
-    });
-});
 
 
 app.post("/item/deleteOneAnimalStudy", (req, res) => {

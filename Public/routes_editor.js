@@ -324,7 +324,6 @@ async function validateForm(form) {
     routeIDInput = "U" + Math.random().toString(36).substring(3, 15);
 
     if(form == "create"){
-        console.log(1);
         formItem={
             User_ID: document.forms["create"]["User_ID"].value,
             Name: document.forms["create"]["Name"].value,
@@ -335,7 +334,7 @@ async function validateForm(form) {
             collection: "userRoutes",
             routeID: routeIDInput,
         };
-        insertItem(formItem);
+
     }
 
 
@@ -354,8 +353,6 @@ async function validateForm(form) {
         deleteDatabaseFiles("userRoutes", "{\"routeID\" : \":" +id + "\"}");
         deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
         deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
-
-        insertItem(formItem);
     }
 
 
@@ -365,16 +362,19 @@ async function validateForm(form) {
             var inputJSON = document.forms[form]["geoJson"].value;
             var userIDInput = document.forms[form]["User_ID"].value;
            if (inputJSON == "") {
-                alert("A route must be selected");
-                return false;
+               alert("A route must be selected");
+               return ;
             } else if (!checkIfGeoJsonLineString(inputJSON)) {
                 alert("No valid GeoJson inserted. Use the Routing Machine to create a valid GeoJson");
-                return false;
+                return ;
             }
             if (userIDInput == "") {
                 alert("A userID must be selected");
-                return false;
+                return;
             }
+
+
+            insertItem(formItem);
 
 
             if(form !== "create") {
@@ -434,41 +434,64 @@ async function validateForm(form) {
         deleted.
          */
         if (form == "deleteAnimalRoute") {
-            var id = document.forms[form]["Route_ID"].value;
+            var id = document.forms["deleteAnimalRoute"]["Route_ID"].value;
             if (id == "") {
+                $('body').css('cursor', 'default');
                 alert("A Route_ID must be selected");
                 return false;
             }
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
+            deleteDatabaseFiles("animalRoutes", "{\"routeID\" : \"" +id +"\"}")
+            $('body').css('cursor', 'default');
+            document.forms["create"].reset();
+            document.forms["update"].reset();
+            document.forms["delete"].reset();
+            document.forms["JumpAddAnimalRoute"].reset();
+            document.forms["deleteAnimalRoute"].reset();
+            document.forms["deleteAnimalStudy"].reset();
+            alert("Delete succesfull");
+
         }
 
         /*
         If there is a Study_ID as input, the corresponding animalIntersections, which belong to the animalRoutes of the
         study, are deleted.
          */
-        if (form == "deleteAnimalStudy") {
-            var id = document.forms[form]["Study_ID"].value;
+        if(form == "deleteAnimalStudy"){
             if (id == "") {
+                $('body').css('cursor', 'default');
                 alert("A Study_ID must be selected");
                 return false;
             }
-        }
+            var id = document.forms["deleteAnimalStudy"]["Study_ID"].value;
+            deleteDatabaseFiles("animalIntersections", "{\"studyID\" : \"" + id + "\"}");
+            deleteDatabaseFiles("animalRoutes", "{\"Study_ID\" : \"" +id + "\"}");
+            $('body').css('cursor', 'default');
+            document.forms["create"].reset();
+            document.forms["update"].reset();
+            document.forms["delete"].reset();
+            document.forms["createAnimal"].reset();
+            document.forms["deleteAnimalRoute"].reset();
+            document.forms["deleteAnimalStudy"].reset();
+            alert("Delete succesfull");
 
-        if(form == "deleteAnimalStudy"){
-            var id = document.forms[form]["Study_ID"].value;
-            // deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
-            deleteDatabaseFiles("animalIntersections", "{\"studyID\" : \"" + id + "\"}")
         }
 
         /*
         All animalIntersections or userIntersections are deleted, if the corresponding button is pushed.
          */
         if(form === "delete"){
-            var id = document.forms[form]["_id"].value;
+            var id = document.forms["delete"]["_id"].value;
             deleteDatabaseFiles("userRoutes", "{\"routeID\" : \"" +id + "\"}" );
             deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
             $('body').css('cursor', 'default');
+            document.forms["create"].reset();
+            document.forms["update"].reset();
+            document.forms["delete"].reset();
+            document.forms["createAnimal"].reset();
+            document.forms["deleteAnimalRoute"].reset();
+            document.forms["deleteAnimalStudy"].reset();
             alert("Delete succesfull");
 
         }
@@ -634,6 +657,9 @@ async function getFilesFromMovebank() {
                 document.forms["create"].reset();
                 document.forms["update"].reset();
                 document.forms["delete"].reset();
+                document.forms["createAnimal"].reset();
+                document.forms["deleteAnimalRoute"].reset();
+                document.forms["deleteAnimalStudy"].reset();
                 alert("Routes of Study No. " + study + " have been added to the Database!");
 
             },
@@ -704,6 +730,9 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
         document.forms["create"].reset();
         document.forms["update"].reset();
         document.forms["delete"].reset();
+        document.forms["createAnimal"].reset();
+        document.forms["deleteAnimalRoute"].reset();
+        document.forms["deleteAnimalStudy"].reset();
         alert ("Item inserted/ updated");
         $('body').css('cursor', 'default');
     }
