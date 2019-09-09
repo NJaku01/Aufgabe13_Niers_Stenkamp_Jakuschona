@@ -311,11 +311,53 @@ function setCookie(cname, cvalue, exdays) {
  */
 async function validateForm(form) {
     "use strict";
+
+    $('body').css('cursor', 'progress');
+
+    var formItem = null;
+
+    /*
+ There is a random routeID for each added userRoute. This routeID gets only created if there is a new
+ userRoute, but not if the userRoute is only updated
+ */
+    var routeIDInput;
+    routeIDInput = "U" + Math.random().toString(36).substring(3, 15);
+
+    if(form == "create"){
+        console.log(1);
+        formItem={
+            User_ID: document.forms["create"]["User_ID"].value,
+            Name: document.forms["create"]["Name"].value,
+            Type: document.forms["create"]["Type"].value,
+            Date: document.forms["create"]["date"].value,
+            Time: document.forms["create"]["time"].value,
+            geoJson:  document.forms["create"]["geoJson"].value,
+            collection: "userRoutes",
+            routeID: routeIDInput,
+        };
+        insertItem(formItem);
+    }
+
+
     if(form === "update"){
         var id = document.forms[form]["_id"].value;
+        formItem={
+            User_ID: document.forms["update"]["User_ID"].value,
+            Name: document.forms["update"]["Name"].value,
+            Type: document.forms["update"]["Type"].value,
+            Date: document.forms["update"]["date"].value,
+            Time: document.forms["update"]["time"].value,
+            geoJson:  document.forms["update"]["geoJson"].value,
+            collection: userRoutes,
+            routeID: id,
+        };
+         deleteDatabaseFiles("userRoutes", "{\"routeID\" : \":" +id + "\"}");
         deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
-        deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
+        deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
+
+        insertItem(formItem);
     }
+
 
     try {
         // If there is a new userRoute added or if a userRoute is updated
@@ -334,16 +376,8 @@ async function validateForm(form) {
                 return false;
             }
 
-            /*
-             There is a random routeID for each added userRoute. This routeID gets only created if there is a new
-             userRoute, but not if the userRoute is only updated
-             */
-            var routeIDInput;
-            if(form=== "create") {
-                routeIDInput = "U" + Math.random().toString(36).substring(3, 15);
-                document.getElementById("routeID").value = routeIDInput;
-            }
-            else{
+
+            if(form !== "create") {
                 routeIDInput = id;
             }
 
@@ -360,6 +394,13 @@ async function validateForm(form) {
 
             // variable for all the animalRoutes stored in Mongodb
             mongodbJSONAnimalRoutes = await getFilesFromMongodb("animalRoutes");
+
+            for(var i in mongodbJSONUserRoutes){
+
+                if(routeIDInput == mongodbJSONUserRoutes[i].routeID){
+                    mongodbJSONUserRoutes.splice(i,1)
+                }
+            }
 
             /*
              Calculation of the Intersects between the userRoutes stored in Mongodb and the new input userRoute. If
@@ -396,11 +437,6 @@ async function validateForm(form) {
                 alert("A Route_ID must be selected");
                 return false;
             }
-        }
-
-        if(form == "deleteAnimalRoute"){
-            var id = document.forms[form]["Route_ID"].value;
-            // deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
         }
 
@@ -427,11 +463,17 @@ async function validateForm(form) {
          */
         if(form === "delete"){
             var id = document.forms[form]["_id"].value;
+            deleteDatabaseFiles("userRoutes", "{\"routeID\" : \"" +id + "\"}" );
             deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
-            deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
+            deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
+            $('body').css('cursor', 'default');
+            alert("Delete succesfull");
+
         }
     }
-    catch(e){ console.log(e)}
+    catch(e){ console.log(e);
+    alert(e);
+        $('body').css('cursor', 'default');}
 }
 
 /**
@@ -587,6 +629,9 @@ async function getFilesFromMovebank() {
 
                 // request progress finished
                 $('body').css('cursor', 'default');
+                document.forms["create"].reset();
+                document.forms["update"].reset();
+                document.forms["delete"].reset();
                 alert("Routes of Study No. " + study + " have been added to the Database!");
 
             },
@@ -652,6 +697,13 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
 
         }
       intersect = {};
+    }
+    if(collection == "animalIntersections") {
+        document.forms["create"].reset();
+        document.forms["update"].reset();
+        document.forms["delete"].reset();
+        alert ("Item inserted/ updated");
+        $('body').css('cursor', 'default');
     }
 }
 
