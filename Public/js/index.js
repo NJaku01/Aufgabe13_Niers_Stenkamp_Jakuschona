@@ -168,7 +168,6 @@ function addMap() {
             .openOn(map);
     });
 
-    $("#mapdiv")[0].scrollIntoView();
     $("#mapdiv")[0].style.visibility = "visible";
 }
 

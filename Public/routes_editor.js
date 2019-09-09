@@ -53,8 +53,8 @@ var control = L.Routing.control({
 })
     .on('routingerror', function (e){
     console.log(e);
-    JL().error("The Routing machine has Thorn an Error: " +e.error.status);
-    alert("The Routing machine has Thorn an Error: " +e.error.status);
+    JL().error("The Routing machine has thrown an Error: " +e.error.status);
+    alert("The Routing machine has thrown an Error: " +e.error.status);
 });
 control.addTo(map);
 
@@ -593,6 +593,7 @@ async function getFilesFromMovebank() {
             error: function (response) {
                 alert(response.responseJSON.error);
                 $('body').css('cursor', 'default');
+                JL().error("Movebank Api Down")
             }
         });
     } catch (err) {
