@@ -1,8 +1,19 @@
 "use strict";
-
+var alertRoutes = "";
+var isThereAnAlert = false;
 const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
+
+var cla = JL.createConsoleAppender("ConsoleAppenderClient");
+
+cla.setOptions( { "batchSize": 1, "batchTimeout": 1000 });
+
+JL("ClientConsole").setOptions({"appenders": [cla]});
+
+JL().warn("Logger active");
+
+
 
 var map = L.map("mapdiv", {
     center: start_latlng,
@@ -157,7 +168,6 @@ function addMap() {
             .openOn(map);
     });
 
-    $("#mapdiv")[0].scrollIntoView();
     $("#mapdiv")[0].style.visibility = "visible";
 }
 
@@ -196,7 +206,7 @@ function addUserRoutes(userRoutes) {
 
         //add all Routes to the Map
         var popup = L.popup();
-        popup.setContent('Route: ' + userRoutes[i].routeID + "<br/>" + "UserID:" + userRoutes[i].User_ID + "<br/> <img src=\"http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png\" /> <br/>" + "Weather: " + weather.weather[0].description);
+        popup.setContent('Route: ' + userRoutes[i].routeID + "<br/>" + "UserID:" + userRoutes[i].User_ID + "<br/>" + "Route Name:" + userRoutes[i].Name + "<br/> <img src=\"http://openweathermap.org/img/w/" + weather.weather[0].icon + ".png\" /> <br/>" + "Weather: " + weather.weather[0].description);
         routes[i].bindPopup(popup);
 
         routes[i].on('mouseover', function (e) {
@@ -204,9 +214,9 @@ function addUserRoutes(userRoutes) {
             popup.setLatLng(e.latlng).openOn(map);
         });
 
-        routes[i].on('mouseout', function (e) {
+        /*routes[i].on('mouseout', function (e) {
             e.target.closePopup();
-        });
+        });*/
         //add  the PopUps to the Map for the Routes
 
 
@@ -253,7 +263,7 @@ function addAnimalRoutes(animalRoutes) {
         routesFeature.addLayer(polyline);
 
         var popup = L.popup();
-        popup.setContent("Animal:" + animalRoutes[i].User_ID);
+        popup.setContent("Animal: " + animalRoutes[i].User_ID + "<br/>" + "Study_ID: " + animalRoutes[i].Study_ID + "<br/>" + "Route_ID: " + animalRoutes[i].routeID);
         collectionOfRoutes[i].bindPopup(popup);
 
         collectionOfRoutes[i].on('mouseover', function (e) {
@@ -261,9 +271,9 @@ function addAnimalRoutes(animalRoutes) {
             popup.setLatLng(e.latlng).openOn(map);
         });
 
-        collectionOfRoutes[i].on('mouseout', function (e) {
+        /* collectionOfRoutes[i].on('mouseout', function (e) {
             e.target.closePopup();
-        });
+        }); */
     }
 
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
@@ -319,31 +329,32 @@ function addUserIntersections(userIntersections) {
 
 }
 
-function addAnimalIntersections(userIntersections) {
+function addAnimalIntersections(animalIntersections) {
 
     var userRoutesToShow = [];
     var animalRoutesToShow = [];
-    var userIntersectionsPoints = [];
+    var animalIntersectionsPoints = [];
     var answer = {userRoutes: [], animalRoutes: []};
-    for (var i in userIntersections) {
+    console.log(animalIntersections)
+    for (var i in animalIntersections) {
 
         var lat;
         var lng;
 
         try {
-            userIntersectionsPoints.push(JSON.parse(userIntersections[i].geoJson));
+            animalIntersectionsPoints.push(JSON.parse(animalIntersections[i].geoJson));
 
-            for (var j in userIntersectionsPoints[i].features) {
+            for (var j in animalIntersectionsPoints[i].features) {
 
-                lng = userIntersectionsPoints[i].features[j].geometry.coordinates[0];
-                lat = userIntersectionsPoints[i].features[j].geometry.coordinates[1];
-                var link = userIntersections[i].id;
+                lng = animalIntersectionsPoints[i].features[j].geometry.coordinates[0];
+                lat = animalIntersectionsPoints[i].features[j].geometry.coordinates[1];
+                var link = animalIntersections[i].id;
                 var marker = L.marker([lat, lng]).addTo(map)
-                    .bindPopup("Animal Intersection between: <br/> User:" + userIntersections[i].UserIDInput + "<br/> Animal: " + userIntersections[i].UserId + "<br/>" +
+                    .bindPopup("Animal Intersection between: <br/> User: " + animalIntersections[i].UserIDInput + "<br/> Animal: " + animalIntersections[i].UserId + "<br/>" +
                         "<a href=" + link + ">Link to this Intersection </a> <br> localhost:3000/" + link + "<br> <button onClick='copy(\"" + link + "\")' >Copy Link </button><br>");
                 routesFeature.addLayer(marker);
-                userRoutesToShow.push(userIntersections[i].routeIDInput);
-                animalRoutesToShow.push(userIntersections[i].routeID);
+                userRoutesToShow.push(animalIntersections[i].routeIDInput);
+                animalRoutesToShow.push(animalIntersections[i].routeID);
             }
 
         } catch (e) {
@@ -393,7 +404,6 @@ function insertItem(data) {
 function weatherRequest(long, lat) {
     "use strict";
 
-    console.log("Jungs: Bitte token in der Form speichern wie in der README angegeben, damit wir das einheitlich halten können!");
     var resource = "https://api.openweathermap.org/data/2.5/weather?units=metric&lat=" + lat + "&lon=" + long + "&appid=" + token.OPENWEATHERMAP_TOKEN;
     var response = null;
 
@@ -408,10 +418,9 @@ function weatherRequest(long, lat) {
         xhttp.open("GET", resource, false);
         xhttp.send();
     } catch (err) {
-        alert("no connection to OpenWeatherMap. Please check your internet connection.");
+        JS.fatal("OpenWeatherMap not working");
+        alert("No connection to OpenWeatherMap. Please check your internet connection.");
     }
-
-
     return response;
 }
 
@@ -492,6 +501,7 @@ async function filter1(id) {
 
             }
         }
+        var animalIntersections2 = [];
         if (!showEverything || userID != "") { //filter by user
             if (userID.indexOf(";") === -1) {
                 query = "{\"UserIDInput\": \"" + userID + "\"}"
@@ -509,9 +519,10 @@ async function filter1(id) {
             }
 
 
-        var animalIntersections2 = [];
+
             try {
                 animalIntersections2 = await getDatabaseFiles("animalIntersections", query);
+                console.log(animalIntersections2);
 
             } catch {
 
@@ -544,10 +555,12 @@ async function filter1(id) {
 
             }
             animalIntersections = animalIntersections.concat(animalIntersections2);
+
         }
 
 
-        if (animalIntersections.length > 1) {//if the database Found some Intersections show them
+        console.log(animalIntersections);
+        if (animalIntersections.length !== 0) {//if the database Found some Intersections show them
             routesToShow = addAnimalIntersections(animalIntersections);
 
             if (routesToShow.userRoutes.length != 0) { //if there are some user Routes, which belong to the Intersection show them
@@ -589,7 +602,9 @@ async function filter1(id) {
                 }
             }
         } else {
-            alert("No Animal Intersections found")
+            alertRoutes = ("\n- No animal intersections found! There is no intersection of an animal route with " +
+                "an user route! \n");
+            isThereAnAlert = true;
         }
     }
 
@@ -654,7 +669,9 @@ async function filter1(id) {
         if (userIntersections.length !== 0) {
             routesToShow = addUserIntersections(userIntersections);
         } else {
-            alert("No User Intersections found")
+            alertRoutes += ("\n- No user intersections found! There is no user route which intersects with an " +
+                "other user route!\n");
+            isThereAnAlert = true;
         }
 
         if (routesToShow.length != 0) {
@@ -710,11 +727,8 @@ async function filter1(id) {
             }
 
             if (userRoutes.length === 0) {
-                alert("The API didn't found User Routes to show. Please makes sure there are User Routes in the Database or the UserID really exists. " +
-                    "Maybe you enteret the UserID the wrong way:" +
-                    "To Show all routes just leave the field empty" +
-                    "Tho Show routes of just on User enter only the UserID" +
-                    "Tho Show routes of more Users seperate the UserIDs by \";\" eg. \"1; 2\" ")
+                alertRoutes +=(" \n- No user routes found! Please proof if there are user routes in the database or the UserID really exists. \n");
+                isThereAnAlert = true;
             } else {
                 addUserRoutes(userRoutes);
             }
@@ -750,14 +764,24 @@ async function filter1(id) {
             }
 
             if (animalRoutes.length === 0) {
-                alert("No animal routes found");
+                alertRoutes += ("\n- No animal routes found! Please proof if there are animal routes in the database or the studyID really exists. \n");
+                isThereAnAlert = true;
+
             } else {
                 addAnimalRoutes(animalRoutes);
             }
+
         }
 
 
     }
+
+    if (isThereAnAlert = true) {
+        alertRoutes = "important hints: \n" + alertRoutes;
+        alertRoutes += "\n- Proof if your selection in the filter is right! \n";
+    }
+    alert (alertRoutes);
+
 
 
 }

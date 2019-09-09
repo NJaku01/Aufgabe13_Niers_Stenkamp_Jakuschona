@@ -31,29 +31,39 @@
     <script src="pub-pkg-bootstrap-min/js/bootstrap-v4.2.1.bundle.js"></script>
     <script src="turf/turf.min.js"></script>
     <script src="token.js"></script>
+    <script src="jsnlog.js"></script>
+
+    <link href="index.css" rel="stylesheet">
+
+
 
 </head>
 
 <body onload="componentDidMount()">
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <span class="navbar-brand">Geosoftware-Projekt</span>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <span class="navbar-brand">Geosoftware-Project</span>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
+            <li class="nav-item active">
                 <a class="nav-link" href="index.html">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="routes_editor.html">Routen-Editor</a>
+                <a class="nav-link" href="routes_editor.html">Route-Editor</a>
             </li>
         </ul>
     </div>
 </nav>
 
+<p> Here all routes will be shown on the map, which have been added with the
+    (<a href="http://localhost:3000/routes_editor.html">Route-Editor</a>). For each meeting of an userRoute with an
+    other userRoute or animalRoute there is an intersection marked on the map. <br/>
+    By the filter below you can manage which of the routes and intersections you want to be shown.
+</p>
 
 <div id="mapdiv" style="width: device-width; height: 500px;"></div>
 <div id="filter">
@@ -68,6 +78,13 @@
         <input type="checkbox" name="animalRoutes" checked/> Show Animal Routes<br/>
         <input type="checkbox" name="userIntersections" checked/> Show Intersections with user<br/>
         <input type="checkbox" name="animalIntersections" checked/> Show Intersections with Animals<br/>
+        <br/>
+        If Intersections are shown, also the corresponding routes are shown no matter if the buttons for the routes are
+        checked. If you want to see a specific User Route/ Animal Route/ Intersection you can input the relative ID and
+        regulate by the checkboxes what you want to see corresponding to your input. <br/> Proof if you entered the
+        userID the right way! <br/> - To show all routes, just leave the field empty <br/> - To show routes of just one
+        user enter only the userID <br/> - To show routes of more users disconnect the userIDs by ";" e.g. "1; 2"
+
     </form>
     <button onclick="filter1(null)" class="btn btn-secondary"> Submit </button>
     <textarea id="id"> </textarea>
@@ -87,17 +104,15 @@
 <footer class="page-footer font-small">
 
     <div class="footer-copyright text-center py-3">
-        © 2019 Copyright: <a href="https://www.wickueler.de/index.php">Wicküler</a>
+        © 2019 Copyright: KillerBoys
     <br/>
-        <a href="impressum.html">Impressum</a>
+        <a href="impressum.html">Legal Notice</a>
     </div>
 
 </footer>
 
 </body>
 
-
 <script src="js/index.js"></script>
-<script src="token.js"></script>
 
 </html>

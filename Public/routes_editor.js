@@ -8,6 +8,18 @@ var mongodbJSONUserRoutes = [];
 var mongodbJSONAnimalRoutes = [];
 
 
+
+var cla = JL.createConsoleAppender("ConsoleAppenderClient");
+
+cla.setOptions( { "batchSize": 1, "batchTimeout": 1000 });
+
+JL("ClientConsole").setOptions({"appenders": [cla]});
+
+JL().warn("Logger active");
+
+
+
+
 var map = L.map("mapdiv", {
     center: start_latlng,
     zoom: 11
@@ -22,10 +34,12 @@ var osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 
+
 var control = L.Routing.control({
     waypoints: [], routeWhileDragging: true,
     geocoder: L.Control.Geocoder.nominatim()
-}).on('routesfound', function (e) {
+})
+    .on('routesfound', function (e) {
     "use strict";
     layers.clearLayers();
     drawnItems = e.routes[0];
@@ -36,6 +50,11 @@ var control = L.Routing.control({
     document.getElementById("geojsonUpdate").value = JSON.stringify(drawnItems.toGeoJSON());
     updateText();
     // alert('Found ' + .length + ' route(s).');
+})
+    .on('routingerror', function (e){
+    console.log(e);
+    JL().error("The Routing machine has thrown an Error: " +e.error.status);
+    alert("The Routing machine has thrown an Error: " +e.error.status);
 });
 control.addTo(map);
 
@@ -75,7 +94,7 @@ try {
     mongodbJSON = await getFilesFromMongodb(collection, query);
 
     if (mongodbJSON.length == 0) {
-        alert("no routes in database");
+        alert("No items in database! First select an userRoute or animalRoute!");
     }
     document.getElementById("database").value = JSON.stringify(mongodbJSON);
 }
@@ -363,8 +382,33 @@ async function validateForm(form) {
             }
         }
 
-        // depending on the input id the corresponding element in mongodb is deleted.
-        if (form == "deleteAnimal") {
+        /*
+        In the following only the Intersections are deleted, the Routes get deleted by the server.js.
+         */
+
+        /*
+        If there is a Route_ID as input, the corresponding animalIntersections which belong to the animalRoute are
+        deleted.
+         */
+        if (form == "deleteAnimalRoute") {
+            var id = document.forms[form]["Route_ID"].value;
+            if (id == "") {
+                alert("A Route_ID must be selected");
+                return false;
+            }
+        }
+
+        if(form == "deleteAnimalRoute"){
+            var id = document.forms[form]["Route_ID"].value;
+            // deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
+            deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
+        }
+
+        /*
+        If there is a Study_ID as input, the corresponding animalIntersections, which belong to the animalRoutes of the
+        study, are deleted.
+         */
+        if (form == "deleteAnimalStudy") {
             var id = document.forms[form]["Study_ID"].value;
             if (id == "") {
                 alert("A Study_ID must be selected");
@@ -372,12 +416,15 @@ async function validateForm(form) {
             }
         }
 
-        if(form == "deleteAnimal"){
+        if(form == "deleteAnimalStudy"){
             var id = document.forms[form]["Study_ID"].value;
             // deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
-            deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
+            deleteDatabaseFiles("animalIntersections", "{\"studyID\" : \"" + id + "\"}")
         }
 
+        /*
+        All animalIntersections or userIntersections are deleted, if the corresponding button is pushed.
+         */
         if(form === "delete"){
             var id = document.forms[form]["_id"].value;
             deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
@@ -506,41 +553,54 @@ async function getFilesFromMovebank() {
 
         $('body').css('cursor', 'progress');
 
-        $.get(resource, async function (response, status, x) {
+        $.ajax({
+            url: resource,
+            success: async function (response, status, x) {
 
-            /**
-             let formatted_response = JSON.stringify(response, null, 4);
-             $("#movebankJson").text(formatted_response);
-             */
+                /**
+                 let formatted_response = JSON.stringify(response, null, 4);
+                 $("#movebankJson").text(formatted_response);
+                 */
 
-            let transMovebankResponse = transformMovebankJson(response);
 
-            // variable for all the userRoutes stored in Mongodb
-            mongodbJSONUserRoutes = await getFilesFromMongodb("userRoutes");
+                let transMovebankResponse = transformMovebankJson(response);
 
-            for (i = 0; i < transMovebankResponse.length; i++) {
-                insertItem({
-                    collection: "animalRoutes",
-                    Study_ID: study,
-                    User_ID: transMovebankResponse[i].User_ID,
-                    Name: transMovebankResponse[i].Name,
-                    Type: transMovebankResponse[i].Type,
-                    date: transMovebankResponse[i].date,
-                    time: transMovebankResponse[i].time,
-                    routeID: transMovebankResponse[i].routeID,
-                    geoJson: JSON.stringify(transMovebankResponse[i].geoJson)
-                });
+                // variable for all the userRoutes stored in Mongodb
+                mongodbJSONUserRoutes = await getFilesFromMongodb("userRoutes");
 
-                // Calculates intersections between user and new animal routes if there are any
-                calculateIntersect(transMovebankResponse[i].routeID, transMovebankResponse[i].User_ID, JSON.stringify(transMovebankResponse[i].geoJson), mongodbJSONUserRoutes, "animalIntersections");
+                for (i = 0; i < transMovebankResponse.length; i++) {
+                    insertItem({
+                        collection: "animalRoutes",
+                        Study_ID: study,
+                        User_ID: transMovebankResponse[i].User_ID,
+                        Name: transMovebankResponse[i].Name,
+                        Type: transMovebankResponse[i].Type,
+                        date: transMovebankResponse[i].date,
+                        time: transMovebankResponse[i].time,
+                        routeID: transMovebankResponse[i].routeID,
+                        geoJson: JSON.stringify(transMovebankResponse[i].geoJson)
+                    });
+
+                    // Calculates intersections between user and new animal routes if there are any
+                    calculateIntersect(transMovebankResponse[i].routeID, transMovebankResponse[i].User_ID, JSON.stringify(transMovebankResponse[i].geoJson), mongodbJSONUserRoutes, "animalIntersections");
+                }
+
+                // request progress finished
+                $('body').css('cursor', 'default');
+                alert("Routes of Study No. " + study + " have been added to the Database!");
+
+            },
+            error: function (response) {
+                alert(response.responseJSON.error);
+                $('body').css('cursor', 'default');
+                JL().error("Movebank Api Down")
             }
-
-            // request progress finished
-            $('body').css('cursor', 'default');
-            alert("Routes of Study No. " + study + " have been added to the Database!");
-
-        })
-    } catch {}
+        });
+    } catch (err) {
+        alert(err);
+        $('body').css('cursor', 'default');
+        return ;
+    }
 }
 
 function showMovebankInformation() {
@@ -568,17 +628,26 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
     for (var j=0; j<allRoutes.length; j++) {
 
         var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geoJson));
-        /*
+
+        /**
         The turf function returns an empty array with length 0 if there is no intersection, therefore only the arrays
         with an content are stored in mongodb.
          */
+
         if (intersect.features.length != 0) {
             intersect=JSON.stringify(intersect);
             var intersectionsID = Math.random().toString(36).substring(2, 15);
             if (routeIDInput.substring(0,0)== "U") {
                 insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
             } else {
-                insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: userIDInput, UserIDInput: allRoutes[j].User_ID, routeIDInput: routeIDInput});
+                // get study id from the form
+                var study = document.forms["createAnimal"]["Study_ID"].value;
+
+                insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: userIDInput, UserIDInput: allRoutes[j].User_ID, routeIDInput: routeIDInput, studyID: study});
+                /*
+                 The collection animalIntersections needs additionally the attribut "study_ID", to provide the user to
+                 delete all routes which belong to a certain study.
+                 */
             }
 
         }

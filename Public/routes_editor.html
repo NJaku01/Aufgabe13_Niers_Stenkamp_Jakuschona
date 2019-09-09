@@ -24,17 +24,18 @@
     <script src="leaflet-routing-machine/leaflet-routing-machine.js"></script>
     <script src="pub-pkg-bootstrap-min/js/bootstrap-v4.2.1.bundle.js"></script>
     <script src="turf/turf.min.js"></script>
+    <script src="jsnlog.js"></script>
 
 
 
     <link href="routes_editor.css" rel="stylesheet">
-    <title>Routes Creator</title>
+    <title>Route-Editor</title>
 </head>
 <body onload="events()">
 
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <span class="navbar-brand">Geosoftware-Projekt</span>
+<nav id="navbar" class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <span class="navbar-brand">Geosoftware-Project</span>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -44,19 +45,26 @@
             <li class="nav-item">
                 <a class="nav-link" href="index.html">Home</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="routes_editor.html">Routen-Editor</a>
+            <li class="nav-item active">
+                <a class="nav-link" href="routes_editor.html">Route-Editor</a>
             </li>
         </ul>
     </div>
 </nav>
 
-
-<h1>Routes Creator</h1>
-<p id="description">With this function a route can be calculated. The result will be shown as JSON on the right side.
-    The result is also saved and can be uploaded to the main page.
-    Furthermore, it is possible to load a route with a maximum of 30 waypoints into the text field. From this a route is
-    calculated and displayed.</p>
+<div id="explanation">
+<p> Here you can calculate a route which will be shown as JSON on the right side. It is possible to
+    load a route with a maximum of 30 waypoints into the text field. From this a route is calculated and displayed.
+    The route can be added so that it is shown on the map in Home. Besides you can update a route and delete a single or
+    all routes.
+    <br/>
+    In addition you can add animal routes of different studys, which will be also shown on the map in Home. You can
+    delete a single route, a single study or all animal routes
+    (<a href="#JumpAddAnimalRoute">further information concerning animal routes by pushing the info button</a>).
+    <br/>
+    Furthermore you can see all routes as JSONs, which are actually shown on the map, below.
+</p>
+</div>
 <div id="main" style="overflow: auto;">
     <div class="container-fluid">
         <div class="row">
@@ -75,10 +83,10 @@
     </div>
     <br/>
     <div class="text-left">
-        <button onclick="showFiles('userRoutes')" class="btn btn-secondary text-left">Show UserRoutes in Database</button><br>
-        <button onclick="showFiles('animalRoutes')" class="btn btn-secondary">Show AnimalRoutes in Database</button><br>
-        <button onclick="showFiles('userIntersections')" class="btn btn-secondary">Show UserIntersections in Database</button><br>
-        <button onclick="showFiles('animalIntersections')" class="btn btn-secondary">Show AnimalIntersections in Database</button>
+        <button onclick="showFiles('userRoutes')" class="btn btn-secondary text-left">Show userRoutes in Database</button><br>
+        <button onclick="showFiles('animalRoutes')" class="btn btn-secondary">Show animalRoutes in Database</button><br>
+        <button onclick="showFiles('userIntersections')" class="btn btn-secondary">Show userIntersections in Database</button><br>
+        <button onclick="showFiles('animalIntersections')" class="btn btn-secondary">Show animalIntersections in Database</button>
         <textarea readonly id="database" style="width: 100%; height: 400px;"
                   placeholder="Here you can show the database content"> </textarea>
     </div>
@@ -86,7 +94,7 @@
         <h5>Add Item (POST Request)</h5>
 
 
-        <form name="create" action="item/create" onsubmit="return validateForm('create')"  method="POST" target="_blank">
+        <form name="create" action="item/create" onsubmit="return validateForm('create')"  method="POST">
             User_ID:<br/>
             <input type="text" name="User_ID"/><br>
             Name of the route:<br/>
@@ -107,7 +115,7 @@
 
         <h5>Update Item</h5>
 
-        <form name="update" action="item/update" target="_blank" onsubmit="return validateForm('update')" method="POST">
+        <form name="update" action="item/update" onsubmit="return validateForm('update')" method="POST">
             ID:<br/>
             <input type="text" name="_id"/><br>
             User_ID:<br/>
@@ -120,7 +128,7 @@
             <input type="date" name="date"/><br>
             Time:<br/>
             <input type="time" name="time"/><br>
-            <input type="hidden" id="geojsonUpdate" name="geojson"><br>
+            <input type="hidden" id="geojsonUpdate" name="geoJson"><br>
             <button class="btn btn-secondary" type="submit" value="Send">Send</button>
         </form>
 
@@ -128,11 +136,14 @@
 
         <h5>Delete Item</h5>
 
-        <form name="delete" action="item/deleteOne" target="_blank" onsubmit="return validateForm('delete')" method="POST">
+        <div id="JumpAddAnimalRoute">
+        <form name="delete" action="item/deleteOne" onsubmit="return validateForm('delete')" method="POST">
             ID:<br/>
             <input type="text" name="_id"/><br>
             <button class="btn btn-secondary" type="submit" value="Send">Send</button>
         </form>
+        </div>
+
 
         <h5>Add Animal Route</h5>
 
@@ -170,6 +181,9 @@
                     -> Search for a Study you are interested in and check if GPS data is available for it ->
                     Agree to the licence terms -> Copy the Movebank ID and use it as Study-ID on the Routes-Editor page.
                 </p>
+                <p>
+                    This information was last updated on 02.08.19.
+                </p>
             </div>
             <input type="text" name="Study_ID"/>
             <br>
@@ -177,8 +191,17 @@
         </form>
         <button onclick="getFilesFromMovebank()" class="btn btn-secondary">Send</button>
 
-        <h5>Delete Animal Route</h5>
-        <form name="deleteAnimal" action="item/deleteMany" onsubmit="return validateForm('deleteAnimal')" method="POST" target="_self">
+        <h5>Delete One Animal Route</h5>
+        <form name="deleteAnimalRoute" action="item/deleteOneAnimalRoute" onsubmit="return validateForm('deleteAnimalRoute')" method="POST">
+            Route ID:<br/>
+            <input type="text" name="Route_ID"/>
+            <br>
+            <button class="btn btn-secondary" type="submit" value="Send">Send</button>
+            <br/>
+        </form>
+
+        <h5>Delete One Animal Study</h5>
+        <form name="deleteAnimalStudy" action="item/deleteOneAnimalStudy" onsubmit="return validateForm('deleteAnimalStudy')" method="POST">
             Study ID:<br/>
             <input type="text" name="Study_ID"/>
             <br>
@@ -188,11 +211,10 @@
 
     </div>
 
-    <button onclick="deleteAll('userRoutes')" class="btn btn-secondary">Delete all UserRoutes in Database</button><br/>
-    <button onclick="deleteAll('animalRoutes')" class="btn btn-secondary">Delete all AnimalRoutes in Database</button><br/>
-    <button onclick="deleteAll('userIntersections')" class="btn btn-secondary">Delete all UserIntersections in Database</button><br/>
-    <button onclick="deleteAll('animalIntersections')" class="btn btn-secondary">Delete all AnimalIntersections in Database</button><br/>
-
+    <button onclick="deleteAll('userRoutes'), deleteAll('animalIntersections'), deleteAll('userIntersections')" class="btn btn-secondary">Delete all userRoutes in Database</button><br/>
+    <button onclick="deleteAll('animalRoutes'), deleteAll('animalIntersections')" class="btn btn-secondary">Delete all animalRoutes in Database</button><br/>
+    <!-- <button onclick="deleteAll('userIntersections')" class="btn btn-secondary">Delete all UserIntersections in Database</button><br/> -->
+    <!-- <button onclick="deleteAll('animalIntersections')" class="btn btn-secondary">Delete all AnimalIntersections in Database</button><br/> -->
 </div>
 
 
@@ -202,9 +224,9 @@
 <footer class="page-footer font-small">
 
     <div class="footer-copyright text-center py-3">
-        © 2019 Copyright: <a href="https://www.wickueler.de/index.php">Wicküler</a>
+        © 2019 Copyright: KillerBoys
         <br/>
-        <a href="impressum.html">Impressum</a>
+        <a href="impressum.html">Legal Notice</a>
     </div>
 
 </footer>
