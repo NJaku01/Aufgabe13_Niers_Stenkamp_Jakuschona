@@ -51,25 +51,27 @@ button:hover {
 }
 
 input[type=submit] {
-     display: inline-block;
-     margin-left: 5%;
-     margin-bottom: 30px;
-     text-decoration: none;
-     font-family: Arial;
-     font-size: 16px;
-     border: 1px solid #fff;
-     border-radius: 15px;
-     color: #fff;
-     background-color: dodgerblue;
-     padding: 5px 15px;
-     font-weight: bold;
-     box-shadow: 3px 3px 4px #8CA0B2;
-     text-shadow: 1px 1px 2px #6E91B2;
- }
+    display: inline-block;
+    margin-left: 5%;
+    margin-bottom: 30px;
+    text-decoration: none;
+    font-family: Arial;
+    font-size: 16px;
+    border: 1px solid #fff;
+    border-radius: 15px;
+    color: #fff;
+    background-color: dodgerblue;
+    padding: 5px 15px;
+    font-weight: bold;
+    box-shadow: 3px 3px 4px #8CA0B2;
+    text-shadow: 1px 1px 2px #6E91B2;
+}
+
 input[type=submit]:hover, #showInfo:hover {
     background-color: lawngreen;
     cursor: pointer;
 }
+
 textarea::-webkit-scrollbar {
     width: 12px;
     background-color: #F5F5F5;

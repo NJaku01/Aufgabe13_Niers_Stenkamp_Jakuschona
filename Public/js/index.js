@@ -12,7 +12,6 @@ JL("ClientConsole").setOptions({"appenders": [cla]});
 JL().warn("Logger active");
 
 
-
 var map = L.map("mapdiv", {
     center: start_latlng,
     zoom: 11
@@ -650,7 +649,7 @@ async function filter1(id) {
     if (isThereAnAlert == true) {
         alertRoutes = "important hints: \n" + alertRoutes;
         alertRoutes += "\n- Proof if your selection in the filter is right! \n";
-        alert (alertRoutes);
+        alert(alertRoutes);
     }
 }
 
