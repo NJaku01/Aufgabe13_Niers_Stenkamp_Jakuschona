@@ -351,7 +351,7 @@ async function validateForm(form) {
             collection: userRoutes,
             routeID: id,
         };
-         deleteDatabaseFiles("userRoutes", "{\"routeID\" : \":" +id + "\"}");
+        deleteDatabaseFiles("userRoutes", "{\"routeID\" : \":" +id + "\"}");
         deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
         deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
 
@@ -386,9 +386,11 @@ async function validateForm(form) {
             /*
             If the userRoute with the corresponding routeID is already in Mongodb, the userRoute will not be added again
              */
-            for (var i in mongodbJSONUserRoutes){
-                if(mongodbJSONUserRoutes[i].routeID == id){
-                    mongodbJSONUserRoutes.splice(i, 1);
+
+            for(var i in mongodbJSONUserRoutes){
+
+                if(routeIDInput == mongodbJSONUserRoutes[i].routeID){
+                    mongodbJSONUserRoutes.splice(i,1)
                 }
             }
 
