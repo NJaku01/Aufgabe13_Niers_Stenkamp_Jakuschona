@@ -1,5 +1,6 @@
 "use strict";
-
+var alertRoutes = "";
+var isThereAnAlert = false;
 const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
@@ -419,10 +420,8 @@ function weatherRequest(long, lat) {
         xhttp.send();
     } catch (err) {
         JS.fatal("OpenWeatherMap not working");
-        alert("no connection to OpenWeatherMap. Please check your internet connection.");
+        alert("No connection to OpenWeatherMap. Please check your internet connection.");
     }
-
-
     return response;
 }
 
@@ -604,7 +603,9 @@ async function filter1(id) {
                 }
             }
         } else {
-            alert("No Animal Intersections found")
+            alertRoutes = ("\n- No animal intersections found! There is no intersection of an animal route with " +
+                "an user route! \n");
+            isThereAnAlert = true;
         }
     }
 
@@ -669,7 +670,9 @@ async function filter1(id) {
         if (userIntersections.length !== 0) {
             routesToShow = addUserIntersections(userIntersections);
         } else {
-            alert("No User Intersections found")
+            alertRoutes += ("\n- No user intersections found! There is no user route which intersects with an " +
+                "other user route!\n");
+            isThereAnAlert = true;
         }
 
         if (routesToShow.length != 0) {
@@ -725,11 +728,8 @@ async function filter1(id) {
             }
 
             if (userRoutes.length === 0) {
-                alert("The API didn't found User Routes to show. Please makes sure there are User Routes in the Database or the UserID really exists. " +
-                    "Maybe you enteret the UserID the wrong way:" +
-                    "To Show all routes just leave the field empty" +
-                    "Tho Show routes of just on User enter only the UserID" +
-                    "Tho Show routes of more Users seperate the UserIDs by \";\" eg. \"1; 2\" ")
+                alertRoutes +=(" \n- No user routes found! Please proof if there are user routes in the database or the UserID really exists. \n");
+                isThereAnAlert = true;
             } else {
                 addUserRoutes(userRoutes);
             }
@@ -765,14 +765,24 @@ async function filter1(id) {
             }
 
             if (animalRoutes.length === 0) {
-                alert("No animal routes found");
+                alertRoutes += ("\n- No animal routes found! Please proof if there are animal routes in the database or the studyID really exists. \n");
+                isThereAnAlert = true;
+
             } else {
                 addAnimalRoutes(animalRoutes);
             }
+
         }
 
 
     }
+
+    if (isThereAnAlert = true) {
+        alertRoutes = "important hints: \n" + alertRoutes;
+        alertRoutes += "\n- Proof if your selection in the filter is right! \n";
+    }
+    alert (alertRoutes);
+
 
 
 }

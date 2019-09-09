@@ -41,7 +41,7 @@
 
 <body onload="componentDidMount()">
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
     <span class="navbar-brand">Geosoftware-Project</span>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,9 +78,13 @@
         <input type="checkbox" name="animalRoutes" checked/> Show Animal Routes<br/>
         <input type="checkbox" name="userIntersections" checked/> Show Intersections with user<br/>
         <input type="checkbox" name="animalIntersections" checked/> Show Intersections with Animals<br/>
-        (If Intersections are shown, also the corresponding routes are shown no matter if the buttons for the routes are
-        checked. If you want to see a specific User Route/ Animal Route/ Intersection you can input the relative ID an
-        regulate by the checkboxes what you want to see corresponding to your input.)
+        <br/>
+        If Intersections are shown, also the corresponding routes are shown no matter if the buttons for the routes are
+        checked. If you want to see a specific User Route/ Animal Route/ Intersection you can input the relative ID and
+        regulate by the checkboxes what you want to see corresponding to your input. <br/> Proof if you entered the
+        userID the right way! <br/> - To show all routes, just leave the field empty <br/> - To show routes of just one
+        user enter only the userID <br/> - To show routes of more users disconnect the userIDs by ";" e.g. "1; 2"
+
     </form>
     <button onclick="filter1(null)"> Submit </button>
     <textarea id="id"> </textarea>

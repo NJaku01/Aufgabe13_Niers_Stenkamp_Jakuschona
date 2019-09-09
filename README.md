@@ -40,12 +40,10 @@ Mit Docker:
 - userRoutes {...}
 
 ##### weitere Hinweise: 
-- Zu Beginn haben wir unser Repository fälschlicherweise "Aufgabe13_..." genannt, wegen Termin 13, an dem die Aufgabe 
-vorgestellt wurde. 
-Haben es dann einfach dabei belassen.
 - Anstelle von GitHub Issues haben wir mit Trello gearbeitet, da wir die dort zur Verfügung stehenden Features für sehr
  sinnvoll, in einer Gruppenarbeit wie dieser, halten. Denn die Nutzung von Trello konnten wir gut in Kombination mit 
  Scrum nutzen, einem Konzept mit dem wir unsere Vorgehensweise zeitlich geregelt haben. Unter folgendem Link ist unser 
  Trello-Board zu finden: 
  https://trello.com/b/pld0FgoX/aufgabe13niersstenkampjakuschona
+- Unsere API läuft in allen gängigen Browsern (Firefox, Google Chrome, Safari)
  
