@@ -339,7 +339,7 @@ async function validateForm(form) {
 
 
     if(form === "update"){
-        var id = document.forms[form]["_id"].value;
+        var id = document.forms["update"]["_id"].value;
         formItem={
             User_ID: document.forms["update"]["User_ID"].value,
             Name: document.forms["update"]["Name"].value,
@@ -347,7 +347,7 @@ async function validateForm(form) {
             Date: document.forms["update"]["date"].value,
             Time: document.forms["update"]["time"].value,
             geoJson:  document.forms["update"]["geoJson"].value,
-            collection: userRoutes,
+            collection: "userRoutes",
             routeID: id,
         };
         deleteDatabaseFiles("userRoutes", "{\"routeID\" : \":" +id + "\"}");
@@ -355,6 +355,15 @@ async function validateForm(form) {
         deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
     }
 
+    // if a userRoute gets updated or delete there is a need for the corresponding id.
+    if (form == "update" || form == "delete") {
+        var id = document.forms[form]["_id"].value;
+        if (id == "") {
+            alert("A id must be selected");
+            $('body').css('cursor', 'default');
+            return;
+        }
+    }
 
     try {
         // If there is a new userRoute added or if a userRoute is updated
@@ -363,13 +372,16 @@ async function validateForm(form) {
             var userIDInput = document.forms[form]["User_ID"].value;
            if (inputJSON == "") {
                alert("A route must be selected");
-               return ;
+               $('body').css('cursor', 'default');
+                return ;
             } else if (!checkIfGeoJsonLineString(inputJSON)) {
                 alert("No valid GeoJson inserted. Use the Routing Machine to create a valid GeoJson");
+               $('body').css('cursor', 'default');
                 return ;
             }
             if (userIDInput == "") {
                 alert("A userID must be selected");
+                $('body').css('cursor', 'default');
                 return;
             }
 
@@ -383,20 +395,13 @@ async function validateForm(form) {
 
             // variable for all the userRoutes stored in Mongodb
             mongodbJSONUserRoutes = await getFilesFromMongodb("userRoutes");
-            /*
-            If the userRoute with the corresponding routeID is already in Mongodb, the userRoute will not be added again
-             */
-
-            for(var i in mongodbJSONUserRoutes){
-
-                if(routeIDInput == mongodbJSONUserRoutes[i].routeID){
-                    mongodbJSONUserRoutes.splice(i,1)
-                }
-            }
 
             // variable for all the animalRoutes stored in Mongodb
             mongodbJSONAnimalRoutes = await getFilesFromMongodb("animalRoutes");
 
+            /*
+            If the userRoute with the corresponding routeID is already in Mongodb, the userRoute will not be added again
+             */
             for(var i in mongodbJSONUserRoutes){
 
                 if(routeIDInput == mongodbJSONUserRoutes[i].routeID){
@@ -416,14 +421,6 @@ async function validateForm(form) {
              */
             calculateIntersect(routeIDInput, userIDInput, inputJSON, mongodbJSONAnimalRoutes, "animalIntersections");
         }
-        // if a userRoute gets updated or delete there is a need for the corresponding id.
-        if (form == "update" || form == "delete") {
-            var id = document.forms[form]["_id"].value;
-            if (id == "") {
-                alert("A id must be selected");
-                return false;
-            }
-        }
 
         /*
         In the following only the Intersections are deleted, the Routes get deleted by the server.js.
@@ -438,6 +435,7 @@ async function validateForm(form) {
             if (id == "") {
                 $('body').css('cursor', 'default');
                 alert("A Route_ID must be selected");
+                $('body').css('cursor', 'default');
                 return false;
             }
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
@@ -710,7 +708,7 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
         if (intersect.features.length != 0) {
             intersect=JSON.stringify(intersect);
             var intersectionsID = Math.random().toString(36).substring(2, 15);
-            if (routeIDInput.substring(0,0)== "U") {
+            if (routeIDInput.substring(0,1)== "U") {
                 insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
             } else {
                 // get study id from the form
@@ -726,7 +724,8 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
         }
       intersect = {};
     }
-    if(collection == "animalIntersections") {
+
+    if(collection == "animalIntersections" && routeIDInput.substring(0,1)== "U") {
         document.forms["create"].reset();
         document.forms["update"].reset();
         document.forms["delete"].reset();

@@ -1,6 +1,4 @@
 "use strict";
-var alertRoutes = "";
-var isThereAnAlert = false;
 const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
@@ -12,6 +10,7 @@ cla.setOptions({"batchSize": 1, "batchTimeout": 1000});
 JL("ClientConsole").setOptions({"appenders": [cla]});
 
 JL().warn("Logger active");
+
 
 
 var map = L.map("mapdiv", {
@@ -136,7 +135,6 @@ function addAnimalRoutes(animalRoutes) {
     for (var i = 0; i < animalRoutes.length; i++) {
         animalGeoJson.push((JSON.parse(animalRoutes[i].geoJson)));
     }
-    console.log(animalGeoJson);
     var collectionOfRoutes = [];
     var coordinates = [];
     for (var i = 0; i < animalGeoJson.length; i++) {
@@ -162,9 +160,6 @@ function addAnimalRoutes(animalRoutes) {
             popup.setLatLng(e.latlng).openOn(map);
         });
 
-        /* collectionOfRoutes[i].on('mouseout', function (e) {
-            e.target.closePopup();
-        }); */
     }
 
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
@@ -220,8 +215,8 @@ function addUserIntersections(userIntersections) {
     map.fitBounds(routesFeature.getBounds());
     return routesToShow;
 
-
 }
+
 
 /**
  * Shows the animal Intersections on the Map
@@ -234,7 +229,7 @@ function addAnimalIntersections(animalIntersections) {
     var animalRoutesToShow = [];
     var animalIntersectionsPoints = [];
     var answer = {userRoutes: [], animalRoutes: []};
-    console.log(animalIntersections)
+
     for (var i in animalIntersections) {
 
         var lat;
@@ -321,7 +316,10 @@ function componentDidMount() {
  */
 async function filter1(id) {
 
-//get Values from Form
+    var alertRoutes = "";
+    var isThereAnAlert = false;
+
+    //get Values from Form
     var userID = document.forms["filter"]["User_ID"].value;
     var animals = document.forms["filter"]["Animal"].value;
     var intersections = document.forms["filter"]["InteractionIDs"].value;
@@ -404,7 +402,6 @@ async function filter1(id) {
 
             try {
                 animalIntersections2 = await getDatabaseFiles("animalIntersections", query);
-                console.log(animalIntersections2);
 
             } catch {
 
@@ -440,8 +437,6 @@ async function filter1(id) {
 
         }
 
-
-        console.log(animalIntersections);
         if (animalIntersections.length !== 0) {//if the database Found some Intersections show them
             routesToShow = addAnimalIntersections(animalIntersections);
 
@@ -639,7 +634,6 @@ async function filter1(id) {
 
             try {
                 animalRoutes = await getDatabaseFiles("animalRoutes", query);
-                console.log(animalRoutes);
             } catch (e) {
                 console.log(e);
             }
@@ -653,12 +647,11 @@ async function filter1(id) {
             }
         }
     }
-
-    if (isThereAnAlert = true) {
+    if (isThereAnAlert == true) {
         alertRoutes = "important hints: \n" + alertRoutes;
         alertRoutes += "\n- Proof if your selection in the filter is right! \n";
+        alert (alertRoutes);
     }
-    alert(alertRoutes);
 }
 
 
