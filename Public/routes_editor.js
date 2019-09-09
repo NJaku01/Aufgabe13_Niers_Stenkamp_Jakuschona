@@ -187,8 +187,7 @@ function checkIfGeoJsonLineString(text) {
     "use strict";
 
     var regex = /\s*{\s*"type"\s*:\s*"FeatureCollection"\s*,\s*"features"\s*:\s*\[\s*({\s*"type"\s*:\s*"Feature"\s*,\s*"properties"\s*:\s*{(\s*"[a-zA-z\d]"*\s*:\s*"[a-zA-z\d]"\s*,\s*)*(\s*"[a-zA-z\d]"*\s*:\s*"[a-zA-z\d]"\s*)?}\s*,\s*"geometry"\s*:\s*{\s*"type"\s*:\s*"LineString"\s*,\s*"coordinates"\s*:\s*\s*\[\s*(\[\s*-?\d{1,2}(\.\d*)?,\s*-?\d{1,3}(\.\d*)?\s*\]\s*,\s*)*\[\s*-?\d{1,2}(\.\d*)?,\s*-?\d{1,3}(\.\d*)?\s*\]\s*\]\s*\}\s*\}\s*,\s*)*\s*{\s*"type"\s*:\s*"Feature"\s*,\s*"properties"\s*:\s*{(\s*"[a-zA-z\d]"*\s*:\s*"[a-zA-z\d]"\s*,\s*)*(\s*"[a-zA-z\d]"*\s*:\s*"[a-zA-z\d]"\s*)?}\s*,\s*"geometry"\s*:\s*{\s*"type"\s*:\s*"LineString"\s*,\s*"coordinates"\s*:\s*\[\s*(\[\s*-?\d{1,2}(\.\d*)?\s*,\s*-?\d{1,3}(\.\d*)?\s*\]\s*,\s*)*\[\s*-?\d{1,2}(\.\d*)?\s*,\s*-?\d{1,3}(\.\d*)?\s*\]\s*\]\s*\}\s*\}\s*\]\s*\}\s*/gi;
-    var answer = document.getElementById("lineAnswer");
-    var button = document.getElementById("button");
+
 
     if (regex.test(text)) {
         return true;
@@ -313,7 +312,7 @@ async function validateForm(form) {
     "use strict";
 
     $('body').css('cursor', 'progress');
-
+    $(':button').prop('disabled', true);
     var formItem = null;
     var id =null;
 
@@ -363,6 +362,7 @@ async function validateForm(form) {
         if (id == "") {
             alert("A id must be selected");
             $('body').css('cursor', 'default');
+            $(':button').prop('disabled', false);
             return;
         }
     }
@@ -375,15 +375,18 @@ async function validateForm(form) {
            if (inputJSON == "") {
                alert("A route must be selected");
                $('body').css('cursor', 'default');
+               $(':button').prop('disabled', false);
                 return ;
             } else if (!checkIfGeoJsonLineString(inputJSON)) {
                 alert("No valid GeoJson inserted. Use the Routing Machine to create a valid GeoJson");
                $('body').css('cursor', 'default');
+               $(':button').prop('disabled', false);
                 return ;
             }
             if (userIDInput == "") {
                 alert("A userID must be selected");
                 $('body').css('cursor', 'default');
+                $(':button').prop('disabled', false);
                 return;
             }
 
@@ -438,12 +441,13 @@ async function validateForm(form) {
             if (id == "") {
                 $('body').css('cursor', 'default');
                 alert("A Route_ID must be selected");
-                $('body').css('cursor', 'default');
+                $(':button').prop('disabled', false);
                 return false;
             }
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
             deleteDatabaseFiles("animalRoutes", "{\"routeID\" : \"" +id +"\"}")
             $('body').css('cursor', 'default');
+            $(':button').prop('disabled', false);
             document.forms["create"].reset();
             document.forms["update"].reset();
             document.forms["delete"].reset();
@@ -461,6 +465,7 @@ async function validateForm(form) {
         if(form == "deleteAnimalStudy"){
             if (id == "") {
                 $('body').css('cursor', 'default');
+                $(':button').prop('disabled', false);
                 alert("A Study_ID must be selected");
                 return false;
             }
@@ -468,6 +473,7 @@ async function validateForm(form) {
             deleteDatabaseFiles("animalIntersections", "{\"studyID\" : \"" + id + "\"}");
             deleteDatabaseFiles("animalRoutes", "{\"Study_ID\" : \"" +id + "\"}");
             $('body').css('cursor', 'default');
+            $(':button').prop('disabled', false);
             document.forms["create"].reset();
             document.forms["update"].reset();
             document.forms["delete"].reset();
@@ -487,6 +493,7 @@ async function validateForm(form) {
             deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
             $('body').css('cursor', 'default');
+            $(':button').prop('disabled', false);
             document.forms["create"].reset();
             document.forms["update"].reset();
             document.forms["delete"].reset();
@@ -500,6 +507,7 @@ async function validateForm(form) {
     catch(e){ console.log(e);
     alert(e);
         $('body').css('cursor', 'default');}
+    $(':button').prop('disabled', false);
 }
 
 /**
@@ -620,6 +628,7 @@ async function getFilesFromMovebank() {
         var resource = "movebank/" + study;
 
         $('body').css('cursor', 'progress');
+        $(':button').prop('disabled', true);
 
         $.ajax({
             url: resource,
@@ -655,6 +664,7 @@ async function getFilesFromMovebank() {
 
                 // request progress finished
                 $('body').css('cursor', 'default');
+                $(':button').prop('disabled', false);
                 document.forms["create"].reset();
                 document.forms["update"].reset();
                 document.forms["delete"].reset();
@@ -667,12 +677,14 @@ async function getFilesFromMovebank() {
             error: function (response) {
                 alert(response.responseJSON.error);
                 $('body').css('cursor', 'default');
+                $(':button').prop('disabled', false);
                 JL().error("Movebank Api Down")
             }
         });
     } catch (err) {
         alert(err);
         $('body').css('cursor', 'default');
+        $(':button').prop('disabled', false);
         return ;
     }
 }
@@ -737,6 +749,7 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
         document.forms["deleteAnimalStudy"].reset();
         alert ("Item inserted/ updated");
         $('body').css('cursor', 'default');
+        $(':button').prop('disabled', false);
     }
 }
 
