@@ -1,26 +1,27 @@
-# Aufgabe13_Niers_Stenkamp_Jakuschona
+# Projektaufgabe_Geosoftware_I_SS_2019
 
-##### Start des Projekts:
+##### HowTo start the project local:
 
-##### Immer: 
-- repository downloaden
-- in shell zum Projektordner wechseln
+###### always: 
+- download the repository
+- change with cd in the terminal to the project-directory
 
-Mit node.js:
-- Docker Local starten
-- Befehle in der Shell eingeben: 
-  - npm install 
-  - npm start
-- öffne localhost:3000 im Browser deiner Wahl
+###### with node.js:
+- start mongodb local 
+- commands you have to input in the terminal: 
+  - "npm install"
+  - "npm start"
+- open localhost:3000 in a browser you like 
+- (if you want to see if the tests are running input the command "npm test" instead of "npm start")
 
-Mit Docker:
-- docker-compose up in der Shell eingeben
-- öffne localhost:3000 im Browser deiner Wahl
+###### with Docker:
+- input in the terminal: "docker-compose up" 
+- open localhost:3000 in a browser you like 
 
-##### Benötigte API-Keys:
-- Bei openweathermap (https://openweathermap.org/) und movebank (https://www.movebank.org/) registrieren
-- im Projektordner einen neuen Ordner "private" erstellen
-  - darin eine Datei token.js anlegen, die folgende Form besitzt:
+##### needed API-Keys:
+- You have to register on openweathermap (https://openweathermap.org/) and movebank (https://www.movebank.org/) 
+- Create in the project-directory a new directory called "private" 
+  - in this directory you have to crate a file called "token.js", which got the form described below:
   -      if (typeof exports == "undefined"){
             var exports = window;
          };
@@ -30,20 +31,22 @@ Mit Docker:
             OPENWEATHERMAP_TOKEN: 'your-openweathermap-token'
          };
          
-##### Link zum öffentlichen github-Repository: 
-- https://github.com/NJaku01/Aufgabe13_Niers_Stenkamp_Jakuschona
+##### link to the public github-repository: 
+- https://github.com/NJaku01/Projektaufgabe_Geosoftware_I_SS_2019
 
-##### Datenstruktur in mongoDB in itemdb: 
-- animalIntersections {routeIDInput, userIDInput, inputJSON, mongodbJSONAnimalRoutes, "animalIntersections"}
-- animalRoutes {collection, Study_ID, User_ID, Name, Type, date, time, routeID, GeoJSON}
-- userIntersections {routeIDInput, userIDInput, inputJSON, mongodbJSONUserRoutes, "userIntersections"}
-- userRoutes {...}
+##### data-structure in mongoDB in itemdb: 
+- animalIntersections {_id, "animalIntersections", geoJSON, id, routeID, UserId, UserIDInput, routeIDInput, studyID}
+- animalRoutes {_id, "animalRoutes", Study_ID, User_ID, Name, Type, date, time, routeID, geoJson}
+- userIntersections {_id, "userIntersections", geoJSON, id, routeID, UserId, UserIDInput, routeIDInput, studyID}
+- userRoutes {_id, User_ID, Name, Type, date, time, geoJSON, "userRoutes", routeID}
+- the attribute "_id" is automatically given by mongodb
+- for each of the four datatypes there is a collection in mongodb where it gets stored, 
+the certain collection e.g. "userRoutes" is named directly above)
 
-##### weitere Hinweise: 
-- Anstelle von GitHub Issues haben wir mit Trello gearbeitet, da wir die dort zur Verfügung stehenden Features für sehr
- sinnvoll, in einer Gruppenarbeit wie dieser, halten. Denn die Nutzung von Trello konnten wir gut in Kombination mit 
- Scrum nutzen, einem Konzept mit dem wir unsere Vorgehensweise zeitlich geregelt haben. Unter folgendem Link ist unser 
- Trello-Board zu finden: 
+##### further hints : 
+- Instead of GitHub Issues we used Trello, because we are convinced that the features in Trello are really useful for 
+a group-work like this. Because Trello is good useable in combination with Srum 
+(a concept, to structure our workflow concerning time, what we used). With the link below you can find our Trello-Board
  https://trello.com/b/pld0FgoX/aufgabe13niersstenkampjakuschona
-- Unsere API läuft in allen gängigen Browsern (Firefox, Google Chrome, Safari)
+- Our API is running with all common browsers (Firefox, Google Chrome, Safari)
  

@@ -130,8 +130,8 @@ app.post("/item", (req, res) => {
 
 app.post("/item/create", (req, res) => {
     // insert item
-    console.log(req.body.collection);
-    console.log(req.body);
+    console.log("Collection: " + req.body.collection);
+    console.log("Body: "+ req.body);
     app.locals.db.collection(req.body.collection).insertOne(req.body, (error, result) => {
         if (error) {
             console.dir(error);
@@ -313,3 +313,4 @@ app.listen(3000, function () {
     console.log('App listening on port 3000!');
 });
 
+module.exports = app;
