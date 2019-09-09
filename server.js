@@ -114,7 +114,6 @@ app.get('/:id', function (req, res) {
 
 app.post("/item", (req, res) => {
     // find all
-    console.log(req.body.query);
     var queryJSON = req.body.query;
     if(queryJSON!=null) {
         queryJSON = JSON.parse(queryJSON);
@@ -123,7 +122,6 @@ app.post("/item", (req, res) => {
         if (error) {
             console.dir(error);
         }
-        console.log(result);
         res.json(result);
     });
 });
@@ -131,7 +129,6 @@ app.post("/item", (req, res) => {
 app.post("/item/create", (req, res) => {
     // insert item
     console.log("Collection: " + req.body.collection);
-    console.log("Body: "+ req.body);
     app.locals.db.collection(req.body.collection).insertOne(req.body, (error, result) => {
         if (error) {
             console.dir(error);
@@ -145,7 +142,6 @@ app.post("/item/update", (req, res) => {
     console.log("update item " + req.body._id);
     let id = req.body._id;
     delete req.body._id;
-    console.log(req.body);// => { name:req.body.name, description:req.body.description }
     app.locals.db.collection('userRoutes').updateOne({routeID: id}, {$set: req.body}, (error, result) => {
         if (error) {
             console.dir(error);
@@ -249,7 +245,6 @@ app.get("/movebank/:id", (req, res) => {
         https.get(endpoint, options, (httpResponse) => {
             // concatenate updates from datastream
 
-            console.log(endpoint);
             var body = "";
             httpResponse.on("data", (chunk) => {
                 //console.log("chunk: " + chunk);
@@ -257,7 +252,6 @@ app.get("/movebank/:id", (req, res) => {
             });
 
             httpResponse.on("end", () => {
-                console.log("Body:" + body);
 
                 try {
                     var weather = JSON.parse(body);
@@ -268,17 +262,6 @@ app.get("/movebank/:id", (req, res) => {
                     return;
                 }
 
-
-                console.log("Req.query: " + req.query.collection);
-
-                /**
-                 app.locals.db.collection("animalRoutes").insertMany(movebankJson, (error, result) => {
-                if (error) {
-                    console.dir(error);
-                }
-                res.redirect('/routes_editor.html');
-            });
-                 */
                 res.json(weather);
 
             });

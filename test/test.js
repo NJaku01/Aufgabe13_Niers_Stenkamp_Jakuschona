@@ -63,7 +63,6 @@ describe("Insert and delete Routes", function () {
             .post("/item")
             .send({collection:'userRoutes'})
             .then(troute => {
-                console.log(troute.body);
                 lBefore = troute.body.length;
                 var lAfter;
                 chai.request(server)
@@ -86,7 +85,9 @@ describe("Insert and delete Routes", function () {
     });
 });
 
-
+/**
+ * Mit netter Unterstützung der Gruppe DeLucse
+ */
 describe('Tests for external APIs', function () {
     describe('movebank test', function () {
         it('should connect with movebank api', function (done) {
