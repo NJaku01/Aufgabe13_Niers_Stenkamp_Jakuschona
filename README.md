@@ -34,6 +34,9 @@
 ##### link to the public github-repository: 
 - https://github.com/NJaku01/Projektaufgabe_Geosoftware_I_SS_2019
 
+##### JSDoc
+With this link you get to the Documentation of the used fundtions: <a href="https://njaku01.github.io/Projektaufgabe_Geosoftware_I_SS_2019/out/global.html" target="_blank">JSDoc</a>
+
 ##### data-structure in mongoDB in itemdb: 
 - animalIntersections {_id, "animalIntersections", geoJSON, id, routeID, UserId, UserIDInput, routeIDInput, studyID}
 - animalRoutes {_id, "animalRoutes", Study_ID, User_ID, Name, Type, date, time, routeID, geoJson}

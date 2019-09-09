@@ -350,8 +350,7 @@ async function validateForm(form) {
             collection: "userRoutes",
             routeID: id,
         };
-        deleteDatabaseFiles("userRoutes", "{\"routeID\" : \"" +id + "\"}" );
-
+        deleteDatabaseFiles("userRoutes", "{\"routeID\" : \":" +id + "\"}");
         deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
         deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
 

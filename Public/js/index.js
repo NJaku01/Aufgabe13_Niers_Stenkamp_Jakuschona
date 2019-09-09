@@ -5,12 +5,11 @@ const start_latlng = [lat, lon];
 
 var cla = JL.createConsoleAppender("ConsoleAppenderClient");
 
-cla.setOptions( { "batchSize": 1, "batchTimeout": 1000 });
+cla.setOptions({"batchSize": 1, "batchTimeout": 1000});
 
 JL("ClientConsole").setOptions({"appenders": [cla]});
 
 JL().warn("Logger active");
-
 
 
 var map = L.map("mapdiv", {
@@ -21,7 +20,12 @@ var map = L.map("mapdiv", {
 
 var routesFeature = L.featureGroup();
 
-
+/**
+ * Extract an Parameter out of an URL
+ * @param name of the parameter
+ * @param url to extract
+ * @returns {*} value of the parameter
+ */
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, '\\$&');
@@ -33,118 +37,9 @@ function getParameterByName(name, url) {
 }
 
 
-// Testroute
-var line1test = {
-    "_id": "5d41a216205cf30395e99b8221",
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        7.492675781249999,
-                        51.60437164681676
-                    ],
-                    [
-                        8.37158203125,
-                        51.05520733858494
-                    ]
-                ]
-            }
-        }
-    ]
-}
-// console.log(line1test.type);
-
-// Testroute
-var line2test = {
-    "_id": "5d41a216205cf30395e99b8a22",
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        7.18505859375,
-                        51.45400691005982
-                    ],
-                    [
-                        8.50341796875,
-                        51.699799849741936
-                    ]
-                ]
-            }
-        }
-    ]
-}
-
-// Testroute
-var line3test = {
-    "_id": "5d41a216205cf30395e99b8123",
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        8.33587646484375,
-                        51.47796179607121
-                    ],
-                    [
-                        7.87994384765625,
-                        51.037939894299356
-                    ]
-                ]
-            }
-        }
-    ]
-}
-
-// Test AllRoutes
-var lines = [];
-lines.push(line2test, line3test);
-//console.log(lines);
-//console.log(line1test);
-//console.log(line1test._id);
-//console.log(turf.lineIntersect(line1test, line2test));
-
-// console.log(turf);
-//console.log(intersect);
 /**
- * function which takes one new inputRoute and compares this one with all other animalGeoJson in allRoutes if they intersect.
- * function returns all given intersections.
- * @param inputRoute
- * @param allRoutes
- * @returns {Array}
+ * Adds a Background Map
  */
-function calculateIntersect(inputRoute, allRoutes) {
-    var intersectAll = [];
-
-    for (var j = 0; j < allRoutes.length; j++) {
-        var intersect = turf.lineIntersect(inputRoute, allRoutes[j]);
-        intersectAll.push(intersect);
-    }
-
-    for (var i = 0; i < intersectAll.length; i++) {
-        if (intersectAll[i].features.length == 0) {
-            intersectAll.splice(i, 1);
-        }
-    }
-    return intersectAll;
-}
-
-//console.log(calculateIntersect(line1test, lines));
-
-
 function addMap() {
 
     routesFeature = L.featureGroup();
@@ -169,6 +64,10 @@ function addMap() {
     $("#mapdiv")[0].style.visibility = "visible";
 }
 
+/**
+ * Shows the userRoutes on the Map
+ * @param userRoutes Array of the routes to show
+ */
 function addUserRoutes(userRoutes) {
 
     var geojsons = [];
@@ -212,9 +111,6 @@ function addUserRoutes(userRoutes) {
             popup.setLatLng(e.latlng).openOn(map);
         });
 
-        /*routes[i].on('mouseout', function (e) {
-            e.target.closePopup();
-        });*/
         //add  the PopUps to the Map for the Routes
 
 
@@ -225,20 +121,15 @@ function addUserRoutes(userRoutes) {
         }
     }
 
-    /**
-     for (i = 0; i < popUpInformation.length; i++) {
-        var marker = L.marker(popUpInformation[i][0]).addTo(map);
-        marker.bindPopup("<img src=\"http://openweathermap.org/img/w/" + popUpInformation[i][3] + ".png\" /> <br/>" + popUpInformation[i][1] + "<br>" + popUpInformation[i][2] + "<br>" + popUpInformation[i][4] + "<br>" + popUpInformation[i][5] + "<br>");
-        points.addLayer(marker);
-    } //add all Markers to the Map with the weather Information
-
-     */
 
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
+/**
+ * Shows the animal Routes on the Map
+ * @param animalRoutes Array of the routes to Show
+ */
 function addAnimalRoutes(animalRoutes) {
-    console.log(animalRoutes);
     var animalGeoJson = [];
     for (var i = 0; i < animalRoutes.length; i++) {
         animalGeoJson.push((JSON.parse(animalRoutes[i].geoJson)));
@@ -277,19 +168,22 @@ function addAnimalRoutes(animalRoutes) {
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
+/**
+ * Copies the Link to the intersection
+ * @param id of the intersection
+ */
 function copy(id) {
-    console.log("run");
     var existsTextarea = document.getElementById('id');
     existsTextarea.value = "localhost:3000/" + id;
     existsTextarea.select();
-    var status = document.execCommand('copy');
-    if (!status) {
-        console.error("Cannot copy text");
-    } else {
-        console.log("The text is now on the clipboard");
-    }
+    document.execCommand('copy');
 }
 
+/**
+ * Shows the User Intersections on the Map
+ * @param userIntersections
+ * @returns {Array}
+ */
 function addUserIntersections(userIntersections) {
 
     var routesToShow = []
@@ -327,6 +221,11 @@ function addUserIntersections(userIntersections) {
 
 }
 
+/**
+ * Shows the animal Intersections on the Map
+ * @param animalIntersections the Intersections to show
+ * @returns {{userRoutes: Array, animalRoutes: Array}} the User Routes and animal routes which belong to the Intersections
+ */
 function addAnimalIntersections(animalIntersections) {
 
     var userRoutesToShow = [];
@@ -370,27 +269,6 @@ function addAnimalIntersections(animalIntersections) {
 }
 
 
-function insertItem(data) {
-
-    $.ajax({
-        url: "/item/create", // URL der Abfrage,
-        data: data,
-        type: "POST"
-    })
-        .done(function (response) {
-            // parse + use data here
-            console.log("insert data" + data);
-        })
-        .fail(function (xhr, status, errorThrown) {
-            // handle errors
-        })
-        .always(function (xhr, status) {
-
-
-        });
-
-}
-
 /**
  * Ask the openWeatherMap for the actual weather
  * @desc Abgabe zu Aufgabe 4, Geosoft 1, SoSe 2019
@@ -423,7 +301,7 @@ function weatherRequest(long, lat) {
 }
 
 /**
- * Function that runs when index.html is loaded
+ * Function that runs when index.html is loaded. Show all available Data or if an ID is given as Parameter, only the wanted Intersection
  */
 function componentDidMount() {
     var id = getParameterByName('id'); //get Parameter from URL
@@ -434,6 +312,11 @@ function componentDidMount() {
     }
 }
 
+/**
+ * Filters the shown Data, by the ID given in the URL or in the form of the Filter.
+ * @param id the id of intersection to show
+ * @returns {Promise<void>}
+ */
 async function filter1(id) {
 
     var alertRoutes = "";
@@ -518,7 +401,6 @@ async function filter1(id) {
                 user = userID.substring(1, userID.length);
                 query += " {\"UserIDInput\": \"" + user + "\"}]}";
             }
-
 
 
             try {
@@ -697,7 +579,6 @@ async function filter1(id) {
 
     }
 
-
     if (wantUserRoutes) {
 
         var query = {};
@@ -728,7 +609,7 @@ async function filter1(id) {
             }
 
             if (userRoutes.length === 0) {
-                alertRoutes +=(" \n- No user routes found! Please proof if there are user routes in the database or the UserID really exists. \n");
+                alertRoutes += (" \n- No user routes found! Please proof if there are user routes in the database or the UserID really exists. \n");
                 isThereAnAlert = true;
             } else {
                 addUserRoutes(userRoutes);
@@ -788,38 +669,12 @@ async function filter1(id) {
  */
 async function getDatabaseFiles(collection, query) {
 
-    //Example query: "{\"User_ID\" : \"1234\"}"
-
     return $.ajax({
         url: "/item", // URL der Abfrage,
         data: {collection: collection, query: query},
         type: "POST"
     })
-
-
 };
 
-var resource = "movebank";
 
-/**
- $.get(resource, function(response, status, x){
-    let formatted_response = JSON.stringify(response,null,4);
-    $("#movebankJson").text(formatted_response);
-
-    let transMovebankResponse = transformMovebankJson(response);
-    console.log(transMovebankResponse);
-    console.log(transMovebankResponse[0].geojson.features.geometry.coordinates);
-
-    var coordinates = [];
-
-    for (i = 0; i < transMovebankResponse.length; i++) {
-        var datastring = JSON.stringify(transMovebankResponse[i].geojson);
-        insertItem({collection: "animalRoutes", animal: transMovebankResponse[i].User_ID, geoJson: datastring} );
-        coordinates.push(transMovebankResponse[i].geojson.features.geometry.coordinates)
-    }
-    console.log(coordinates);
-    //var polyline = L.polyline(coordinates).addTo(map);
-    //map.fitBounds(polyline.getBounds());
-});
- */
 
