@@ -547,7 +547,7 @@ async function filter1(id) {
         }
 
 
-        if (animalIntersections.length !== 0) {//if the database Found some Intersections show them
+        if (animalIntersections.length > 1) {//if the database Found some Intersections show them
             routesToShow = addAnimalIntersections(animalIntersections);
 
             if (routesToShow.userRoutes.length != 0) { //if there are some user Routes, which belong to the Intersection show them
