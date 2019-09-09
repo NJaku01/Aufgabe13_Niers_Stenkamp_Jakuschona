@@ -88,5 +88,4 @@ fabric.properties
 .node_modules/
 .data/
 
-.private/
 /out/
