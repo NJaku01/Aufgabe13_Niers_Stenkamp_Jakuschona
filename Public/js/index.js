@@ -7,12 +7,11 @@ const start_latlng = [lat, lon];
 
 var cla = JL.createConsoleAppender("ConsoleAppenderClient");
 
-cla.setOptions( { "batchSize": 1, "batchTimeout": 1000 });
+cla.setOptions({"batchSize": 1, "batchTimeout": 1000});
 
 JL("ClientConsole").setOptions({"appenders": [cla]});
 
 JL().warn("Logger active");
-
 
 
 var map = L.map("mapdiv", {
@@ -34,93 +33,6 @@ function getParameterByName(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
-
-// Testroute
-var line1test = {
-    "_id": "5d41a216205cf30395e99b8221",
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        7.492675781249999,
-                        51.60437164681676
-                    ],
-                    [
-                        8.37158203125,
-                        51.05520733858494
-                    ]
-                ]
-            }
-        }
-    ]
-}
-// console.log(line1test.type);
-
-// Testroute
-var line2test = {
-    "_id": "5d41a216205cf30395e99b8a22",
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        7.18505859375,
-                        51.45400691005982
-                    ],
-                    [
-                        8.50341796875,
-                        51.699799849741936
-                    ]
-                ]
-            }
-        }
-    ]
-}
-
-// Testroute
-var line3test = {
-    "_id": "5d41a216205cf30395e99b8123",
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [
-                        8.33587646484375,
-                        51.47796179607121
-                    ],
-                    [
-                        7.87994384765625,
-                        51.037939894299356
-                    ]
-                ]
-            }
-        }
-    ]
-}
-
-// Test AllRoutes
-var lines = [];
-lines.push(line2test, line3test);
-//console.log(lines);
-//console.log(line1test);
-//console.log(line1test._id);
-//console.log(turf.lineIntersect(line1test, line2test));
-
-// console.log(turf);
-//console.log(intersect);
 /**
  * function which takes one new inputRoute and compares this one with all other animalGeoJson in allRoutes if they intersect.
  * function returns all given intersections.
@@ -143,9 +55,6 @@ function calculateIntersect(inputRoute, allRoutes) {
     }
     return intersectAll;
 }
-
-//console.log(calculateIntersect(line1test, lines));
-
 
 function addMap() {
 
@@ -227,25 +136,16 @@ function addUserRoutes(userRoutes) {
         }
     }
 
-    /**
-     for (i = 0; i < popUpInformation.length; i++) {
-        var marker = L.marker(popUpInformation[i][0]).addTo(map);
-        marker.bindPopup("<img src=\"http://openweathermap.org/img/w/" + popUpInformation[i][3] + ".png\" /> <br/>" + popUpInformation[i][1] + "<br>" + popUpInformation[i][2] + "<br>" + popUpInformation[i][4] + "<br>" + popUpInformation[i][5] + "<br>");
-        points.addLayer(marker);
-    } //add all Markers to the Map with the weather Information
-
-     */
-
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
 }
 
 function addAnimalRoutes(animalRoutes) {
-    console.log(animalRoutes);
+
     var animalGeoJson = [];
     for (var i = 0; i < animalRoutes.length; i++) {
         animalGeoJson.push((JSON.parse(animalRoutes[i].geoJson)));
     }
-    console.log(animalGeoJson);
+
     var collectionOfRoutes = [];
     var coordinates = [];
     for (var i = 0; i < animalGeoJson.length; i++) {
@@ -271,9 +171,6 @@ function addAnimalRoutes(animalRoutes) {
             popup.setLatLng(e.latlng).openOn(map);
         });
 
-        /* collectionOfRoutes[i].on('mouseout', function (e) {
-            e.target.closePopup();
-        }); */
     }
 
     map.fitBounds(routesFeature.getBounds());// zoom Map to the Markers
@@ -326,8 +223,8 @@ function addUserIntersections(userIntersections) {
     map.fitBounds(routesFeature.getBounds());
     return routesToShow;
 
-
 }
+
 
 function addAnimalIntersections(animalIntersections) {
 
@@ -335,7 +232,7 @@ function addAnimalIntersections(animalIntersections) {
     var animalRoutesToShow = [];
     var animalIntersectionsPoints = [];
     var answer = {userRoutes: [], animalRoutes: []};
-    console.log(animalIntersections)
+
     for (var i in animalIntersections) {
 
         var lat;
@@ -392,6 +289,7 @@ function insertItem(data) {
         });
 
 }
+
 
 /**
  * Ask the openWeatherMap for the actual weather
@@ -519,10 +417,8 @@ async function filter1(id) {
             }
 
 
-
             try {
                 animalIntersections2 = await getDatabaseFiles("animalIntersections", query);
-                console.log(animalIntersections2);
 
             } catch {
 
@@ -558,8 +454,6 @@ async function filter1(id) {
 
         }
 
-
-        console.log(animalIntersections);
         if (animalIntersections.length !== 0) {//if the database Found some Intersections show them
             routesToShow = addAnimalIntersections(animalIntersections);
 
@@ -727,7 +621,7 @@ async function filter1(id) {
             }
 
             if (userRoutes.length === 0) {
-                alertRoutes +=(" \n- No user routes found! Please proof if there are user routes in the database or the UserID really exists. \n");
+                alertRoutes += (" \n- No user routes found! Please proof if there are user routes in the database or the UserID really exists. \n");
                 isThereAnAlert = true;
             } else {
                 addUserRoutes(userRoutes);
@@ -758,7 +652,6 @@ async function filter1(id) {
 
             try {
                 animalRoutes = await getDatabaseFiles("animalRoutes", query);
-                console.log(animalRoutes);
             } catch (e) {
                 console.log(e);
             }
@@ -780,8 +673,7 @@ async function filter1(id) {
         alertRoutes = "important hints: \n" + alertRoutes;
         alertRoutes += "\n- Proof if your selection in the filter is right! \n";
     }
-    alert (alertRoutes);
-
+    alert(alertRoutes);
 
 
 }
@@ -804,28 +696,3 @@ async function getDatabaseFiles(collection, query) {
 
 
 };
-
-var resource = "movebank";
-
-/**
- $.get(resource, function(response, status, x){
-    let formatted_response = JSON.stringify(response,null,4);
-    $("#movebankJson").text(formatted_response);
-
-    let transMovebankResponse = transformMovebankJson(response);
-    console.log(transMovebankResponse);
-    console.log(transMovebankResponse[0].geojson.features.geometry.coordinates);
-
-    var coordinates = [];
-
-    for (i = 0; i < transMovebankResponse.length; i++) {
-        var datastring = JSON.stringify(transMovebankResponse[i].geojson);
-        insertItem({collection: "animalRoutes", animal: transMovebankResponse[i].User_ID, geoJson: datastring} );
-        coordinates.push(transMovebankResponse[i].geojson.features.geometry.coordinates)
-    }
-    console.log(coordinates);
-    //var polyline = L.polyline(coordinates).addTo(map);
-    //map.fitBounds(polyline.getBounds());
-});
- */
-

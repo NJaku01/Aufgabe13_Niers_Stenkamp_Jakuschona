@@ -8,16 +8,13 @@ var mongodbJSONUserRoutes = [];
 var mongodbJSONAnimalRoutes = [];
 
 
-
 var cla = JL.createConsoleAppender("ConsoleAppenderClient");
 
-cla.setOptions( { "batchSize": 1, "batchTimeout": 1000 });
+cla.setOptions({"batchSize": 1, "batchTimeout": 1000});
 
 JL("ClientConsole").setOptions({"appenders": [cla]});
 
 JL().warn("Logger active");
-
-
 
 
 var map = L.map("mapdiv", {
@@ -34,28 +31,27 @@ var osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 
-
 var control = L.Routing.control({
     waypoints: [], routeWhileDragging: true,
     geocoder: L.Control.Geocoder.nominatim()
 })
     .on('routesfound', function (e) {
-    "use strict";
-    layers.clearLayers();
-    drawnItems = e.routes[0];
-    var coord = drawnItems.coordinates;
-    drawnItems = L.geoJson(getGeoJson(coord));
-    control.hide();
-    document.getElementById("geojson").value = JSON.stringify(drawnItems.toGeoJSON());
-    document.getElementById("geojsonUpdate").value = JSON.stringify(drawnItems.toGeoJSON());
-    updateText();
-    // alert('Found ' + .length + ' route(s).');
-})
-    .on('routingerror', function (e){
-    console.log(e);
-    JL().error("The Routing machine has thrown an Error: " +e.error.status);
-    alert("The Routing machine has thrown an Error: " +e.error.status);
-});
+        "use strict";
+        layers.clearLayers();
+        drawnItems = e.routes[0];
+        var coord = drawnItems.coordinates;
+        drawnItems = L.geoJson(getGeoJson(coord));
+        control.hide();
+        document.getElementById("geojson").value = JSON.stringify(drawnItems.toGeoJSON());
+        document.getElementById("geojsonUpdate").value = JSON.stringify(drawnItems.toGeoJSON());
+        updateText();
+        // alert('Found ' + .length + ' route(s).');
+    })
+    .on('routingerror', function (e) {
+        console.log(e);
+        JL().error("The Routing machine has thrown an Error: " + e.error.status);
+        alert("The Routing machine has thrown an Error: " + e.error.status);
+    });
 control.addTo(map);
 
 
@@ -90,15 +86,15 @@ function events() {
  * @returns {Promise<void>}
  */
 async function showFiles(collection, query) {
-try {
-    mongodbJSON = await getFilesFromMongodb(collection, query);
+    try {
+        mongodbJSON = await getFilesFromMongodb(collection, query);
 
-    if (mongodbJSON.length == 0) {
-        alert("No items in database! First select an userRoute or animalRoute!");
+        if (mongodbJSON.length == 0) {
+            alert("No items in database! First select an userRoute or animalRoute!");
+        }
+        document.getElementById("database").value = JSON.stringify(mongodbJSON);
+    } catch {
     }
-    document.getElementById("database").value = JSON.stringify(mongodbJSON);
-}
-catch {}
 }
 
 /**
@@ -123,22 +119,22 @@ async function getFilesFromMongodb(collection, query) {
  * Function for inserting an item into mongodb.
  * @param data
  */
-function insertItem(data){
-$.ajax({
-    url: "/item/create", // URL of the request
-    data: data,
-    type: "POST"
-})
-    .done(function (response) {
-        // parse + use data here
+function insertItem(data) {
+    $.ajax({
+        url: "/item/create", // URL of the request
+        data: data,
+        type: "POST"
     })
-    .fail(function (xhr, status, errorThrown) {
-        // handle errors
-    })
-    .always(function (xhr, status) {
+        .done(function (response) {
+            // parse + use data here
+        })
+        .fail(function (xhr, status, errorThrown) {
+            // handle errors
+        })
+        .always(function (xhr, status) {
 
 
-    });
+        });
 
 }
 
@@ -311,7 +307,7 @@ function setCookie(cname, cvalue, exdays) {
  */
 async function validateForm(form) {
     "use strict";
-    if(form === "update"){
+    if (form === "update") {
         var id = document.forms[form]["_id"].value;
         deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
         deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
@@ -322,7 +318,7 @@ async function validateForm(form) {
         if (form == "create" || form == "update") {
             var inputJSON = document.forms[form]["geoJson"].value;
             var userIDInput = document.forms[form]["User_ID"].value;
-           if (inputJSON == "") {
+            if (inputJSON == "") {
                 alert("A route must be selected");
                 return false;
             } else if (!checkIfGeoJsonLineString(inputJSON)) {
@@ -339,11 +335,10 @@ async function validateForm(form) {
              userRoute, but not if the userRoute is only updated
              */
             var routeIDInput;
-            if(form=== "create") {
+            if (form === "create") {
                 routeIDInput = "U" + Math.random().toString(36).substring(3, 15);
                 document.getElementById("routeID").value = routeIDInput;
-            }
-            else{
+            } else {
                 routeIDInput = id;
             }
 
@@ -352,8 +347,8 @@ async function validateForm(form) {
             /*
             If the userRoute with the corresponding routeID is already in Mongodb, the userRoute will not be added again
              */
-            for (var i in mongodbJSONUserRoutes){
-                if(mongodbJSONUserRoutes[i].routeID == id){
+            for (var i in mongodbJSONUserRoutes) {
+                if (mongodbJSONUserRoutes[i].routeID == id) {
                     mongodbJSONUserRoutes.splice(i, 1);
                 }
             }
@@ -398,7 +393,7 @@ async function validateForm(form) {
             }
         }
 
-        if(form == "deleteAnimalRoute"){
+        if (form == "deleteAnimalRoute") {
             var id = document.forms[form]["Route_ID"].value;
             // deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
@@ -416,7 +411,7 @@ async function validateForm(form) {
             }
         }
 
-        if(form == "deleteAnimalStudy"){
+        if (form == "deleteAnimalStudy") {
             var id = document.forms[form]["Study_ID"].value;
             // deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
             deleteDatabaseFiles("animalIntersections", "{\"studyID\" : \"" + id + "\"}")
@@ -425,13 +420,14 @@ async function validateForm(form) {
         /*
         All animalIntersections or userIntersections are deleted, if the corresponding button is pushed.
          */
-        if(form === "delete"){
+        if (form === "delete") {
             var id = document.forms[form]["_id"].value;
             deleteDatabaseFiles("userIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ");
             deleteDatabaseFiles("animalIntersections", "{\"$or\" : [ {\"routeID\" : \"" + id + "\"} , {\"routeIDInput\" : \"" + id + "\"}]} ")
         }
+    } catch (e) {
+        console.log(e)
     }
-    catch(e){ console.log(e)}
 }
 
 /**
@@ -455,7 +451,7 @@ async function deleteDatabaseFiles(collection, query) {
  * All items in mongodb depending on collection will get deleted.
  * @param collection
  */
-function deleteAll(collection){
+function deleteAll(collection) {
     $.ajax({
         url: "/item/deleteAll", // URL of the request
         data: {collection: collection},
@@ -488,18 +484,29 @@ function transformMovebankJson(movebankResponse) {
     var latlon = [];
 
     // compose a json for every animal returned by the movebank api
-    for (i = 0; i < movebankResponse.individuals.length; i++){
+    for (i = 0; i < movebankResponse.individuals.length; i++) {
 
-        var json = {"User_ID":"","Name":"","Type":"","date":"","time":"", "routeID": "",
-            "geoJson":{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"LineString","coordinates":[]}}]}};
+        var json = {
+            "User_ID": "", "Name": "", "Type": "", "date": "", "time": "", "routeID": "",
+            "geoJson": {
+                "type": "FeatureCollection",
+                "features": [{
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {"type": "LineString", "coordinates": []}
+                }]
+            }
+        };
 
         json.User_ID = movebankResponse.individuals[i].individual_taxon_canonical_name;
         json.Name = movebankResponse.individuals[i].individual_local_identifier;
         json.Type = "animal";
-        json.routeID = "A" +  Math.random().toString(36).substring(3, 15);
+        json.routeID = "A" + Math.random().toString(36).substring(3, 15);
         var date = new Date(movebankResponse.individuals[i].locations[0].timestamp);
-        json.date = date.toISOString().substring(0, 10);;
-        json.time = date.toISOString().substring(12, 16);;
+        json.date = date.toISOString().substring(0, 10);
+        ;
+        json.time = date.toISOString().substring(12, 16);
+        ;
 
         coordinates = [];
 
@@ -526,7 +533,7 @@ function transformMovebankJson(movebankResponse) {
  */
 async function getFilesFromMovebank() {
     try {
-        /**
+        /*
          * Working Study IDs:
          * Belgien bis Afrika: 604806671
          * Galapagos: 2911040
@@ -543,7 +550,6 @@ async function getFilesFromMovebank() {
          * Nord- & Osteuropa: 467107447
          * Schweden bis Holland: 350174730
          * Schweden bis Spanien: 10722328
-         *
          */
 
         // get study id from the form
@@ -556,12 +562,6 @@ async function getFilesFromMovebank() {
         $.ajax({
             url: resource,
             success: async function (response, status, x) {
-
-                /**
-                 let formatted_response = JSON.stringify(response, null, 4);
-                 $("#movebankJson").text(formatted_response);
-                 */
-
 
                 let transMovebankResponse = transformMovebankJson(response);
 
@@ -599,7 +599,7 @@ async function getFilesFromMovebank() {
     } catch (err) {
         alert(err);
         $('body').css('cursor', 'default');
-        return ;
+        return;
     }
 }
 
@@ -625,25 +625,42 @@ function showMovebankInformation() {
 function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, collection) {
     var parseInputRoute = JSON.parse(inputRoute);
 
-    for (var j=0; j<allRoutes.length; j++) {
+    for (var j = 0; j < allRoutes.length; j++) {
 
         var intersect = turf.lineIntersect(parseInputRoute, JSON.parse(allRoutes[j].geoJson));
 
         /**
-        The turf function returns an empty array with length 0 if there is no intersection, therefore only the arrays
-        with an content are stored in mongodb.
+         The turf function returns an empty array with length 0 if there is no intersection, therefore only the arrays
+         with an content are stored in mongodb.
          */
 
         if (intersect.features.length != 0) {
-            intersect=JSON.stringify(intersect);
+            intersect = JSON.stringify(intersect);
             var intersectionsID = Math.random().toString(36).substring(2, 15);
-            if (routeIDInput.substring(0,0)== "U") {
-                insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: allRoutes[j].User_ID, UserIDInput: userIDInput, routeIDInput: routeIDInput});
+            if (routeIDInput.substring(0, 0) == "U") {
+                insertItem({
+                    collection: collection,
+                    geoJson: intersect,
+                    id: intersectionsID,
+                    routeID: allRoutes[j].routeID,
+                    UserId: allRoutes[j].User_ID,
+                    UserIDInput: userIDInput,
+                    routeIDInput: routeIDInput
+                });
             } else {
                 // get study id from the form
                 var study = document.forms["createAnimal"]["Study_ID"].value;
 
-                insertItem({collection: collection, geoJson: intersect, id: intersectionsID, routeID: allRoutes[j].routeID, UserId: userIDInput, UserIDInput: allRoutes[j].User_ID, routeIDInput: routeIDInput, studyID: study});
+                insertItem({
+                    collection: collection,
+                    geoJson: intersect,
+                    id: intersectionsID,
+                    routeID: allRoutes[j].routeID,
+                    UserId: userIDInput,
+                    UserIDInput: allRoutes[j].User_ID,
+                    routeIDInput: routeIDInput,
+                    studyID: study
+                });
                 /*
                  The collection animalIntersections needs additionally the attribut "study_ID", to provide the user to
                  delete all routes which belong to a certain study.
@@ -651,7 +668,7 @@ function calculateIntersect(routeIDInput, userIDInput, inputRoute, allRoutes, co
             }
 
         }
-      intersect = {};
+        intersect = {};
     }
 }
 
