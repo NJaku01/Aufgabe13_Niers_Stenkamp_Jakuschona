@@ -1,6 +1,4 @@
 "use strict";
-var alertRoutes = "";
-var isThereAnAlert = false;
 const lat = 51.96;
 const lon = 7.59;
 const start_latlng = [lat, lon];
@@ -318,7 +316,10 @@ function componentDidMount() {
  */
 async function filter1(id) {
 
-//get Values from Form
+    var alertRoutes = "";
+    var isThereAnAlert = false;
+
+    //get Values from Form
     var userID = document.forms["filter"]["User_ID"].value;
     var animals = document.forms["filter"]["Animal"].value;
     var intersections = document.forms["filter"]["InteractionIDs"].value;
@@ -646,12 +647,11 @@ async function filter1(id) {
             }
         }
     }
-
-    if (isThereAnAlert = true) {
+    if (isThereAnAlert == true) {
         alertRoutes = "important hints: \n" + alertRoutes;
         alertRoutes += "\n- Proof if your selection in the filter is right! \n";
+        alert (alertRoutes);
     }
-    alert(alertRoutes);
 }
 
 
