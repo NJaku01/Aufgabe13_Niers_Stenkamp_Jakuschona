@@ -12,6 +12,7 @@
   - "npm install"
   - "npm start"
 - open localhost:3000 in a browser you like 
+- (if you want to see if the tests are running input the command "npm test" instead of "npm start")
 
 ###### with Docker:
 - input in the terminal: "docker-compose up" 
